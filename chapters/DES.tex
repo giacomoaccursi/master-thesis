@@ -1,0 +1,88 @@
+\chapter{Simulazioni ad Eventi Discreti}
+Un sistema ad eventi discreti è un sistema a stati discreti guidato da eventi, il cui il progresso del tempo è determinato dall'occorrenza di eventi grazie ai quali il sistema evolve. Nel contesto di una simulazione event-driven, un evento rappresenta un cambiamento nello stato del sistema. 
+Gli esempi di eventi possono includere l'arrivo di un messaggio in un sistema di comunicazione, il completamento di un processo, o qualsiasi altro avvento che influenzi il comportamento del sistema. La simulazione avanza di passi discreti, con ogni passo che corrisponde all'accadimento di un nuovo evento. 
+Questo approccio è spesso utilizzato per modellare e analizzare sistemi complessi, come reti di computer, catene di approvvigionamento, code di attesa o altri scenari in cui gli eventi guidano il comportamento del sistema. 
+
+\section{Terminologia e componenti}
+I concetti alla base di un sistema ad eventi discreti sono i seguenti: 
+\begin{itemize}
+    \item Sistema: collezione di entità che interagiscono fra loro nel tempo per raggiungere determinati obiettivi.
+    \item Modello: una rappresentazione astratta del sistema, spesso contenente relazioni strutturali, logiche o matematiche che descrivono il sistema stesso.
+    \item Stato del sistema: una collezione di variabili che contengono tutte le informazioni necessarie per descrivere il sistema in ogni momento.
+    \item Entità: un oggetto nel sistema che richiede una rappresentazione esplicita nel modello. Le entità possono essere create in fase di inizializzazione della simulazione o durante essa. 
+    \item Attributi: sono le proprietà di una determinata entità.
+    \item Evento: una occorrenza istantanea che cambia lo stato del sistema. 
+    \item Lista degli eventi futuri (FEL): contiene tutti gli eventi futuri ordinati cronologicamente in base al tempo di accadimento. Deve essere implementata in modo che gestisca in maniera efficiente l'aggiunta, la rimozione e la ricerca di eventi. 
+    \item Clock: una variabile rappresentante il tempo simulato. In generale non esiste nessuna correlazione fra il tempo simulato e il tempo necessario per eseguire la simulazione. 
+\end{itemize}
+Una simulazione ad eventi discreti procede acquisendo una sequenza di snapshot, i quali rappresentano l'evoluzione del sistema nel tempo. Uno snapshot ad un determinato istante t, include non solo lo stato del sistema al tempo t, ma anche la lista degli eventi futuri e lo stato di tutte le entità del sistema.
+
+\section{Algoritmo Event-scheduling Time-advance}
+La dinamicità intrinseca delle simulazioni ad eventi discreti impone la necessità di gestire attentamente il flusso temporale attraverso il monitoraggio costante del clock. 
+Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``event scheduling/time-advance'', basato sull'utilizzo  della future event list (FEL).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.7\linewidth]{figures/discrete-event-simulation/time-advance-flow.png}
+    \caption{Flow of control for the next-event time-advance approach~\cite{Law15}.}
+    \label{fig:next-event-flow}
+\end{figure}
+
+
+L'algoritmo in questione è suddiviso in tre sezioni chiave: \textit{inizializzazione}, \textit{ciclo di elaborazione degli eventi} e \textit{fase di output}.
+La simulazione inizia al tempo 0, quando il \textit{main program} dà avvio alla simulazione invocando la \textit{initialization routine}, nella quale il clock viene settato a 0 e le entità e le variabili di stato sono inizializzate.
+Il controllo torna poi al main program, il quale invoca una \textit{timing routine} per identificare il prossimo evento da eseguire.
+La lista degli eventi futuri contiene tutti gli eventi ordinati per tempo di accadimento: $FEL = [t_1, t_2, \dots t_n], t_1 \leq t_2 \leq \dots \leq t_n$. 
+Il tempo $t$ è il valore corrente del clock, mentre l'evento associato al tempo $t_1$ è chiamato evento imminente, ovvero il prossimo evento che dovrà verificarsi.~\cite{DBLP:books/daglib/0034857}
+Il controllo torna nuovamente al main program, il quale invoca l'\textit{event routine} grazie al quale l'evento imminente viene eseguito effettivamente. 
+L'esecuzione dell'evento imminente, al tempo $t$, seguita dalla generazione di uno snapshot correlato, comporta l'avanzamento del clock al successivo istante temporale, $t_1$. L'evento imminente è rimosso quindi dalla FEL ed eseguito, generando un nuovo snapshot a $t_1$ basato sulla natura dell'evento e lo snapshot precedente. In questa fase nuovi eventi futuri possono essere generati e aggiunti opportunamente alla FEL.
+Il processo si ripete ciclicamente fino alla conclusione della simulazione. 
+Durante la fase di output vengono invece elaborate e registrate le statistiche di interesse. 
+
+
+\subsection{Gestione Future Event List}
+Una Future Event List, come anticipato, è la struttura dati che contiene l'elenco degli eventi programmati per verificarsi in futuro. Tradizionalmente l'elenco è ordinato in base al tempo di esecuzione al quale l'evento è stato schedulato, ma questo non è un requisito. 
+La gestione efficiente della FEL è di fondamentale importanza, alcuni modelli di simulazione impiegano più tempo CPU nella gestione della lista piuttosto che qualsiasi altro aspetto, come per esempio la generazione di numeri casuali, l'elaborazione di eventi, l'esecuzione di operazioni aritmetiche varie ecc\dots
+
+Nella gestione degli eventi che compongono la FEL, ci sono due operazioni critiche: l'operazione di inserimento (\textit{enqueue}) e l'operazione di cancellazione (\textit{dequeue}). Un'operazione di cancellazione viene eseguita per elaborare l'evento o perché un evento, precedentemente pianificato deve essere annullato per qualche motivo. L'inserimento e la cancellazione possono verificarsi in una posizione prescritta nella lista degli eventi, oppure potrebbe essere necessario avviare una ricerca per determinare la giusta posizione. 
+Importante è anche l'operazione di modifica, in cui una ricerca di evento esistente presente in lista è seguita da una modifica di qualche aspetto dell'evento stesso, come ad esempio la modifica del tempo di accadimento al quale è schedulato. 
+
+Esistono tre criteri principali per determinare l'efficacia della struttura data e dell'algoritmo per la gestione della FEL: 
+\begin{itemize}
+    \item \textbf{Velocità}: la struttura dati e l'algoritmo per inserire ed eliminare un evento devono essere ottimizzate per minimizzare il tempo di esecuzione. Per ottenere tempi di esecuzione rapidi è fondamentale una ricerca degli eventi efficiente. Un algoritmo efficiente tende a limitare il numero di eventi ricercati per l'inserimento o la cancellazione. 
+    \item  \textbf{Robustezza}: È necessaria una gestione efficace degli errori per affrontare scenari imprevisti. Occorre una validazione dei dati durante l'inserimento per garantire l'integrità della struttura dati.  
+    \item \textbf{Adattabilità}: La FEL dovrebbe consentire la configurazione di parametri chiave per adattarsi a diverse modalità di gestione degli eventi o politiche temporali. Dovrebbe inoltre essere progettata in modo che nuove funzionalità o tipi di eventi possano essere facilmente integrati senza modificare drasticamente il codice esistente. 
+\end{itemize}
+
+\section{Partenza e terminazione di una simulazione}
+Nella sezione precedente è stato descritto come la simulazione viene fatta partire e viene fatta terminare. Tipicamente per far partire una simulazione, in fase di inizializzazione viene generato un evento che viene poi inserito nella lista di eventi futuri. 
+La terminazione può invece essere raggiunta tramite diversi meccanismi: 
+\begin{itemize}
+    \item Tempo di simulazione massimo: al tempo 0 viene schedulato un evento di stop ad un futuro tempo Te. In questo caso siamo certi che la simulazione verrà eseguita nell'intervallo $[0, T_e]$.
+    \item Eventi speciali di terminazione: il tempo di esecuzione $T_e$ è determinato dalla simulazione stessa. In genere Te dipende dal numero di occorrenze di un determinato evento. Per esempio potrebbe essere il tempo del completamento del centesimo servizio presso un determinato centro di assistenza. 
+    \item Terminazione quando la lista di eventi futuri è vuota.
+\end{itemize}
+Nel secondo e nel terzo caso il tempo per eseguire la simulazione non è conosciuto a priori e può variare di simulazione in simulazione.
+Le esecuzioni di una simulazione possono essere classificate in transient e steady state La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che vogliamo analizzare. Con il termine transient ci si riferisce ad una simulazione che termina, per causa di un evento speciale o ad un tempo prefissato. 
+Una simulazione steady state, al contrario, non termina mai. L'obiettivo in questo caso è studiare il comportamento a lungo termine del sistema. 
+
+\section{Simulazione parallela}
+La simulazione parallela a eventi discreti (PDES), si riferisce all'esecuzione di un singolo programma di simulazione a eventi discreti su un computer sfruttando il calcolo parallelo~\cite{DBLP:journals/cacm/Fujimoto90}. Distribuendo l'esecuzione di una simulazione su più processori, si cerca di ridurre notevolmente il tempo di esecuzione del modello (fino a un fattore pari al numero di processori. \sidenote{guarda leggi sulla concorrenza}). Per esempio, se si sta simulando un modello militare di grandi dimensioni o una rete di comunicazione contenente migliaia di nodi, il tempo di esecuzione potrebbe essere eccessivo e si potrebbe prendere in considerazione la simulazione parallela. Un altro uso della simulazione parallela potrebbe essere il processo decisionale in tempo reale. Ad esempio, in un sistema di controllo del traffico aereo, potrebbe risultare utile simulare diverse ore di traffico aereo per decidere come reindirizzarlo al meglio~\cite{DBLP:conf/wsc/Wieland98}. 
+Lo sviluppo di una simulazione parallela richiede la scomposizione del modello in processi logici (LP). I singoli LP sono assegnati a processori diversi, ognuno dei quali si occupa di simulare la propria parte di modello. Gli LP comunicano fra loro inviandosi messaggi o eventi con data e ora.
+Quando si progetta una simulazione parallela è di fondamentale importanza garantire che gli eventi del modello, indipendentemente dal loro LP, vengano elaborati nella corretta sequenza temporale, mantenendo in questo modo l'ordine causale di essi. Se ogni LP elabora tutti i suoi eventi (generati da se stesso o da un altro LP) in ordine di tempo crescente, garantendo che gli eventi successivi siano eseguiti solo dopo quelli precedenti, e garantendo che gli eventi siano correttamente sincronizzati durante l'esecuzione in parallelo, allora l'ordine causale viene automaticamente conservato nella simulazione distribuita. Questo principio è cruciale per evitare inconsistenze e risultati non realistici.
+Ogni LP può essere visto come un modello di simulazione sequenziale a eventi discreti, con le proprie variabili di stato locali, i propri eventi e il proprio clock.
+Storicamente sono stati adottati due meccanismi di sincronizzazione differente: \textit{conservativo} e \textit{ottimistico}~\cite{DBLP:conf/wsc/Fujimoto95}.
+Quando si utilizza un meccanismo conservativo l'obiettivo è evitare di violare il vincolo di causalità temporale. Ad esempio, si supponga che un particolare LP si trovi attualmente al tempo di simulazione 25 e sia pronto a elaborare il prossimo evento, che ha un tempo di 30. Il meccanismo di sincronizzazione deve assicurarsi che questo LP non riceva in seguito un evento da un altro LP con tempo di accadimento inferiore a 30. Pertanto, l'obiettivo è determinare quando è effettivamente sicuro elaborare un particolare evento. 
+La sincronizzazione conservativa presenta due principali svantaggi: 
+\begin{itemize}
+    \item Non può sfruttare appieno il parallelismo disponibile: se l'evento A influenza in qualche modo l'evento B, allora A e B devono essere eseguiti in sequenza. Se il modello è tale per cui A influisce raramente B, allora A e B potrebbero essere elaborati in modo concorrente per la maggior parte del tempo.
+    \item Non è robusta: una modifica apparentemente piccola del modello può inficiare le prestazioni. 
+\end{itemize}
+Nella sincronizzazione di tipo ottimistico, le violazioni del vincolo di causalità locale possono verificarsi, ma il meccanismo di sincronizzazione rileva le violazioni e le recupera. Anche in questo caso ogni LP simula la propria porzione di modello in avanti nel tempo, ma non aspetta di ricevere messaggi da altri processi. 
+Il meccanismo di time-warp~\cite{DBLP:journals/toplas/Jefferson85} è il più noto approccio ottimistico. Se un LP riceve un messaggio che avrebbe dovuto essere ricevuto nel sup passato (e che quindi potrebbe influenzare le sue azioni da quel momento in poi), viene effettuato un rollback nell'LP ricevente che porta il suo clock all'ora del messaggio in arrivo.
+Parte del lavoro annullato potrebbe consistere nell'invio di messaggi ad altri LP. L'invio di questi messaggi viene anch'esso annullato grazie all'invio del corrispondente anti-messaggio. L'invio di anti-messaggi può generare a sua volta rollback secondari negli LP di destinazione.
+I meccanismi di sincronizzazione ottimistici possono sfruttare il parallelismo in modo migliore rispetto agli approcci conservativi, poiché non sono limitati dallo scenario peggiore. Tutta via presentano comunque alcuni svantaggi: 
+\begin{itemize}
+    \item Comportano costi computazionali maggiori legati all'esecuzione dei rollback. 
+    \item Richiedono una maggiore quantità di memoria, poiché ogni lo stato di ogni LP deve essere salvato periodicamente per poter effettuare i rollback.
+\end{itemize}
