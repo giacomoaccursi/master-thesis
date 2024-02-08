@@ -5,6 +5,7 @@
 \usepackage{notes}
 \usepackage{shortcuts}
 \usepackage{acronym}
+\usepackage{import}
 \school{\unibo}
 \programme{Corso di Laurea Magistrale in Ingegneria e Scienze Informatiche}
 \title{Fancy Title}
@@ -13,7 +14,6 @@
 \subject{Laboratorio di Sistemi Software}
 \supervisor{Prof. Danilo Pianini}
 \cosupervisor{Dott. Gianluca Aguzzi}
-% \morecosupervisor{Dott. CoSupervisor 2}
 \session{IV}
 \academicyear{2022-2023}
 
@@ -22,7 +22,7 @@
 % \acrodef{vm}[VM]{Virtual Machine}
 
 
-\mainlinespacing{1.241} % line spacing in mainmatter, comment to default (1)
+\mainlinespacing{1.241}
 
 \begin{document}
 
@@ -96,7 +96,8 @@ Optional. Max 1 page.
 %----------------------------------------------------------------------------------------
 % Discrete Event Simulation
 %----------------------------------------------------------------------------------------
-\include{chapters/DES}
+\chapter{Simulazioni ad Eventi Discreti}
+\import{chapters/}{DES.tex}
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
