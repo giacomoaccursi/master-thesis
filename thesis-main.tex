@@ -48,8 +48,8 @@ Optional. Max 1 page.
 \mainmatter
 
 %----------------------------------------------------------------------------------------
-\chapter{Introduction}
-\label{chap:introduction}
+\chapter{Introduzione}
+\label{chap:introduzione}
 %----------------------------------------------------------------------------------------
 
 % Write your intro here.
@@ -76,12 +76,6 @@ Optional. Max 1 page.
 
 % I suggest referencing stuff as follows: \cref{fig:random-image} or \Cref{fig:random-image}
 
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=.8\linewidth]{}
-%     \caption{Some random image}
-%     \label{fig:random-image}
-% \end{figure}
 
 % \section{Some cool topic}
 
@@ -97,6 +91,7 @@ Optional. Max 1 page.
 %----------------------------------------------------------------------------------------
 \chapter{Simulazioni ad Eventi Discreti}
 \section{Panoramica sulle simulazioni ad eventi discreti}
+\label{sec:panoramica-des}
 Un sistema ad eventi discreti è un sistema a stati discreti guidato da eventi, il cui il progresso del tempo è determinato dall'occorrenza di eventi grazie ai quali il sistema evolve. Nel contesto di una simulazione event-driven, un evento rappresenta un cambiamento nello stato del sistema. 
 Gli esempi di eventi possono includere l'arrivo di un messaggio in un sistema di comunicazione, il completamento di un processo, o qualsiasi altro avvento che influenzi il comportamento del sistema. La simulazione avanza di passi discreti, con ogni passo che corrisponde all'accadimento di un nuovo evento. 
 Questo approccio è spesso utilizzato per modellare e analizzare sistemi complessi, come reti di computer, catene di approvvigionamento, code di attesa o altri scenari in cui gli eventi guidano il comportamento del sistema. 
@@ -117,7 +112,7 @@ Una simulazione ad eventi discreti procede acquisendo una sequenza di snapshot, 
 
 \subsection{Algoritmo Event-scheduling Time-advance}
 La dinamicità intrinseca delle simulazioni ad eventi discreti impone la necessità di gestire attentamente il flusso temporale attraverso il monitoraggio costante del clock. 
-Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``event scheduling/time-advance'', basato sull'utilizzo  della future event list (FEL).
+Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``event scheduling/time-advance'', basato sull'utilizzo della future event list (FEL).
 
 \begin{figure}
     \centering
@@ -155,12 +150,12 @@ Esistono tre criteri principali per determinare l'efficacia della struttura data
 Nella sezione precedente è stato descritto come la simulazione viene fatta partire e viene fatta terminare. Tipicamente per far partire una simulazione, in fase di inizializzazione viene generato un evento che viene poi inserito nella lista di eventi futuri. 
 La terminazione può invece essere raggiunta tramite diversi meccanismi: 
 \begin{itemize}
-    \item Tempo di simulazione massimo: al tempo 0 viene schedulato un evento di stop ad un futuro tempo Te. In questo caso siamo certi che la simulazione verrà eseguita nell'intervallo $[0, T_e]$.
-    \item Eventi speciali di terminazione: il tempo di esecuzione $T_e$ è determinato dalla simulazione stessa. In genere Te dipende dal numero di occorrenze di un determinato evento. Per esempio potrebbe essere il tempo del completamento del centesimo servizio presso un determinato centro di assistenza. 
-    \item Terminazione quando la lista di eventi futuri è vuota.
+    \item tempo di simulazione massimo: al tempo 0 viene schedulato un evento di stop ad un futuro tempo $T_e$. In questo caso siamo certi che la simulazione verrà eseguita nell'intervallo $[0, T_e]$; 
+    \item eventi speciali di terminazione: il tempo di esecuzione $T_e$ è determinato dalla simulazione stessa. In genere Te dipende dal numero di occorrenze di un determinato evento. Per esempio potrebbe essere il tempo del completamento del centesimo servizio presso un determinato centro di assistenza;  
+    \item terminazione quando la lista di eventi futuri è vuota.
 \end{itemize}
 Nel secondo e nel terzo caso il tempo per eseguire la simulazione non è conosciuto a priori e può variare di simulazione in simulazione.
-Le esecuzioni di una simulazione possono essere classificate in transient e steady state La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che vogliamo analizzare. Con il termine transient ci si riferisce ad una simulazione che termina, per causa di un evento speciale o ad un tempo prefissato. 
+Le esecuzioni di una simulazione possono essere classificate in \textit{transient} e \textit{steady state} La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che vogliamo analizzare. Con il termine transient ci si riferisce ad una simulazione che termina, per causa di un evento speciale o ad un tempo prefissato. 
 Una simulazione steady state, al contrario, non termina mai. L'obiettivo in questo caso è studiare il comportamento a lungo termine del sistema. 
 
 \subsection{Distribuzioni di probabilità}
@@ -174,7 +169,7 @@ Oltre ai tempi di arrivo e di servizio, le simulazioni possono coinvolgere altre
 \sidenote{da capire se spiegare anche tutte le distribuzioni di probabilità che potrebbero essere usate (divise in continue e discrete) in modo dettagliato. Da capire perchè forse diventa una spiegazione troppo da libro di testo. Da chiedere al prof.}
 
 \subsection{Simulazione parallela}
-La simulazione parallela a eventi discreti (PDES) si riferisce all'esecuzione di un singolo programma di simulazione a eventi discreti su un computer sfruttando il calcolo parallelo~\cite{DBLP:journals/cacm/Fujimoto90}. Distribuendo l'esecuzione di una simulazione su più processori, si cerca di ridurre notevolmente il tempo di esecuzione del modello, fino a un fattore pari al numero di processori. Questo concetto è valido in teoria, in realtà la legge di Amdahl stabilisce che il miglioramento della velocità di esecuzione di un programma parallelizzabile su un sistema multicore è limitato dalla frazione sequenziale del programma~\cite{DBLP:conf/afips/Amdahl67}. In altra parole, anche se una parte del programma può essere eseguita in modo parallelo, ci sarà sempre una parte sequenziale che non può essere parallelizzata. La legge di Amdahl può essere espressa con la seguente formula: 
+La simulazione parallela a eventi discreti (PDES) si riferisce all'esecuzione di un singolo programma di simulazione a eventi discreti su un computer sfruttando il calcolo parallelo~\cite{DBLP:journals/cacm/Fujimoto90}. Distribuendo l'esecuzione di una simulazione su più processori, si cerca di ridurre notevolmente il tempo di esecuzione del modello, fino a un fattore pari al numero di processori. Questo concetto è valido in teoria, in realtà la legge di Amdahl stabilisce che il miglioramento della velocità di esecuzione di un programma parallelizzabile su un sistema multi-core è limitato dalla frazione sequenziale del programma~\cite{DBLP:conf/afips/Amdahl67}. In altra parole, anche se una parte del programma può essere eseguita in modo parallelo, ci sarà sempre una parte sequenziale che non può essere parallelizzata. La legge di Amdahl può essere espressa con la seguente formula: 
 $$
 Speedup_{max} = \frac{1}{(1-P)+\frac{P}{N}}
 $$
@@ -236,6 +231,158 @@ Studiando il traffico di rete è possibile individuare possibili congestioni di 
 Un altro aspetto importante è la possibilità di valutare la scalabilità della rete, ovvero la sua capacità di gestire un aumento del carico di lavoro o del numero di utenti. 
 Il testing di nuovi protocolli e tecnologie consente di valutare le prestazioni di nuove soluzioni prima della loro effettiva implementazione su larga scala. 
 Anche in questo caso, modellando scenari di attacco e valutando la robustezza delle contromisure di sicurezza adottate, è possibile analizzare la sicurezza della rete, proteggendola da minacce esterne e garantendo la sicurezza dei dati sensibili. 
+
+\section{Simulazioni ad eventi discreti vs continue}
+Ogni modello di simulazione è la specifica di un sistema fisico (o una parte di esso) in termini di un insieme di stati ed eventi. 
+Effettuare una simulazione significa imitare l'occorrenza degli eventi che evolvono nel tempo e riconoscerne gli effetti, rappresentati come stati~\cite{PDES}. 
+Gli eventi futuri indotti dagli stati devono essere pianificati. Come è possibile notare in~\Cref{fig:Continuous-vs-Discrete} in una simulazione continua i cambiamenti di stato avvengono continuamente nel tempo, mentre in una simulazione discreta il verificarsi di un evento è istantaneo e limitato a un punto selezionato nel tempo. 
+Il concetto di tempo continuo modella il tempo come un continuum di punti temporali successivi. Questo implica che i dati forniti per un certo arco di tempo sono specificati come una funzione continua nel tempo. In genere si assume che questa funzione sia anche differenziabile, in modo che che le variazioni della variabile di stato nel tempo possano essere modellate come la derivata prima della variabile di stato. Gli intervalli di tempo non svolgono un ruolo specifico come principio organizzativo. Naturalmente si puà considerare qualsiasi intervallo di tempo, ma non intervalli di tempo predefiniti di lunghezza finita che strutturano l'intero modello~\cite{Ossimitz2008TheBO}. 
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\linewidth]{figures/discrete-event-simulation/Discrete-vs-Continuous-Simulation.png}
+    \caption{Cambiamento di stato nel tempo in simulazioni continue vs simulazioni ad eventi discreti~\cite{Helal2008AHS}.}
+    \label{fig:Continuous-vs-Discrete}
+\end{figure}
+
+Ad esempio, il livello dell'acqua in un serbatoio (la quale è una variabile di stato) può cambiare in modo continuo (ovvero con incrementi e decrementi infinitamente piccoli) e in qualsiasi punto del tempo continuo. Spesso questi modelli sono descritti da equazioni differenziali che specificano i tassi di variazione degli stati nel tempo.
+Le simulazioni a tempo continuo non sono veramente continue nel senso matematico del termine poiché, per ragioni computazionali, è impossibile rappresentare il tempo in modo continuo su un computer. Anche se il concetto di tempo continuo è utilizzato nella modellazione e nella simulazione, il computer deve comunque discretizzare il tempo per eseguire le simulazioni in maniera efficiente e accurata.
+Ci sono diverse ragioni per cui le simulazioni a tempo continuo non possono essere veramente continue:
+\begin{itemize}
+    \item Limitazioni computazionali: i computer hanno una quantità finita di memoria e risorse di calcolo. Per simulare un processo continuo, il tempo deve essere discretizzato in intervalli finiti. Questo porta a una rappresentazione approssimata del tempo continuo, con una risoluzione determinata dalla precisione temporale della simulazione. 
+    \item Errori numerici: anche con un elevato numero di punti discreti nel tempo, l'approssimazione del tempo continuo introduce errori numerici. Questi errori possono accumularsi nel tempo e influenzare l'accuratezza complessiva della simulazione.
+    \item Algoritmi di integrazione numerica: nelle simulazioni a tempo continuo, le equazioni differenziali che descrivono il sistema devono essere risolte numericamente utilizzando algoritmi di integrazione numerica, come ad esempio il metodo di Runge-Kutta. Questi algoritmi discretizzano implicitamente il tempo per calcolare l'evoluzione del sistema nel tempo.
+\end{itemize}
+
+In generale, poiché la simulazione in tempo continuo tiene traccia dello stato del sistema in modo continuo, è più granulare e, in certe situazioni (soprattutto nelle scienze naturali), più accurata. D'altra parte, la simulazione in tempo continuo può richiedere più risorse computazionali, perché il tracciamento continuo degli stati del sistema può essere costoso.
+
+Un'altra differenza tra le simulazioni a tempo continuo e quelle ad eventi discreti è la loro adattabilità a problemi sia continui che discreti~\cite{zgn2009DiscreteVC}. Più precisamente:
+\begin{itemize}
+    \item La simulazione in tempo continuo può essere utilizzata per modellare processi continui e discreti. Sebbene i processi discreti non siano continui per natura, i modelli in tempo continuo possono modellarli con successo e generare risultati validi. Ad esempio, può succedere che fenomeni come il flusso del traffico di veicoli, siano approssimati da un modello a tempo continuo considerando il traffico come un fluido. Tuttavia, un modello in tempo continuo richiederebbe più tempo e calcoli per lo stesso problema discreto. Inoltre, per alcuni sistemi discreti, l'output di un modello di simulazione in tempo continuo potrebbe non avere senso.
+    \item I modelli discreti potrebbero, in teoria, essere applicati anche ai sistemi a tempo continuo. Tuttavia, un modello a eventi discreti ne fornirebbe una visione meno raffinata, a causa della sua natura.
+\end{itemize}
+
+In conclusione, è preferibile utilizzare un modello ad eventi discreti quando: 
+\begin{itemize}
+    \item il sistema da modellare è caratterizzato da eventi distinti che influenzano il comportamento complessivo, come code di attesa, processi di produzione, reti di computer etc\dots
+    \item il sistema mostra comportamenti che possono essere modellati efficacemente attraverso una serie di eventi distinti e continui; 
+    \item le risorse computazionali sono limitate o gli eventi significativi sono rari nel tempo.
+\end{itemize}
+Mentre è da preferire la simulazione continua quando: 
+\begin{itemize}
+    \item il sistema è meglio descritto da equazioni differenziali o processi che si evolvono in modo continuo nel tempo, come sistemi meccanici, flussi di traffico o processi chimici; 
+    \item è necessaria una rappresentazione accurata dei cambiamenti nel tempo, specialmente quando i dettagli più sottili del comportamento sono cruciali per l'analisi; 
+    \item si dispone di risorse computazionali sufficienti per gestire la complessità richiesta.
+\end{itemize}
+
+\section{Simulazioni Time-Driven vs Event-Driven}
+Esistono due tipi di simulazione discreta che possono essere distinti per quanto riguarda le politiche di avanzamento nel tempo all'interno della simulazione. In una simulazione discreta time-driven il tempo simulato avanza in passaggi temporali (o ticks) di dimensioni constanti $\Delta$, ovvero, l'osservazione del sistema dinamico simulato è discretizzata in intervalli di tempo unitari. La scelta di $\Delta$ determina la precisione della simulazione e il tempo di simulazione trascorso: i ticks abbastanza brevi da garantire la precisione richiesta generalmente implicano un tempo di simulazione più lungo. Intuitivamente, per strutture event-driven irregolarmente distribuite nel tempo, l'approccio time-driven genera algoritmi di simulazione inefficienti. 
+
+La simulazione discreta con approccio event-driven discretizza l'osservazione del sistema simulato negli istanti in cui si verificano gli eventi. Una simulazione ad eventi discreti, quando eseguita sequenzialmente, elabora ripetutamente l'occorrenza degli eventi nel tempo simulato, mantenendo una lista di eventi ordinata per tempo che tiene traccia degli eventi temporizzati programmati per accadere in futuro, un orologio globale che indica il tempo corrente e la variabili di stato $S = (s_1, s_2, \dots, s_n)$ che definiscono lo stato attuale del sistema. Come già descritto nella \Cref{sec:panoramica-des}, un motore di simulazione guida la simulazione prendendo continuamente il primo evento dalla lista degli eventi, simulando l'effetto dell'evento cambiando le variabili di stato e eventualmente rimuovendo anche gli eventi obsoleti. Questo viene eseguito fino a quando viene raggiunto un tempo di fine predefinito, o non ci sono più eventi da verificarsi.
+
+Il modello event-driven si concentra sulla relazione causale tra gli eventi esterni e le azioni eseguite da un sistema, ovvero sul "perché" accade qualcosa, mentre il modello time-driven si concentra sul tempismo delle azioni, ovvero sul "quando" accade qualcosa. Nel primo caso, le azioni vengono eseguite "il prima possibile" all'arrivo degli eventi, e il tempo può essere gestito mediante segnali temporali trattati come eventi esterni asincroni. Al contrario, nel secondo caso le azioni vengono eseguite "al momento giusto" secondo un programma, e gli eventi esterni possono essere gestiti mediante meccanismi di polling~\cite{TISATO199531}.
+La scelta tra i due modelli dipende dal dominio di applicazione. Nei sistemi complessi, i due modelli dovrebbero coesistere per soddisfare requisiti contrastanti. Di conseguenza, un linguaggio di programmazione dovrebbe consentire al progettista di scegliere e mescolare astrazioni per catturare nel modo più espressivo possibile i concetti chiave legati a un problema specifico o a un sotto-problema. 
+
+\section{Simulatore Alchemist}
+
+Alchemist~\cite{DBLP:journals/jos/PianiniMV13} è un simulatore ad eventi discreti open-source sviluppato all'interno dell'Università di Bologna, che permette la simulazione di scenari inerenti la computazione pervasiva ed ispirata alla natura. 
+Alchemist si basa sull'algoritmo Next Reaction Method~\cite{doi:10.1021/jp993732q}, un algoritmo di simulazione stocastica più efficiente dell'algoritmo di Gillespie~\cite{doi:10.1021/j100540a008}, su cui si basa.
+
+\subsection{Modello del dominio}
+Il dominio di Alchemist, rappresentato in~\Cref{fig:alchemist-model} ,è rappresentato dalle seguenti entità: 
+\begin{itemize}
+    \item \textbf{Molecola}: il nome dei data item. Se Alchemist fosse un linguaggio imperativo, una molecola potrebbe rappresentare il nome di una variabile. 
+    \item \textbf{Concentrazione}: il valore associato a una particolare molecola. In un linguaggio imperativo la concentrazione sarebbe il valore associato alla variabile. 
+    \item \textbf{Nodo}: un contenitore di molecole e reazioni, che vivono all'interno di un environment. 
+    \item \textbf{Environment}: è l'astrazione di alchemist per lo spazio. È un contenitore di nodi con le seguenti funzionalità: 
+    \begin{itemize}
+        \item è capace di dirci dov'è un nodo nello spazio;
+        \item è capace di dirci la distanza fra due nodi;
+        \item opzionalmente ha il supporto per rimuovere i nodi.
+    \end{itemize}
+    \item \textbf{Regola di collegamento}: una funzione dello stato corrente dell'environment che associa ad ogni nodo un vicinato. 
+    \item \textbf{Vicinato}: un'entità composta da un nodo e un insieme di nodi vicini. Il concetto di vicino deve essere il più generale e flessibile possibile: dal concetto fisico di agenti all'interno di un raggio, al concetto sociale di due agenti collegati da una relazione sociale di qualche tipo. 
+    \item \textbf{Reazione}: il concetto di reazione è più elaborato di quello usato nella chimica: nei modelli classici, una reazione elenca un certo numero di molecole reagenti che, combinate, producono un insieme di molecole prodotto. In alchemist una reazione è un evento capace di cambiare lo stato dell'environment. Ogni nodo ha un possibile insieme (anche vuoto) di reazioni. Ogni reazione è definita da una lista (anche vuota) di condizioni, una o più azioni ad essa associate e una distribuzione temporale. La frequenza con la quale accade dipende da:
+    \begin{itemize}
+        \item un parametro a tasso statico; 
+        \item il valore di ciascuna condizione; 
+        \item una distribuzione temporale
+        \item un'equazione che a partire dal tasso statico e dai valori delle condizioni restituisce un tasso istantaneo.
+    \end{itemize}
+    Il suo funzionamento può essere osservato in~\Cref{fig:alchemist-reaction}
+    \item \textbf{Condizione}: una funzione che prende come input l'environment corrente e restituisce in output un booleano. Per poter essere innescata, una reazione necessita che tutte le condizioni ad essa associate siano soddisfatte. Le condizioni sono tipicamente espresse come un elenco di annotazioni che devono essere disponibili in una località per l'esecuzione della reazione, ma possono anche includere considerazioni sulla forma del vicinato.
+    \item \textbf{Azione}: modella i cambiamenti dell'environment. Le azioni possono essere la trasformazione, la rimozione o la produzione di annotazioni, lo spostamento di agenti, la duplicazione di essi e così via.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-reaction.png}
+    \caption{Rappresentazione grafica del funzionamento di una reazione}
+    \label{fig:alchemist-reaction}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-model.png}
+    \caption{Meta-modello alla base di Alchemist.}
+    \label{fig:alchemist-model}
+\end{figure}
+
+Una delle caratteristiche principali del simulatore è la sua generalità. Essa viene raggiunta attraverso l'uso delle \textbf{incarnazioni}, ovvero le istanze concrete del meta-modello in cui ogni entità viene mappata ad un corrispettivo concetto dell'universo di interesse. 
+Un'incarnazione di Alchemist include una definizione del tipo di concentrazione ed eventualmente un insieme di condizioni specifiche, azioni e (raramente) ambienti e reazioni che operano su tali tipi. 
+Incarnazioni diverse possono modellare universi completamente diversi. Per esempio, come nel caso di \textbf{Biochemistry}, se la concentrazione viene definita come un numero intero positivo e vengono fornite azioni e condizioni adeguate, Alchemist diventa un simulatore stocastico di chimica con compartimenti interconnessi e mobili.
+\textbf{SAPERE} è l'incarnazione più vecchia. In questa incarnazione le concentrazioni sono un insieme di tuple Linda-Like. È stata utilizzata per simulare evacuazione di folle, l'adattamento anticipato e l'esplorazione di risorse.  
+Nel caso di \textbf{Protelis}, la concentrazione è definita come Java Object. In questa incarnazione i nodi eseguono specifiche scritte nel linguaggio Protelis~\cite{DBLP:conf/sac/PianiniVB15}. \textbf{Scafi} è dedicata alla programmazione aggregata ed è basata sul framework Scafi~\cite{DBLP:journals/softx/CasadeiVAP22}.
+
+\subsection{Funzionalità e utilizzo del simulatore}
+Per configurare una simulazione in Alchemist, è necessario fornire un file in formato YAML\footnote{https://yaml.org/}. Nel file di configurazione occorre specificare quali classi e parametri utilizzare. Le entità vengono identificate tramite chiavi, al livello zero è possibile trovare: 
+\begin{itemize}
+    \item \textbf{incarnation}: è l'unica chiave obbligatoria. Serve a specificare quale incarnazione si intende utilizzare; 
+    \item \textbf{seed}: specifica il seme da utilizzare per generazione di numeri casuali. Questo serve a garantire la riproducibilità degli esperimenti scientifici. È essenziale, a fini di debug riuscire a garantire simulazioni sempre uguali partendo dalla stessa configurazione nel file YAML;
+    \item \textbf{variables}: i valori che si intendono riutilizzare all'interno del file di configurazione. 
+    \item \textbf{environment}: la tipologia di ambiente dentro al quale si intende eseguire la simulazione;
+    \item \textbf{network-model}: permette di decidere come devono essere collegati fra loro i nodi;
+    \item \textbf{export}: permette la configurazione e la scelta dei dati della simulazione che si intende esportare; 
+    \item \textbf{deployment}: permette di definire quali sono i nodi del sistema e dove si trovano. 
+\end{itemize}
+Il simulatore può essere eseguito in due modalità: interattiva o batch. Nella prima viene eseguita una sola simulazione per volta mentre nella seconda vengono eseguite molteplici simulazioni che dipendono dai valori delle variabili impostati dall'utente. Impostando multipli valori per ciascuna variabile, il simulatore eseguirà una simulazione per ogni possibile combinazione di esse. 
+
+Alchemist supporta il caricamento delle planimetrie e delle mappe geografiche. Il caricamento di una planimetria avviene a partire da un'immagine, convertendo i pixel adiacenti del colore specificato in ostacoli. Il supporto agli standard GPX e GPS rende invece possibile il caricamento di mappe. 
+\subsection{Architettura}
+Il framework, la cui architettura ad alto livello è osservabile in~\Cref{fig:alchemist-architecture} è stato progettato per essere modulare ed estendibile. L'engine può essere re-implementato senza toccare niente del modello e il modello può essere esteso senza necessità di modificare l'engine. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-architecture.png}
+    \caption{Architettura di Alchemist. Gli elementi disegnati con linee continue indicano i componenti comuni a tutti gli scenari, quelli con linee tratteggiate rappresentano componenti che devono essere sviluppati da una specifica incarnazione~\cite{DBLP:journals/jos/PianiniMV13}.}
+    \label{fig:alchemist-architecture}
+\end{figure}
+
+\subsubsection{Engine}
+Di seguito si intende descrivere brevemente il funzionamento del algoritmo Next Reaction Method, utilizzato da Alchemist per selezionare il prossimo evento da eseguire e il Dynamic Dependency Graph, utilizzato per gestire le dipendenze fra le reazioni presenti all'interno dei nodi. 
+\paragraph{Next Reaction Method}
+Come anticipato, Alchemist si basa sull'algoritmo di simulazione stocastica \textit{Next Reaction Method}. Ad ogni step della simulazione è in grado di selezionare la prossima reazione da eseguire in tempo costante. L'algoritmo richiede tempo logaritmico per aggiornare la struttura dati interna. L'algoritmo non sceglie la prossima reazione da eseguire valutando la sua velocità, ma generando un tempo putativo e ordinando le reazioni per decidere quale sia la prossima da eseguire. L'algoritmo originale è stato modificato per consentire di aggiungere, rimuovere o spostare le reazioni in modo dinamico. 
+Le reazioni vengono memorizzate in una \textit{Dynamic Indexed Priority Queue}. Quest'ultima è un binary tree di reazioni, la sua proprietà principale è che ogni nodo memorizza una reazione il cui tempo di accadimento presunto è inferiore a quello di ciascuno dei suoi figli. Ciò significa che la prossima reazione da eseguire sarà sempre quella nella radice dell'albero e ci si potrà quindi accedere in tempo costante. 
+Un'altra proprietà importante della priority queue è che in assenza dell'aggiunta di nuovi nodi all'albero, lo swap fra due nodi non ne modifica il bilanciamento. 
+In Alchemist i nodi vengono aggiunti e quindi non si riesce a sfruttare direttamente questa proprietà. L'idea è di tenere traccia, per ogni nodo, del numero di discendenti per ogni ramo, avendo così la possibilità di mantenere bilanciato l'albero a seguito dell'aggiunta di nodi. 
+
+\paragraph{Dynamic Dependency Graph}
+Consiste in un grafo diretto, nel quale i nodi sono le reazioni e gli archi connettono una reazione $r$ a tutti i nodi che dipendono da essa, ovvero quelli il cui tempo di attivazione deve essere aggiornato a seguito dell'esecuzione di $r$. Per esempio, se $r$ muove una molecola da un nodo $n$ ad un nodo $m$, tutte le reazioni che usano le molecole in $m$ devono essere riprogrammate in modo appropriato non appena $r$ viene attivata.
+Mantenere il grafo delle dipendenze aggiornato durante la simulazione è uno dei task più critici. Dato che si vuole supportare nativamente l'interazione fra nodi, che diventano dipendenze fra le reazioni che avvengono in questi nodi, sono definiti tre \textit{contesti} (chiamati anche \textit{scopes}): 
+\begin{itemize}
+    \item \textbf{locale}: la reazione influenza solo il nodo in cui avviene; 
+    \item \textbf{vicinato}: la reazione influenza il suo nodo e tutto il vicinato; 
+    \item \textbf{globale}: la reazione influenza tutte le altre reazioni. 
+\end{itemize}
+Ogni reazione ha un \textit{contesto di input}, ovvero il contesto più piccolo in cui una reazione può leggere informazioni, e un \textit{contesto di output}, ovvero il contesto più piccolo nel quale una reazione può effettuare modifiche. 
+la scelta del contesto giusto è cruciale: se è troppo ristretto la simulazione sarà invalida, se viene scelto troppo grande, questo impatterà pesantemente sulle performance. 
+L'aggiunta di una reazione implica la verifica delle sue dipendenze con tutte le reazioni del sistema. Se esiste, questa dipendenza viene aggiunta al grafo delle dipendenze. La rimozione di una reazione richiede l'eliminazione di tutte le dipendenze in cui quest'ultima è coinvolta, sia come influenzante che come influenzata. 
+In caso di cambiamento della topologia del sistema è necessario un ulteriore controllo delle dipendenze tra le reazioni appartenenti ai nodi che hanno subito un cambiamento del proprio vicinato. Occorre eseguire una scansione in questi nodi, calcolando le nuove dipendenze con le reazioni appartenenti ai nuovi vicini e cancellando quelle con i nodi che non appartengono più al vicinato. 
+
+
+
+
+
+
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
