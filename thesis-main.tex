@@ -387,6 +387,108 @@ La scelta del contesto giusto è cruciale: se è troppo ristretto la simulazione
 L'aggiunta di una reazione implica la verifica delle sue dipendenze con tutte le reazioni del sistema. Se esiste, questa dipendenza viene aggiunta al grafo delle dipendenze. La rimozione di una reazione richiede l'eliminazione di tutte le dipendenze in cui quest'ultima è coinvolta, sia come influenzante che come influenzata. 
 In caso di cambiamento della topologia del sistema è necessario un ulteriore controllo delle dipendenze tra le reazioni appartenenti ai nodi che hanno subito un cambiamento del proprio vicinato. Occorre eseguire una scansione in questi nodi, calcolando le nuove dipendenze con le reazioni appartenenti ai nuovi vicini e cancellando quelle con i nodi che non appartengono più al vicinato. 
 
+\chapter{Programmazione reattiva}
+\section{Concetti chiave della programmazione reattiva}
+\subsection{Definizione}
+L'uso del termine programmazione reattiva nella letteratura scientifica risale alla metà degli anni '60. Una definizione rilevante è stata data da G. Berry nel 1991~\cite{DBLP:journals/pieee/BenvenisteB91}. Berry descrive i programmi reattivi in relazione alla loro controparte duale, i programmi interattivi: 
+\begin{quotation}
+    "I programmi interattivi interagiscono alla propria velocità con gli utenti o con altri programmi; dal punto di vista dell'utente, un sistema time-sharing è interattivo. Anche i programmi reattivi mantengono una continua interazione con l'ambiente, ma a una velocità che è determinata dall'ambiente e non dal programma stesso"
+\end{quotation}
+
+I programmi interattivi concretizzano l'idea di un modello di calcolo ``pull-based'', in cui il programma - in questo caso il consumatore - ha il controllo sulla velocità con cui i dai vengono richiesti e gestiti. 
+Un esempio perfetto di programma interattivo è una struttura di flusso di controllo come un ciclo for che itera su un insieme di dati: il programma ha il controllo della velocità con cui i dati vengono recuperati dalla collezione e richiederà l'elemento successivo solo aver terminato la gestione di quello attuale. 
+
+I programmi reattivi, al contrario, incarnano l'idea di un modello di calcolo ``push based'', in cui la velocità con il programma interagisce con l'ambiente è determinata dall'ambiente stesso piuttosto che dal programma. In altre parole, ora è il produttore dei dati a determinare la velocità con cui si verificheranno gli eventi, mentre il ruolo del programma si riduce a quello di un osservatore silenzioso che reagisce alla ricezione degli eventi. Esempi standard di tali sistemi sono le applicazioni GUI che si occupano di vari eventi originati dall'input dell'utente, come per esempio il click del mouse. Queste applicazioni sono difficili da programmare con i tradizionali approcci di programmazione sequenziale, perché è impossibile prevedere o controllare l'ordine di arrivo degli eventi esterni. Inoltre quando si verifica un cambiamento di stato in un calcolo o in un dato, il programmatore deve aggiornare tutti gli altri che dipendono da esso. Questa gestione manuale dei cambiamenti di stato e delle dipendenze dei dati è complessa e soggetta ad errori.
+
+Utilizzando soluzioni di programmazione tradizionali, le applicazioni interattive sono tipicamente costruite attorno alla nozione di callback asincrone. 
+Coordinare le callback può essere un compito arduo, poiché numerosi frammenti di codice isolati possono manipolare gli stessi dati e il loro ordine di esecuzione non è prevedibile. Inoltre, le callback solitamente non hanno un valore di ritorno, quindi sono richiesti side-effect per modificare lo stato dell'applicazione~\cite{DBLP:phd/us/Cooper08}. 
+
+Il paradigma della programmazione reattiva è stato recentemente proposto come soluzione adatta allo sviluppo di applicazioni event-driven. La programmazione reattiva affronta i problemi posti dalla applicazioni event-driven fornendo astrazioni per esprimere i programmi come reazioni a eventi esterni e facendo in modo che il linguaggio gestisca automaticamente il flusso del tempo e le dipendenze di dati e calcoli. Ciò comporta il vantaggio che i programmatori non devono preoccuparsi dell'ordine degli eventi e delle dipendenze di calcolo. I linguaggi di programmazione reattivi astraggono dalla gestione del tempo, proprio come i garbage collector astraggono dalla gestione della memoria. 
+
+\subsection{Propagazione del cambiamento}
+La programmazione reattiva è un paradigma che si basa sulla nozione di valori variabili e continui nel tempo e sulla propagazione del cambiamento. 
+In questo paradigma i cambiamenti di stato vengono automaticamente ed efficientemente propagati attraverso la rete di computa<ioni dipendenti dal modello di esecuzione sottostante. Consideriamo un semplice esempio di calcolo della somma di due variabili.
+\begin{quotation}
+    \texttt{var1 = 1}
+    \texttt{var2 = 2}
+    \texttt{var3 = var1 + var2}
+\end{quotation}
+
+Nella programmazione sequenziale imperativa convenzionale il valore della variabile \texttt{var3} conterrà sempre il valore 3, ovvero la somma dei valori iniziali delle variabili \texttt{var1} e \texttt{var2}.
+Nella programmazione reattiva il valore di \texttt{var3} è sempre aggiornato perché viene ricalcolato ogni volta che il valore di \texttt{var1} o \texttt{var2} cambia.
+Questa è la nozione chiave della programmazione reattiva. I valori cambiano nel tempo e tutti i calcoli dipendenti vengono automaticamente rieseguiti. Nella terminologia della programmazione reattiva la variabile \texttt{var3} è detta dipendente dalle variabili \texttt{var1} e \texttt{var2}. La dipendenza in questione può essere osservata in~\Cref{fig:rp-dependency}.
+
+La logica della propagazione del cambiamento può essere implementata per mezzo di un grafo i cui nodi rappresentano i valori da tenere aggiornati e gli archi rappresentano le relazioni di dipendenza che coinvolgono i nodi. Utilizzando questo tipo di architettura si viene quindi a creare una rete di dipendenze computazioni ed il cambiamento di un nodo (quindi di un valore) scatena una reazione che implica l'attraversamento degli eventuali archi ad eso collegati e il conseguente aggiornamento di tutti i nodi raggiunti. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.65\linewidth]{figures/reactive-programming/RP-dependency.png}
+    \caption{Rappresentazione grafica della dipendenza fra espressioni nella programmazione reattiva \cite{DBLP:journals/csur/BainomugishaCCMM13}.}
+    \label{fig:rp-dependency}
+\end{figure}
+
+\subsubsection{Strategie di propagazione}
+Esistono diverse strategie adottabili per la propagazione del cambiamento nella programmazione reattiva, di seguito verranno descritte le principali:
+\begin{itemize}
+    \item \textbf{complete propagation}: ogni nodo, durante la propagazione, invia il suo stato attuale completo ai nodi dipendenti. In questo caso tutto lo stato precedente del nodo viene perso durante l'aggiornamento del nuovo stato. Questa strategia non è adatta nei casi in cui il grafo delle dipendenze sia particolarmente complesso o nel caso in cui gli stati necessitino di grandi quantità di dati per essere descritti a causa del suo alto carico computazionale;
+    \item \textbf{delta propagation}: al momento della propagazione i nodi interrati inviano solo una porzione (un \textit{delta}) del loro stato ai nodi dipendenti, cioè solo le frazioni di informazioni che sono state effettivamente coinvolte da modifiche. Questo approccio tende a minimizzare la quantità di dati da trasportare lungo la catena di dipendenze durante la propagazione dei cambiamenti, dunque risulta efficiente anche nei casi in cui si ha un grafo delle dipendenze complesso e una grande quantità di dati per la rappresentazione degli stati; 
+    \item \textbf{batch propagation}: prevede un ritardo nella propagazione dei cambiamenti, cioè la rappresentazione ritardata nel tempo. Consente l'ottimizzazione di quelle situazioni in cui abbiamo più cambiamenti vicini nel tempo che si annullano a vicenda e fanno sì che si ritorni allo stato di partenza. Nel caso in cui due o più cambiamenti vicini nel tempo generino un'effettiva mutazione di stato nel grafo viene propagato solo l'ultimo cambiamento, scartando i precedenti, ormai obsoleti. Questa strategia tende a minimizzare il numero di propagazioni e di conseguenza il carico computazionale complessivo. 
+    Tuttavia, occorre adottare un tempo di ritardo corretto, al fine di ridurre il carico computazionale ma al tempo stesso garantire una buona reattività; 
+    \textbf{invalidity notification propagation}: potrebbe essere definita come una "sotto-strategia" piuttosto che ua vera e propria strategia implementativa. Consiste nella richiesta di aggiornamento da parte di un nodo che riscontra di possedere uno stato non valido, oppure che riceve un messaggio di propagazione non valido. In questo caso il nodo interessato scarta l'anomalia e richiede ai nodi da cui dipende un nuovo aggiornamento. 
+\end{itemize}
+
+\subsection{Modelli di valutazione}
+Nella programmazione reattiva, per \textit{modello di valutazione} (\textit{evaluation model}) si intende la dinamica direzionale che viene adottata per gestire la propagazione dei cambiamenti nel grafo delle dipendenze computazionali. 
+Il modello viene applicato a livello di linguaggio, rimanendo quindi trasparente all'utilizzatore finale. 
+I modelli presenti in letteratura sono due, ai quali si aggiunge un terzo, ibrido fra i primi due: 
+\begin{itemize}
+    \item \textbf{push-based}: nel modello push-based la reazione inizia quando un nodo produttore cambia stato aggiornandosi. Il nodo in questione ``spinge'' l'informazione attraverso i nodi consumatori, ovvero i nodi dipendenti. Questo approccio, guidato dalla disponibilità di nuove informazioni, ha il vantaggio di rendere il sistema altamente reattivo, in quanto le reazioni vengono provocate e propagate immediatamente dopo la disponibilità di nuovi dati.  
+    \item \textbf{pull-based}: 
+    \item \textbf{hybrid push-pull}: 
+\end{itemize}
+
+
+\subsection{Glitch}
+In programmazione reattiva un \textbf{glitch} indica un malfunzionamento dovuto ad una inconsistenza dei dati presenti nel grafo delle dipendenze computazionali. La prevenzioni dei glitch è un'altra proprietà che deve essere presa in considerazione in un linguaggio reattivo~\cite{DBLP:journals/csur/BainomugishaCCMM13}.
+Un glitch può essere provocato da una anomalia durante la propagazione di un cambiamento, oppure dal calcolo di un espressione presente in un nodo prima della valutazione di tutte le sue dipendenze. Il risultato è una situazione nella quale un nodo esegue la propria computazione utilizzando alcuni dati aggiornati ed altri ormai obsoleti, provocando quasi certamente errori di calcolo e inconsistenze. 
+Consideriamo il seguente esempio: 
+\begin{quotation}
+    \texttt{var1 = 1}
+    \texttt{var2 = var1 * 1}
+    \texttt{var3 = var1 + var2}
+\end{quotation} 
+In questo esempio, il valore della variabile \texttt{var2} dovrebbe essere sempre lo stesso di \texttt{var1}, e il valore di \texttt{var3} dovrebbe invece essere il doppio di \texttt{var1}. Inizialmente quando il valore di \texttt{var1} è 1, il valore di \texttt{var2} è 1, e quello di \texttt{var3} è 2. Se il valore di \texttt{var1} cambia, per esempio diventa 2, ci si aspetta che il valore di \texttt{var2} diventi 2 e di conseguenza quello di \texttt{var3} diventa 4. Tuttavia, in una implementazione reattiva non corretta, il cambiamento del valore di \texttt{var1} potrebbe causare il ricalcolo di \texttt{var1 + var2} prima di \texttt{var1 * 1} . In questo caso il valore di \texttt{var3} sarebbe momentaneamente 3, ovvero un valore non corretto.
+Prima o poi l'espressione \texttt{var1 * 1} sarà computata, in quel momento il valore di var2 diventerà 2 e quello di var3 sarà ricalcolato, riflettendo il valore corretto 4. Il comportamento appena descritto è osservabile in 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.65\linewidth]{figures/reactive-programming/RP-glitch.png}
+    \caption{Rappresentazione di un possibile glitch nella programmazione reattiva \cite{DBLP:journals/csur/BainomugishaCCMM13}.}
+    \label{fig:rp-glitch}
+\end{figure}
+
+La maggior parte dei linguaggi di programmazione reattiva elimina i glitch organizzando le espressioni in un grafico ordinato topologicamente, garantendo così che un'espressione venga sempre valutata dopo che tutte le dipendenze sono state valutate. 
+Nella teoria dei grafi l'ordinamento topologico di un grafo consiste nell'ordinare linearmente i suoi nodi in modo che preso un qualunque arco $xy$ dal nodo $x$ al nodo $y$, $x$ venga prima di $y$ nell'ordinamento. In altre parole, i nodi sono disposti in modo tale che ognuno di essi preceda tutti i nodi collegati ai suoi archi uscenti seguendo l'ordinamento scelto.
+Le implementazioni reattive più recenti riescono ad evitare i glitch nei programmi reattivi eseguiti su un singolo computer, ma non nei programmi reattivi distribuiti. Evitare problemi in un ambiente distribuito non è un'attività banale a causa dei guasti di rete, ritardi e mancanza di un orologio globale. 
+
+\subsection{Lifting}
+Quando la programmazione reattiva è incorporata nei linguaggi host (come libreria o come estensione), gli operatori esistenti (ad esempio + o *) e le funzioni o i metodi definiti dall'utente devono essere convertiti per operare sui comportamenti. 
+La conversione di un operatore ordinario in una variante in grado di operare sui comportamenti è nota come \textit{lifting}. 
+Il lifting ha un duplice scopo: trasforma la firma del tipo di una funzione e registra un grafico delle dipendenze nel grafico del flusso di dati dell'applicazione. 
+Esistono diverse strategie per effettuare il lifting: 
+\begin{itemize}
+    \item \textbf{lifting implicito}: quando un operatore viene applicato ad un comportamento, viene eseguito in maniera automatica il lifting. Il lifting implicito rende la programmazione reattiva trasparente agli utilizzatori. 
+    \item \textbf{lifting esplicito}: in questo caso il linguaggio fornisce una serie di combinatori che possono essere utilizzati per effettuare il lifting.
+    \item \textbf{lifting manuale}: il linguaggio non fornisce operatori per effettuare il lifting. Il programmatore deve ottenere manualmente il valore corrente di un valore variabile nel tempo, che poi può essere utilizzato con gli operatori del linguaggio. 
+\end{itemize}
+
+\subsection{Flussi asincroni di dati ed eventi}
+
+\subsection{Entità osservabili e osservatrici}
+
+\subsection{Contesti di utilizzo}
+
+\subsection{Il manifesto reattivo}
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
