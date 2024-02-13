@@ -442,9 +442,9 @@ Nella programmazione reattiva, per \textit{modello di valutazione} (\textit{eval
 Il modello viene applicato a livello di linguaggio, rimanendo quindi trasparente all'utilizzatore finale. 
 I modelli presenti in letteratura sono due, ai quali si aggiunge un terzo, ibrido fra i primi due: 
 \begin{itemize}
-    \item \textbf{push-based}: nel modello push-based la reazione inizia quando un nodo produttore cambia stato aggiornandosi. Il nodo in questione ``spinge'' l'informazione attraverso i nodi consumatori, ovvero i nodi dipendenti. Questo approccio, guidato dalla disponibilità di nuove informazioni, ha il vantaggio di rendere il sistema altamente reattivo, in quanto le reazioni vengono provocate e propagate immediatamente dopo la disponibilità di nuovi dati.  
-    \item \textbf{pull-based}: 
-    \item \textbf{hybrid push-pull}: 
+    \item \textbf{push-based}: nel modello push-based la reazione inizia quando un nodo produttore cambia stato aggiornandosi. Il nodo in questione ``spinge'' l'informazione attraverso i nodi consumatori, ovvero i nodi dipendenti. Questo approccio, guidato dalla disponibilità di nuove informazioni, ha il vantaggio di rendere il sistema altamente reattivo, in quanto le reazioni vengono provocate e propagate immediatamente dopo la disponibilità di nuovi dati. Questo approccio comporta, d'altra parte, a computazioni superflue e un alto carico di calcolo, a causa delle elaborazioni necessarie ad ogni cambiamento di stato del produttore. 
+    \item \textbf{pull-based}: nel modello pull-based sono i nodi consumatori a richiedere i nuovi valori nel momento in cui ne hanno bisogno. L'approccio in questo caso è guidato dalla domanda di nuovi dati da parte dei nodi dipendenti. Questo porta ad un sistema più flessibile, ma introduce latenze fra il momento in cui un cambiamento si verifica e il momento in cui avviene la reazione. 
+    \item \textbf{hybrid push-pull}: il modello ibrido combina i due modelli push e pull, cercando di trarre i vantaggi di entrambe le soluzioni. Il modello push-based funziona bene quando è richiesta una reazione istantanea al cambiamento, mentre il modello pull-based porta a prestazioni migliori quando nel sistema si presentano continui cambiamenti di valori nel tempo. Questo approccio riesce quindi a trarre i benefici del modello push-based (efficienza e latenza bassa) e del modello pull-based (flessibilità nella richiesta dei valori)~\cite{DBLP:conf/haskell/Elliott09}.  
 \end{itemize}
 
 
@@ -482,10 +482,20 @@ Esistono diverse strategie per effettuare il lifting:
     \item \textbf{lifting manuale}: il linguaggio non fornisce operatori per effettuare il lifting. Il programmatore deve ottenere manualmente il valore corrente di un valore variabile nel tempo, che poi può essere utilizzato con gli operatori del linguaggio. 
 \end{itemize}
 
-\subsection{Flussi asincroni di dati ed eventi}
-
 \subsection{Entità osservabili e osservatrici}
+Nel contesto della programmazione reattiva, le fonti di dati o eventi che emettono informazioni vengono chiamate entità osservabili, mentre le entità osservatrici sono quelle che si collegano a queste fonti per monitorare e reagire ai dati o agli eventi emessi. In questa sezione vengono descritte le due entità, evidenziando le loro caratteristiche. 
+\subsubsection{Entità osservabile}
+Un'entità osservabile rappresenta un flusso continuo di dati o eventi che può essere emesso in modo regolare o completamente asincrono. Questo flusso può essere caratterizzato da una quantità variabile di elementi, incluso zero, uno o un numero infinito di essi. Questo concetto è fondamentale per gestire dati in tempo reale e interazioni utente in applicazioni moderne, consentendo una gestione dinamica dei flussi di informazioni.
 
+Tuttavia, l'entità osservabile va oltre la semplice emissione di dati o eventi. Essa può concludersi in due modi principali: notificando un completamento avvenuto o segnalando un errore anomalo durante la sua esecuzione. Il completamento avvenuto è tipicamente utilizzato quando il flusso di dati ha termini definiti e finiti, ad esempio dopo il completamento di una sequenza di operazioni. D'altra parte, l'errore può essere segnalato in caso di malfunzionamenti imprevisti, come errori di connessione di rete o eccezioni di programmazione.
+
+Se consideriamo un'entità osservabile con un flusso infinito di elementi, come ad esempio gli eventi di click dell'utente in un'applicazione Android, è importante notare che non sarà mai in grado di emettere un messaggio di completamento. Questo perché il completamento è riservato solo al termine naturale del flusso di eventi disponibili, il quale, se infinito, non si verifica mai. Tuttavia, è possibile che l'entità osservabile termini in modo anomalo, segnalando un errore, nel caso si verifichino anomalie durante la sua esecuzione. In tal caso, l'entità osservabile con un flusso infinito terminerà anticipatamente e non emetterà ulteriori elementi.
+
+\subsection{Entità Osservatrice}
+Un'entità osservatrice può instaurare una connessione (sottoscrizione) con un'entità osservabile al fine di monitorare e gestire i dati o gli eventi trasmessi da quest'ultima secondo specifiche politiche reattive. 
+Gli elementi all'interno di un flusso sono emessi in modo sequenziale, uno dopo l'altro, e vengono elaborati dall'entità osservatrice in modo consecutivo. Questa caratteristica impedisce la comparsa di corse critiche, mantenendo l'ordine delle operazioni e garantendo una gestione reattiva dei dati.
+Nel caso in cui un grande numero di dati o eventi venga emesso rapidamente dall'entità osservabile e l'entità osservatrice non sia in grado di elaborarli con la stessa velocità, è possibile adottare strategie come l'utilizzo di una coda degli eventi o il meccanismo di buffering per gestire in modo efficiente il flusso di dati e prevenire perdite o sovraccarichi.
+Infine, un'entità osservabile può essere sottoscritta da zero, una o più entità osservatrici contemporaneamente, permettendo una gestione flessibile e dinamica del flusso di dati o eventi all'interno di un'applicazione reattiva. 
 \subsection{Contesti di utilizzo}
 
 \subsection{Il manifesto reattivo}
