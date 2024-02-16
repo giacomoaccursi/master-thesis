@@ -388,37 +388,36 @@ L'aggiunta di una reazione implica la verifica delle sue dipendenze con tutte le
 In caso di cambiamento della topologia del sistema è necessario un ulteriore controllo delle dipendenze tra le reazioni appartenenti ai nodi che hanno subito un cambiamento del proprio vicinato. Occorre eseguire una scansione in questi nodi, calcolando le nuove dipendenze con le reazioni appartenenti ai nuovi vicini e cancellando quelle con i nodi che non appartengono più al vicinato. 
 
 \chapter{Programmazione reattiva}
-\section{Concetti chiave della programmazione reattiva}
-\subsection{Definizione}
-L'uso del termine programmazione reattiva nella letteratura scientifica risale alla metà degli anni '60. Una definizione rilevante è stata data da G. Berry nel 1991~\cite{DBLP:journals/pieee/BenvenisteB91}. Berry descrive i programmi reattivi in relazione alla loro controparte duale, i programmi interattivi: 
+\section{Concetti chiave}
+L'uso del termine \textbf{programmazione reattiva} nella letteratura scientifica risale alla metà degli anni '60. Una definizione rilevante è stata data da G. Berry nel 1991~\cite{DBLP:journals/pieee/BenvenisteB91}. Berry descrive i \textit{programmi reattivi} in relazione alla loro controparte duale, i \textit{programmi interattivi}: 
 \begin{quotation}
     "I programmi interattivi interagiscono alla propria velocità con gli utenti o con altri programmi; dal punto di vista dell'utente, un sistema time-sharing è interattivo. Anche i programmi reattivi mantengono una continua interazione con l'ambiente, ma a una velocità che è determinata dall'ambiente e non dal programma stesso"
 \end{quotation}
+I programmi interattivi concretizzano l'idea di un modello di calcolo ``\textit{pull-based}'', in cui il programma - in questo caso il consumatore - ha il controllo sulla velocità con cui i dai vengono richiesti e gestiti. 
+Un esempio perfetto di programma interattivo è una struttura di flusso di controllo come un \textit{ciclo for} che itera su un insieme di dati: il programma ha il controllo della velocità con cui i dati vengono recuperati dalla collezione e richiederà l'elemento successivo solo aver terminato la gestione di quello attuale. 
 
-I programmi interattivi concretizzano l'idea di un modello di calcolo ``pull-based'', in cui il programma - in questo caso il consumatore - ha il controllo sulla velocità con cui i dai vengono richiesti e gestiti. 
-Un esempio perfetto di programma interattivo è una struttura di flusso di controllo come un ciclo for che itera su un insieme di dati: il programma ha il controllo della velocità con cui i dati vengono recuperati dalla collezione e richiederà l'elemento successivo solo aver terminato la gestione di quello attuale. 
+I programmi reattivi, al contrario, incarnano l'idea di un modello di calcolo ``\textit{push based}'', in cui la velocità con il programma interagisce con l'ambiente è determinata dall'ambiente stesso piuttosto che dal programma. In altre parole, ora è il produttore dei dati a determinare la velocità con cui si verificheranno gli eventi, mentre il ruolo del programma si riduce a quello di un osservatore silenzioso che reagisce alla ricezione degli eventi. Esempi standard di tali sistemi sono le applicazioni con \textit{graphical user interface} (GUI) che si occupano di vari eventi originati dall'input dell'utente, come per esempio il click del mouse. Queste applicazioni sono difficili da programmare con i tradizionali approcci di programmazione sequenziale, perché è impossibile prevedere o controllare l'ordine di arrivo degli eventi esterni. Inoltre quando si verifica un cambiamento di stato in un calcolo o in un dato, il programmatore deve aggiornare tutti gli altri che dipendono da esso. Questa gestione manuale dei cambiamenti di stato e delle dipendenze dei dati è complessa e soggetta ad errori.
 
-I programmi reattivi, al contrario, incarnano l'idea di un modello di calcolo ``push based'', in cui la velocità con il programma interagisce con l'ambiente è determinata dall'ambiente stesso piuttosto che dal programma. In altre parole, ora è il produttore dei dati a determinare la velocità con cui si verificheranno gli eventi, mentre il ruolo del programma si riduce a quello di un osservatore silenzioso che reagisce alla ricezione degli eventi. Esempi standard di tali sistemi sono le applicazioni GUI che si occupano di vari eventi originati dall'input dell'utente, come per esempio il click del mouse. Queste applicazioni sono difficili da programmare con i tradizionali approcci di programmazione sequenziale, perché è impossibile prevedere o controllare l'ordine di arrivo degli eventi esterni. Inoltre quando si verifica un cambiamento di stato in un calcolo o in un dato, il programmatore deve aggiornare tutti gli altri che dipendono da esso. Questa gestione manuale dei cambiamenti di stato e delle dipendenze dei dati è complessa e soggetta ad errori.
-
-Utilizzando soluzioni di programmazione tradizionali, le applicazioni interattive sono tipicamente costruite attorno alla nozione di callback asincrone. 
+Utilizzando soluzioni di programmazione tradizionali, le applicazioni interattive sono tipicamente costruite attorno alla nozione di \textit{callback} asincrone. 
 Coordinare le callback può essere un compito arduo, poiché numerosi frammenti di codice isolati possono manipolare gli stessi dati e il loro ordine di esecuzione non è prevedibile. Inoltre, le callback solitamente non hanno un valore di ritorno, quindi sono richiesti side-effect per modificare lo stato dell'applicazione~\cite{DBLP:phd/us/Cooper08}. 
 
-Il paradigma della programmazione reattiva è stato recentemente proposto come soluzione adatta allo sviluppo di applicazioni event-driven. La programmazione reattiva affronta i problemi posti dalla applicazioni event-driven fornendo astrazioni per esprimere i programmi come reazioni a eventi esterni e facendo in modo che il linguaggio gestisca automaticamente il flusso del tempo e le dipendenze di dati e calcoli. Ciò comporta il vantaggio che i programmatori non devono preoccuparsi dell'ordine degli eventi e delle dipendenze di calcolo. I linguaggi di programmazione reattivi astraggono dalla gestione del tempo, proprio come i garbage collector astraggono dalla gestione della memoria. 
+Il paradigma della programmazione reattiva è stato recentemente proposto come soluzione adatta allo sviluppo di applicazioni \textit{event-driven}. La programmazione reattiva affronta i problemi posti dalla applicazioni \textit{event-driven} fornendo astrazioni per esprimere i programmi come reazioni a eventi esterni e facendo in modo che il linguaggio gestisca automaticamente il flusso del tempo e le dipendenze di dati e calcoli. Ciò porta un vantaggio per i programmatori, i quali non devono preoccuparsi dell'ordine degli eventi e delle dipendenze di calcolo. I linguaggi di programmazione reattivi astraggono dalla gestione del tempo, proprio come i \textit{garbage collector} astraggono dalla gestione della memoria. 
 
-\subsection{Propagazione del cambiamento}
-La programmazione reattiva è un paradigma che si basa sulla nozione di valori variabili e continui nel tempo e sulla propagazione del cambiamento. 
-In questo paradigma i cambiamenti di stato vengono automaticamente ed efficientemente propagati attraverso la rete di computa<ioni dipendenti dal modello di esecuzione sottostante. Consideriamo un semplice esempio di calcolo della somma di due variabili.
-\begin{quotation}
-    \texttt{var1 = 1}
-    \texttt{var2 = 2}
+\section{Propagazione del cambiamento}
+La programmazione reattiva è un paradigma che si basa sulla nozione di valori variabili e continui nel tempo e sulla \textbf{propagazione del cambiamento}. 
+In questo paradigma i cambiamenti di stato vengono automaticamente ed efficientemente propagati attraverso la rete di computazioni dipendenti dal modello di esecuzione sottostante.
+
+Consideriamo un semplice esempio di calcolo della somma di due variabili.
+\begin{quotation}\noindent
+    \texttt{var1 = 1} \newline
+    \texttt{var2 = 2} \newline
     \texttt{var3 = var1 + var2}
 \end{quotation}
-
 Nella programmazione sequenziale imperativa convenzionale il valore della variabile \texttt{var3} conterrà sempre il valore 3, ovvero la somma dei valori iniziali delle variabili \texttt{var1} e \texttt{var2}.
 Nella programmazione reattiva il valore di \texttt{var3} è sempre aggiornato perché viene ricalcolato ogni volta che il valore di \texttt{var1} o \texttt{var2} cambia.
 Questa è la nozione chiave della programmazione reattiva. I valori cambiano nel tempo e tutti i calcoli dipendenti vengono automaticamente rieseguiti. Nella terminologia della programmazione reattiva la variabile \texttt{var3} è detta dipendente dalle variabili \texttt{var1} e \texttt{var2}. La dipendenza in questione può essere osservata in~\Cref{fig:rp-dependency}.
 
-La logica della propagazione del cambiamento può essere implementata per mezzo di un grafo i cui nodi rappresentano i valori da tenere aggiornati e gli archi rappresentano le relazioni di dipendenza che coinvolgono i nodi. Utilizzando questo tipo di architettura si viene quindi a creare una rete di dipendenze computazioni ed il cambiamento di un nodo (quindi di un valore) scatena una reazione che implica l'attraversamento degli eventuali archi ad eso collegati e il conseguente aggiornamento di tutti i nodi raggiunti. 
+La logica della propagazione del cambiamento può essere implementata per mezzo di un grafo i cui nodi rappresentano i valori da tenere aggiornati e gli archi rappresentano le relazioni di dipendenza che coinvolgono i nodi. Utilizzando questo tipo di architettura si viene quindi a creare una rete di dipendenze computazioni ed il cambiamento di un nodo (quindi di un valore) scatena una reazione che implica l'attraversamento degli eventuali archi ad esso collegati e il conseguente aggiornamento di tutti i nodi raggiunti. 
 
 \begin{figure}
     \centering
@@ -427,38 +426,38 @@ La logica della propagazione del cambiamento può essere implementata per mezzo 
     \label{fig:rp-dependency}
 \end{figure}
 
-\subsubsection{Strategie di propagazione}
+\subsection{Strategie di propagazione}
 Esistono diverse strategie adottabili per la propagazione del cambiamento nella programmazione reattiva, di seguito verranno descritte le principali:
 \begin{itemize}
     \item \textbf{complete propagation}: ogni nodo, durante la propagazione, invia il suo stato attuale completo ai nodi dipendenti. In questo caso tutto lo stato precedente del nodo viene perso durante l'aggiornamento del nuovo stato. Questa strategia non è adatta nei casi in cui il grafo delle dipendenze sia particolarmente complesso o nel caso in cui gli stati necessitino di grandi quantità di dati per essere descritti a causa del suo alto carico computazionale;
-    \item \textbf{delta propagation}: al momento della propagazione i nodi interrati inviano solo una porzione (un \textit{delta}) del loro stato ai nodi dipendenti, cioè solo le frazioni di informazioni che sono state effettivamente coinvolte da modifiche. Questo approccio tende a minimizzare la quantità di dati da trasportare lungo la catena di dipendenze durante la propagazione dei cambiamenti, dunque risulta efficiente anche nei casi in cui si ha un grafo delle dipendenze complesso e una grande quantità di dati per la rappresentazione degli stati; 
+    \item \textbf{delta propagation}: al momento della propagazione i nodi interessati inviano solo una porzione (un \textit{delta}) del loro stato ai nodi dipendenti, cioè solo le frazioni di informazioni che sono state effettivamente coinvolte da modifiche. Questo approccio tende a minimizzare la quantità di dati da trasportare lungo la catena di dipendenze durante la propagazione dei cambiamenti, dunque risulta efficiente anche nei casi in cui si ha un grafo delle dipendenze complesso e una grande quantità di dati per la rappresentazione degli stati; 
     \item \textbf{batch propagation}: prevede un ritardo nella propagazione dei cambiamenti, cioè la rappresentazione ritardata nel tempo. Consente l'ottimizzazione di quelle situazioni in cui abbiamo più cambiamenti vicini nel tempo che si annullano a vicenda e fanno sì che si ritorni allo stato di partenza. Nel caso in cui due o più cambiamenti vicini nel tempo generino un'effettiva mutazione di stato nel grafo viene propagato solo l'ultimo cambiamento, scartando i precedenti, ormai obsoleti. Questa strategia tende a minimizzare il numero di propagazioni e di conseguenza il carico computazionale complessivo. 
-    Tuttavia, occorre adottare un tempo di ritardo corretto, al fine di ridurre il carico computazionale ma al tempo stesso garantire una buona reattività; 
-    \textbf{invalidity notification propagation}: potrebbe essere definita come una "sotto-strategia" piuttosto che ua vera e propria strategia implementativa. Consiste nella richiesta di aggiornamento da parte di un nodo che riscontra di possedere uno stato non valido, oppure che riceve un messaggio di propagazione non valido. In questo caso il nodo interessato scarta l'anomalia e richiede ai nodi da cui dipende un nuovo aggiornamento. 
+    Tuttavia, occorre adottare un tempo di ritardo corretto al fine di ridurre il carico computazionale, ma al tempo stesso garantire una buona reattività; 
+    \item \textbf{invalidity notification propagation}: potrebbe essere definita come una "sotto-strategia" piuttosto che una vera e propria strategia implementativa. Consiste nella richiesta di aggiornamento da parte di un nodo che riscontra di possedere uno stato non valido, oppure che riceve un messaggio di propagazione non valido. In questo caso il nodo interessato scarta l'anomalia e richiede ai nodi da cui dipende un nuovo aggiornamento. 
 \end{itemize}
 
-\subsection{Modelli di valutazione}
+\section{Modelli di valutazione}
 Nella programmazione reattiva, per \textit{modello di valutazione} (\textit{evaluation model}) si intende la dinamica direzionale che viene adottata per gestire la propagazione dei cambiamenti nel grafo delle dipendenze computazionali. 
 Il modello viene applicato a livello di linguaggio, rimanendo quindi trasparente all'utilizzatore finale. 
 I modelli presenti in letteratura sono due, ai quali si aggiunge un terzo, ibrido fra i primi due: 
 \begin{itemize}
-    \item \textbf{push-based}: nel modello push-based la reazione inizia quando un nodo produttore cambia stato aggiornandosi. Il nodo in questione ``spinge'' l'informazione attraverso i nodi consumatori, ovvero i nodi dipendenti. Questo approccio, guidato dalla disponibilità di nuove informazioni, ha il vantaggio di rendere il sistema altamente reattivo, in quanto le reazioni vengono provocate e propagate immediatamente dopo la disponibilità di nuovi dati. Questo approccio comporta, d'altra parte, a computazioni superflue e un alto carico di calcolo, a causa delle elaborazioni necessarie ad ogni cambiamento di stato del produttore. 
-    \item \textbf{pull-based}: nel modello pull-based sono i nodi consumatori a richiedere i nuovi valori nel momento in cui ne hanno bisogno. L'approccio in questo caso è guidato dalla domanda di nuovi dati da parte dei nodi dipendenti. Questo porta ad un sistema più flessibile, ma introduce latenze fra il momento in cui un cambiamento si verifica e il momento in cui avviene la reazione. 
-    \item \textbf{hybrid push-pull}: il modello ibrido combina i due modelli push e pull, cercando di trarre i vantaggi di entrambe le soluzioni. Il modello push-based funziona bene quando è richiesta una reazione istantanea al cambiamento, mentre il modello pull-based porta a prestazioni migliori quando nel sistema si presentano continui cambiamenti di valori nel tempo. Questo approccio riesce quindi a trarre i benefici del modello push-based (efficienza e latenza bassa) e del modello pull-based (flessibilità nella richiesta dei valori)~\cite{DBLP:conf/haskell/Elliott09}.  
+    \item \textbf{push-based}: nel modello \textit{push-based} la reazione inizia quando un nodo produttore cambia stato aggiornandosi. Il nodo in questione ``spinge'' l'informazione attraverso i nodi consumatori, ovvero i nodi dipendenti. Questo approccio, guidato dalla disponibilità di nuove informazioni, ha il vantaggio di rendere il sistema altamente reattivo, in quanto le reazioni vengono provocate e propagate immediatamente dopo la disponibilità di nuovi dati. Questo approccio comporta, d'altra parte, a computazioni superflue e un alto carico di calcolo, a causa delle elaborazioni necessarie ad ogni cambiamento di stato del produttore. 
+    \item \textbf{pull-based}: nel modello \textit{pull-based} sono i nodi consumatori a richiedere i nuovi valori nel momento in cui ne hanno bisogno. L'approccio in questo caso è guidato dalla domanda di nuovi dati da parte dei nodi dipendenti. Questo porta ad un sistema più flessibile, ma introduce latenze fra il momento in cui un cambiamento si verifica e il momento in cui avviene la reazione. 
+    \item \textbf{hybrid push-pull}: il modello ibrido combina i due modelli \textit{push} e \textit{pull}, cercando di trarre i vantaggi di entrambe le soluzioni. Il modello \textit{push-based} funziona bene quando è richiesta una reazione istantanea al cambiamento, mentre il modello \textit{pull-based} porta a prestazioni migliori quando nel sistema si presentano continui cambiamenti di valori nel tempo. Questo approccio riesce quindi a trarre i benefici del modello \textit{push-based} (efficienza e latenza bassa) e del modello \textit{pull-based} (flessibilità nella richiesta dei valori)~\cite{DBLP:conf/haskell/Elliott09}.  
 \end{itemize}
 
 
-\subsection{Glitch}
+\section{Glitch}
 In programmazione reattiva un \textbf{glitch} indica un malfunzionamento dovuto ad una inconsistenza dei dati presenti nel grafo delle dipendenze computazionali. La prevenzioni dei glitch è un'altra proprietà che deve essere presa in considerazione in un linguaggio reattivo~\cite{DBLP:journals/csur/BainomugishaCCMM13}.
-Un glitch può essere provocato da una anomalia durante la propagazione di un cambiamento, oppure dal calcolo di un espressione presente in un nodo prima della valutazione di tutte le sue dipendenze. Il risultato è una situazione nella quale un nodo esegue la propria computazione utilizzando alcuni dati aggiornati ed altri ormai obsoleti, provocando quasi certamente errori di calcolo e inconsistenze. 
+Un glitch può essere provocato da una anomalia durante la propagazione di un cambiamento, oppure dal calcolo di un'espressione presente in un nodo prima della valutazione di tutte le sue dipendenze. Il risultato è una situazione nella quale un nodo esegue la propria computazione utilizzando alcuni dati aggiornati ed altri ormai obsoleti, provocando quasi certamente errori di calcolo e inconsistenze. 
 Consideriamo il seguente esempio: 
-\begin{quotation}
-    \texttt{var1 = 1}
-    \texttt{var2 = var1 * 1}
+\begin{quotation}\noindent
+    \texttt{var1 = 1}\newline
+    \texttt{var2 = var1 * 1}\newline
     \texttt{var3 = var1 + var2}
 \end{quotation} 
-In questo esempio, il valore della variabile \texttt{var2} dovrebbe essere sempre lo stesso di \texttt{var1}, e il valore di \texttt{var3} dovrebbe invece essere il doppio di \texttt{var1}. Inizialmente quando il valore di \texttt{var1} è 1, il valore di \texttt{var2} è 1, e quello di \texttt{var3} è 2. Se il valore di \texttt{var1} cambia, per esempio diventa 2, ci si aspetta che il valore di \texttt{var2} diventi 2 e di conseguenza quello di \texttt{var3} diventa 4. Tuttavia, in una implementazione reattiva non corretta, il cambiamento del valore di \texttt{var1} potrebbe causare il ricalcolo di \texttt{var1 + var2} prima di \texttt{var1 * 1} . In questo caso il valore di \texttt{var3} sarebbe momentaneamente 3, ovvero un valore non corretto.
-Prima o poi l'espressione \texttt{var1 * 1} sarà computata, in quel momento il valore di var2 diventerà 2 e quello di var3 sarà ricalcolato, riflettendo il valore corretto 4. Il comportamento appena descritto è osservabile in 
+In questo esempio, il valore della variabile \texttt{var2} dovrebbe essere sempre lo stesso di \texttt{var1}, e il valore di \texttt{var3} dovrebbe invece essere il doppio di \texttt{var1}. Inizialmente quando il valore di \texttt{var1} è 1, il valore di \texttt{var2} è 1, e quello di \texttt{var3} è 2. Se il valore di \texttt{var1} cambia, per esempio diventa 2, ci si aspetta che il valore di \texttt{var2} diventi 2 e di conseguenza quello di \texttt{var3} diventi 4. Tuttavia, in una implementazione reattiva non corretta, il cambiamento del valore di \texttt{var1} potrebbe causare il ricalcolo di \texttt{var1 + var2} prima di \texttt{var1 * 1} . In questo caso il valore di \texttt{var3} sarebbe momentaneamente 3, ovvero un valore non corretto.
+Prima o poi l'espressione \texttt{var1 * 1} sarà computata, in quel momento il valore di \texttt{var2} diventerà 2 e quello di \texttt{var3} sarà ricalcolato, riflettendo il valore corretto 4. Il comportamento appena descritto è osservabile in~\Cref{fig:rp-glitch}.
 
 \begin{figure}
     \centering
@@ -467,14 +466,14 @@ Prima o poi l'espressione \texttt{var1 * 1} sarà computata, in quel momento il 
     \label{fig:rp-glitch}
 \end{figure}
 
-La maggior parte dei linguaggi di programmazione reattiva elimina i glitch organizzando le espressioni in un grafico ordinato topologicamente, garantendo così che un'espressione venga sempre valutata dopo che tutte le dipendenze sono state valutate. 
+La maggior parte dei linguaggi di programmazione reattiva elimina i glitch organizzando le espressioni in un grafo ordinato topologicamente, garantendo così che un'espressione venga sempre valutata dopo che tutte le dipendenze sono state valutate. 
 Nella teoria dei grafi l'ordinamento topologico di un grafo consiste nell'ordinare linearmente i suoi nodi in modo che preso un qualunque arco $xy$ dal nodo $x$ al nodo $y$, $x$ venga prima di $y$ nell'ordinamento. In altre parole, i nodi sono disposti in modo tale che ognuno di essi preceda tutti i nodi collegati ai suoi archi uscenti seguendo l'ordinamento scelto.
 Le implementazioni reattive più recenti riescono ad evitare i glitch nei programmi reattivi eseguiti su un singolo computer, ma non nei programmi reattivi distribuiti. Evitare problemi in un ambiente distribuito non è un'attività banale a causa dei guasti di rete, ritardi e mancanza di un orologio globale. 
 
-\subsection{Lifting}
+\section{Lifting}
 Quando la programmazione reattiva è incorporata nei linguaggi host (come libreria o come estensione), gli operatori esistenti (ad esempio + o *) e le funzioni o i metodi definiti dall'utente devono essere convertiti per operare sui comportamenti. 
 La conversione di un operatore ordinario in una variante in grado di operare sui comportamenti è nota come \textit{lifting}. 
-Il lifting ha un duplice scopo: trasforma la firma del tipo di una funzione e registra un grafico delle dipendenze nel grafico del flusso di dati dell'applicazione. 
+Il lifting ha un duplice scopo: trasforma la firma del tipo di una funzione e registra un grafico delle dipendenze nel grafo del flusso di dati dell'applicazione. 
 Esistono diverse strategie per effettuare il lifting: 
 \begin{itemize}
     \item \textbf{lifting implicito}: quando un operatore viene applicato ad un comportamento, viene eseguito in maniera automatica il lifting. Il lifting implicito rende la programmazione reattiva trasparente agli utilizzatori. 
@@ -482,9 +481,9 @@ Esistono diverse strategie per effettuare il lifting:
     \item \textbf{lifting manuale}: il linguaggio non fornisce operatori per effettuare il lifting. Il programmatore deve ottenere manualmente il valore corrente di un valore variabile nel tempo, che poi può essere utilizzato con gli operatori del linguaggio. 
 \end{itemize}
 
-\subsection{Entità osservabili e osservatrici}
-Nel contesto della programmazione reattiva, le fonti di dati o eventi che emettono informazioni vengono chiamate entità osservabili, mentre le entità osservatrici sono quelle che si collegano a queste fonti per monitorare e reagire ai dati o agli eventi emessi. In questa sezione vengono descritte le due entità, evidenziando le loro caratteristiche. 
-\subsubsection{Entità osservabile}
+\section{Entità osservabili e osservatrici}
+Nel contesto della programmazione reattiva, le fonti di dati o eventi che emettono informazioni vengono chiamate \textbf{entità osservabili}, mentre le \textbf{entità osservatrici} sono quelle che si collegano a queste fonti per monitorare e reagire ai dati o agli eventi emessi. In questa sezione vengono descritte le due entità, evidenziando le loro caratteristiche. 
+\subsection{Entità osservabile}
 Un'entità osservabile rappresenta un flusso continuo di dati o eventi che può essere emesso in modo regolare o completamente asincrono. Questo flusso può essere caratterizzato da una quantità variabile di elementi, incluso zero, uno o un numero infinito di essi. Questo concetto è fondamentale per gestire dati in tempo reale e interazioni utente in applicazioni moderne, consentendo una gestione dinamica dei flussi di informazioni.
 
 Tuttavia, l'entità osservabile va oltre la semplice emissione di dati o eventi. Essa può concludersi in due modi principali: notificando un completamento avvenuto o segnalando un errore anomalo durante la sua esecuzione. Il completamento avvenuto è tipicamente utilizzato quando il flusso di dati ha termini definiti e finiti, ad esempio dopo il completamento di una sequenza di operazioni. D'altra parte, l'errore può essere segnalato in caso di malfunzionamenti imprevisti, come errori di connessione di rete o eccezioni di programmazione.
@@ -494,19 +493,243 @@ Se consideriamo un'entità osservabile con un flusso infinito di elementi, come 
 \subsection{Entità Osservatrice}
 Un'entità osservatrice può instaurare una connessione (sottoscrizione) con un'entità osservabile al fine di monitorare e gestire i dati o gli eventi trasmessi da quest'ultima secondo specifiche politiche reattive. 
 Gli elementi all'interno di un flusso sono emessi in modo sequenziale, uno dopo l'altro, e vengono elaborati dall'entità osservatrice in modo consecutivo. Questa caratteristica impedisce la comparsa di corse critiche, mantenendo l'ordine delle operazioni e garantendo una gestione reattiva dei dati.
-Nel caso in cui un grande numero di dati o eventi venga emesso rapidamente dall'entità osservabile e l'entità osservatrice non sia in grado di elaborarli con la stessa velocità, è possibile adottare strategie come l'utilizzo di una coda degli eventi o il meccanismo di buffering per gestire in modo efficiente il flusso di dati e prevenire perdite o sovraccarichi.
+Nel caso in cui un grande numero di dati o eventi venga emesso rapidamente dall'entità osservabile e l'entità osservatrice non sia in grado di elaborarli con la stessa velocità, è possibile adottare strategie come l'utilizzo di una \textit{coda degli eventi} o il meccanismo di \textit{buffering} per gestire in modo efficiente il flusso di dati e prevenire perdite o sovraccarichi.
 Infine, un'entità osservabile può essere sottoscritta da zero, una o più entità osservatrici contemporaneamente, permettendo una gestione flessibile e dinamica del flusso di dati o eventi all'interno di un'applicazione reattiva. 
-\subsection{Contesti di utilizzo}
 
-\subsection{Il manifesto reattivo}
-%----------------------------------------------------------------------------------------
-% BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
+\section{Il Manifesto Reattivo}
+Il 16 settembre 2014 è stata rilasciata la seconda versione del \textit{Manifesto Reattivo}~\footnote{https://www.reactivemanifesto.org/}, un documento redatto da esperti del settore tra cui Jonas Bonér, Dave Farley, Roland Kuhn e Martin Thompson. Questo manifesto, piuttosto che essere un trattato sulla programmazione reattiva, si presenta come una guida pratica per la progettazione di sistemi reattivi, delineando le caratteristiche chiave che tali sistemi dovrebbero possedere.
+È importante comprendere che il manifesto non promuove un'unica metodologia o paradigma di programmazione reattiva, ma piuttosto si concentra su principi generali che possono essere applicati a una vasta gamma di architetture e tecnologie. L'obiettivo è garantire che i sistemi reattivi siano capaci di affrontare sfide come la scalabilità, la resilienza e la responsività, comuni nell'ambito delle applicazioni moderne.
+La necessità di redigere il manifesto è stata spinta dai rapidi cambiamenti nel panorama tecnologico. Mentre in passato le applicazioni erano caratterizzate da un'architettura monolitica, tempi di risposta relativamente lunghi e gestione di volumi limitati di dati, oggi ci troviamo di fronte a una realtà in cui le applicazioni devono essere distribuite su una vasta gamma di dispositivi, supportare grandi volumi di dati e fornire risposte quasi istantanee agli utenti.
+Gli autori del manifesto descrivono un sistema reattivo come \textbf{flessibile}, a \textbf{basso accoppiamento} e \textbf{scalabile}: questo lo rende più semplice da sviluppare e più malleabile nel tempo. Tali sistemi sono più \textbf{tolleranti ai guasti} e reagiscono ad essi in modo elegante e non brusco. Sono altamente \textbf{responsivi}, offrendo agli utenti un feedback concreto.
+Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{fig:rp-reactive-manifesto}, che un sistema deve assolutamente possedere per essere considerato reattivo: 
+\begin{itemize}
+    \item \textbf{responsività}: il sistema, se è in generale possible dare una risposta ai client, la dà in maniera tempestiva. La responsività è la pietra miliare dell'usabilità e dell'utilità del sistema; essa presuppone che i problemi vengano identificati velocemente e gestiti in modo efficace. I sistemi responsivi sono focalizzati a minimizzare il tempo di risposta, individuando per esso un limite massimo prestabilito di modo da garantire una qualità del servizio consistente nel tempo. Il comportamento risultante è quindi predicibile, il che semplifica la gestione delle situazioni di errore, genera fiducia negli utenti finali e predispone ad ulteriori interazioni con il sistema;
+    \item \textbf{relisienza}: il sistema resta responsivo anche in caso di guasti. Ciò riguarda non solo i sistemi ad alta disponibilità o mission-critical: infatti, accade che ogni sistema che non è resiliente si dimostrerà anche non responsivo in seguito ad un guasto. La resilienza si acquisisce tramite replica, contenimento, isolamento e delega. I guasti sono relegati all'interno di ogni componente, isolando così ogni componente dagli altri e quindi garantendo che il guasto delle singole porzioni del sistema non comprometta il sistema intero. Il recupero di ogni componente viene delegato ad un altro componente (esterno) e l'alta disponibilità viene assicurata tramite replica laddove necessario. I client di un componente vengono dunque alleviati dal compito di gestirne i guasti;
+    \item \textbf{elasticità}: il sistema rimane responsivo sotto carichi di lavoro variabili nel tempo. I sistemi reattivi possono adattarsi alle variazioni nella frequenza temporale degli input incrementando o decrementando le risorse allocate al processamento degli stessi. Questo porta ad architetture che non hanno né sezioni contese né colli di bottiglia, favorendo così la distribuibilità o la replica dei componenti e la ripartizione degli input su di essi. I sistemi reattivi permettono l'implementazione predittiva, oltre che reattiva, di algoritmi scalabili perché fondati sulla misurazione real-time della performance. Tali sistemi, raggiungono l'elasticità in maniera cost-effective su commodity hardware e piattaforme software a basso costo;
+    \item \textbf{orientato ai messaggi}: i sistemi reattivi si basano sullo scambio di messaggi asincrono per delineare per ogni componente il giusto confine che possa garantirne il basso accoppiamento con gli altri, l'isolamento e la trasparenza sul dislocamento e permetta di esprimere i guasti del componente sotto forma di messaggi al fine di delegarne la gestione. L'utilizzo di uno scambio esplicito di messaggi permette migliore gestibilità del carico di lavoro, elasticità e controllo dei flussi di messaggi mediante setup e monitoraggio di code di messaggi all'interno del sistema e mediante l'applicazione di feedback di pressione laddove necessari. Uno scambio di messaggi trasparente rispetto al dislocamento rende possibile, ai fini della gestione dei guasti, l'utilizzo degli stessi costrutti e semantiche sia su cluster che su singoli host. Uno stile di comunicazione non bloccante fa sì che l'entità ricevente possa solo consumare le risorse, il che porta ad un minor sovraccarico sul sistema.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.80\linewidth]{figures/reactive-programming/reactive-manifesto.png}
+    \caption{Caratteristiche fondamentali di un sistema reattivo.}
+    \label{fig:rp-reactive-manifesto}
+\end{figure}
+
+\chapter{Programmazione reattiva in Kotlin}
+\section{Coroutines}
+Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. Quando si parla di una coroutine, solitamente ci si riferisce ad una \textit{suspending function}, ovvero una funzione la cui esecuzione può essere sospesa e ripristinata, preservandone lo stato anche durante la sospensione. 
+Kotlin definisce una coroutine come un istanza di una suspending function, ovvero una funzione che può sospendere temporaneamente la propria esecuzione, concettualmente simile ad un \textit{thread}, per il fatto che entrambi prendono un blocco di codice da eseguire e hanno un ciclo di vita simile. Le coroutines tuttavia, non sono limitate ad un singolo thread. La loro esecuzione può essere sospesa in un thread e può essere ripristinata in un altro. 
+
+\subsection{Classificazione}
+Ana Lucia De Moura e Roberto Ierusalimschy~\cite{DBLP:journals/toplas/MouraI09} classificano le coroutine secondo la loro implementazione: 
+\begin{itemize}
+    \item \textbf{trasferimento del controllo simmetrico/asimmetrico}: riguarda il modo in cui le coroutines gestiscono il flusso di esecuzione e la comunicazione con altre coroutines o con il thread principale.
+    Nel trasferimento del controllo \textit{simmetrico}, le coroutine cooperano tra loro per controllare l'esecuzione. Le coroutines con trasferimento del controllo simmetrico sono generalmente implementate utilizzando un meccanismo cooperativo, dove una coroutine può essere sospesa e ripresa solo quando decide di farlo.
+    D'altra parte, nel trasferimento del controllo \textit{asimmetrico}, una delle coroutines coinvolte detiene il controllo sull'esecuzione e può assegnarlo ad altre coroutines in modo asincrono. In questo modello, una coroutine può essere sospesa o ripresa anche senza il suo consenso diretto, poiché il controllo è gestito in modo asincrono dal sistema o da un'entità esterna;
+    \item \textbf{implementazione stackful/stackless}: influenzano il modo in cui vengono gestite le coroutines e la profondità dello stack delle chiamate.
+    In un'implementazione \textit{stackful}, ogni coroutine ha il proprio stack separato, simile a quello di un \textit{thread}. Ciò consente a ciascuna di esse di eseguire chiamate ricorsive senza causare un \textit{overflow} dello stack, poiché ogni coroutine ha il proprio stack dedicato. Tuttavia, questo approccio richiede una gestione importante delle risorse, poiché ogni coroutine richiede un'allocazione di memoria separata per lo stack.
+    In un'implementazione \textit{stackless}, le coroutines condividono lo stesso stack o utilizzano un modello di gestione dello stack non ricorsivo, come i \textit{coroutine frames}. Questo modello rende la gestione delle coroutine più efficiente in termini di utilizzo delle risorse, ma può limitare la profondità delle chiamate ricorsive e potenzialmente causare un overflow dello stack se la profondità delle chiamate è troppo grande; 
+    \item \textbf{supporto di prima classe/limitato}: influisce sul grado di flessibilità e controllo che gli sviluppatori hanno quando utilizzano le coroutines.
+    Con il \textit{supporto di prima classe}, le coroutines sono trattate come qualsiasi altro tipo di dato nel linguaggio di programmazione. Ciò significa che possono essere passate come argomenti a funzioni, restituite come valori di ritorno da funzioni e assegnate a variabili.
+    Il \textit{supporto limitato} per le coroutine porta a restrizioni sulle operazioni che è possibile eseguire con le coroutines.
+\end{itemize}
+
+
+\subsection{Limitazioni della programmazione asincrona}
+\label{sec:async-limitation}
+La programmazione asincrona è soggetta agli stessi problemi della programmazione in generale; allo stesso tempo, presenta una serie di problemi unici, non rilevanti per il codice sincrono~\cite{DBLP:conf/oopsla/ElizarovBAU21}. In questa sezione verranno discussi brevemente due problemi che influenzano maggiormente lo spazio di progettazione per un linguaggio di programmazione con supporto alla programmazione asincrona: ``\textbf{colorazione delle funzioni}'' e \textbf{gestione degli errori}.
+
+\subsubsection{Colorazione delle funzioni}
+Una differenza importante tra diverse implementazioni di computazione asincrona riguarda la gestione della divisione tra codice asincrono e sincrono. Ci si riferisce a questo problema come ``\textit{colorazione delle funzioni}''.
+Questo è un concetto comune che assume diverse forme e formalizzazioni, ma in sostanza si riduce a un numero di regole semplici: 
+\begin{itemize}
+    \item ogni programma o funzione è assegnata ad un particolare colore, ad esempio rosso o blue; 
+    \item il codice blue rappresenta la computazione sincrona e può essere acceduto da entrambi i colori; 
+    \item il codice rosso rappresenta invece la computazione asincrona, e può essere acceduto solo dal codice di colore rosso;  
+    \item esistono costrutti speciali che consentono di chiamare il codice rosso da quello blu, in alternativa, il codice delle \textit{entry function} è rosso. 
+\end{itemize}
+Per risolvere questo problema si potrebbe pensare ad un linguaggio in cui tutto il codice è rosso, e tutte le computazioni sono quindi asincrone. Nella realtà, però, introdurre computazione asincrona in tutte le funzioni introduce diversi problemi: 
+\begin{itemize}
+    \item la computazione asincrona introduce complessità rispetto alla chiamata di normali funzioni;
+    \item molti linguaggi di programmazione sono sincroni per natura e introducono costrutti asincroni solo per determinati scopi. La mancanza di una chiara distinzione tra funzioni sincrone e asincrone porta a problemi di comprensione del programma;
+    \item La gestione degli errori e la loro propagazione in codice rosso è un task particolarmente complesso. Se tutto il codice fosse rosso, sarebbe richiesto una gestione avanzata degli errori in tutto il codice.  
+\end{itemize}
+
+
+\subsubsection{Gestione degli errori}
+Un altro problema cruciale nella programmazione asincrona riguarda la gestione degli errori. Quando si hanno più esecuzioni asincrone in corso contemporaneamente e una di esse fallisce, il modo per recuperare e proseguire l'esecuzione non è così lineare come nel codice sincrono. Nel codice standard, esiste una chiara relazione tra chiamante e chiamato: gli errori nel chiamato si propagano verso l'alto al chiamante e vengono gestiti lì o continuano a propagarsi. Tuttavia, nel codice asincrono, questa relazione non è più presente e senza di essa non c'è un punto di responsabilità definito su chi debba gestire quali errori. È anche possibile che sia necessario propagare la gestione degli errori verso il basso, ad esempio per annullare calcoli non necessari.
+Per affrontare questo problema, si possono utilizzare le funzionalità offerte dal linguaggio di programmazione per creare un meccanismo di gestione degli errori sostitutivo, tuttavia, tutte queste soluzioni non sono ottimali per la gestione degli errori verso il basso.
+Un approccio più strutturato alla gestione degli errori asincroni incorporerebbe sia la gestione verso l'alto che quella verso il basso. Esistono due approcci principali utilizzati nella programmazione asincrona attuale. Il primo si basa sugli \textbf{alberi di supervisione}. Questo metodo prevede l'organizzazione esplicita delle attività asincrone in alberi padre-figlio, che corrispondono alla struttura desiderata di propagazione degli errori verso l'alto e verso il basso. In caso di errore, è possibile scegliere se isolare, propagare o riavviare il sotto-albero di attività interessato. Il secondo approccio è chiamato \textbf{concorrenza strutturata}, propone di applicare i principi della programmazione strutturata alla programmazione asincrona. In questo caso, se un'attività A avvia un'attività B, la durata di B non può superare quella di A. Questo schema stabilisce una relazione di ``\textit{launcher-launchee}'' invece di quella \textit{chiamante-chiamato} e descrive come propagare gli errori e le cancellazioni verso il basso.
+Rispetto agli alberi di supervisione, la concorrenza strutturata è meno flessibile, poiché la strategia di gestione degli errori è predefinita. Tuttavia, è anche meno verbosa e corrisponde meglio al modo in cui solitamente viene scritto il codice asincrono.
+
+\subsection{Goals}
+Kotlin è stato concepito come un linguaggio di programmazione pragmatico, pensato per essere utilizzato quotidianamente e per agevolare gli sviluppatori nel completare i loro compiti attraverso le sue funzionalità e strumenti. Questo stesso approccio viene applicato al suo supporto per la programmazione asincrona, con obiettivi principali ben definiti.
+
+Prima di tutto, Kotlin mira a garantire \textbf{l'indipendenza dalle specifiche implementazioni di basso livello} delle piattaforme. Poiché è progettato per essere un linguaggio multipiattaforma, con capacità di compilazione su JVM, JavaScript e binari nativi, costruire un supporto asincrono basato su altre implementazioni (come ad esempio i futures su JVM) potrebbe generare diversi problemi, soprattutto in termini di interoperabilità tra le diverse piattaforme.
+
+Inoltre, Kotlin si impegna a essere altamente \textbf{adattabile alle implementazioni esistenti}. Essendo relativamente nuovo, il linguaggio presta particolare attenzione all'interoperabilità con il codice già esistente, con un'enfasi speciale sul lavoro con il codice Java sulla piattaforma JVM in modo trasparente. Considerando che esistono già approcci consolidati per la gestione del codice asincrono su piattaforme specifiche (come ad esempio le promise in JavaScript o le operazioni di input/output non bloccanti su JVM), Kotlin mira a integrare senza soluzione di continuità tali API nel suo ecosistema.
+
+Infine, Kotlin punta a fornire un \textbf{supporto per la programmazione asincrona pragmatica}. L'avvento e la diffusione dell'approccio async/await, rispetto ad altri stili di programmazione asincrona, hanno evidenziato l'importanza della leggibilità del codice. Anche se l'approccio async/await potrebbe essere meno espressivo rispetto a quello basato sulle coroutine, copre la maggior parte dei casi d'uso pratici e offre anche prestazioni migliori.
+
+\subsection{Coroutine builder}
+I \textbf{coroutine builder} sono funzioni che consentono di creare e avviare coroutine in Kotlin. In Kotlin sono disponibili diversi coroutine builder, i più utilizzati sono:
+\begin{itemize}
+    \item \textbf{launch}: è utilizzato per avviare una nuova coroutine in modo asincrono. Quando si utilizza \textit{launch}, la coroutine viene avviata e viene eseguito il codice all'interno della coroutine in modo indipendente dal flusso principale del programma. Questo significa che la coroutine può essere eseguita in background senza bloccare il thread principale.
+    \textit{Launch} non restituisce alcun valore, quindi è utilizzato principalmente per operazioni di tipo \textit{fire-and-forget}; 
+    l'esecuzione ritorna un oggetto \texttt{job}, sul quale si può eseguire il metodo \texttt{join()}, che blocca il thread chiamante fino a quando la coroutine non è terminata. 
+    Le eccezioni che accadono in una coroutine eseguita con \textit{launch} sono propagate alla coroutine padre, ma non alle coroutines sorelle. Se viene lanciata una eccezione e non viene gestita, questa verrà ignorata silenziosamente. 
+    \item \textbf{async}: è utilizzato per avviare una coroutine che restituisce un valore, cioè un'operazione che produce un risultato. A differenza di \textit{launch}, \textit{async} restituisce un oggetto \texttt{Deferred}, che rappresenta il risultato futuro dell'operazione asincrona. Il valore può essere ottenuto utilizzando la funzione \texttt{await()} su un oggetto \texttt{Deferred}. Anche in questo caso il thread chiamante è bloccato finché non è stato prodotto il risultato. 
+    Questo è utile quando si desidera eseguire un'operazione asincrona e recuperare il risultato prodotto da essa.
+    Le eccezioni in questo caso sono immagazzinate all'interno dell'oggetto \texttt{Deferred}. Se eseguiamo il metodo \texttt{await()}, l'eccezione viene rilanciata e può essere gestita con un normale blocco \texttt{try-cath} o altri meccanismi di gestione delle eccezioni. 
+    \item \textbf{runBlocking}: è un coroutine builder che fa da ponte fra il codice al suo interno e il mondo esterno alle coroutine. Il thread che esegue questo builder viene bloccato per tutta la durata della chiamata, finché tutte le coroutine al suo interno non hanno completato la loro esecuzione. 
+\end{itemize}
+
+\subsection{Coroutine scope e concorrenza strutturata}
+Un \textbf{coroutine scope} fornisce un modo per gestire il ciclo di vita delle coroutines, consentendo di avviare, gestire o cancellare gruppi di coroutines in modo coerente e sicuro. Ciascuna di esse deve essere gestita all'interno di uno scope e quando questo viene cancellato tutte le coroutines al suo interno vengono cancellate. I coroutine scope possono essere nidificati, in questo caso quando uno scope di livello superiore viene cancellato, vengono cancellate tutte le coroutines al suo interno e tutti gli scope interni vengono cancellati ricorsivamente. La radice di questo albero di dipendenze è chiamata \texttt{GlobalScope}. Anche se è possibile eseguire le coroutines all'interno dello scope globale, è consigliato creare nuovi scope secondo la necessità e renderli figli e genitori l'uno dell'altro in modo logico, sicuro e efficiente. 
+In sintesi, il coroutine scope permette di gestire le coroutines in modo strutturato, definendo il ciclo di vita delle stesse. Questo garantisce che le risorse vengano gestite in modo corretto e che le attività vengano terminate in modo ordinato, migliorando l'affidabilità e la manutenibilità del software e risolvendo i problemi della gestione degli errori nella programmazione asincrona descritti nella~\Cref{sec:async-limitation}
+
+\subsection{Coroutine context}
+Il \textbf{coroutine context} è un insieme persistente di oggetti definiti dall'utente che possono essere associati alla coroutine stessa. Questo insieme può includere oggetti responsabili delle politiche di threading della coroutine, del logging, degli aspetti di sicurezza e di transazione dell'esecuzione della coroutine, nonché dell'identità e del nome della stessa.
+Se pensiamo alle coroutines come thread leggeri, il contesto di una coroutine può essere paragonato a una raccolta di variabili locali del thread. Tuttavia, a differenza delle variabili locali del thread, il contesto di una coroutine è immutabile, ma è possibile aggiungerne elementi usando l'operatore \texttt{plus}. Questo non rappresenta una grave limitazione, poiché le coroutines sono così leggere che è facile lanciarne una nuova quando c'è la necessità di modificare qualcosa nel contesto.
+La libreria standard non include implementazioni concrete, ma fornisce un'interfaccia, consultabile al Listato~\ref{lst:coroutine-contex-interface}, in modo che tutti questi aspetti possano essere definiti in modo componibile. 
+Concettualmente, il coroutine context può essere considerato una sorta di ibrido tra un insieme e una mappa: gli elementi hanno chiavi come in una mappa, ma le chiavi sono direttamente associate agli elementi, similmente ad un insieme.
+Ogni elemento di un coroutine context è esso stesso un contesto. Questo consente la creazione di contesti composti.
+In~\Cref{fig:rp-coroutine-context} è possibile notare come lo scope di una coroutine figlio venga definito partire dal contesto dello scope padre e aggiungendo la propria istanza di \texttt{job}. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.80\linewidth]{figures/reactive-programming/coroutine-context.png}
+    \caption{La nuova coroutine crea la propria istanza di \texttt{job} e definisce il proprio contesto a partire dal contesto padre più il job creato.}
+    \label{fig:rp-coroutine-context}
+\end{figure}
+
+\lstinputlisting[float,language=Kotlin,caption = {Interfaccia definita per il coroutine context, presente nel package \texttt{kotlin.coroutines}.}, label={lst:coroutine-contex-interface}]{listings/coroutines/coroutine-context.kt}
+
+\subsubsection{Coroutine Dispatcher}
+Un coroutine context include un \textbf{coroutine dispatcher}, il quale determina quale o quali thread saranno utilizzati per l'esecuzione delle coroutine. È responsabile dell'allocazione delle risorse di sistema necessarie per l'esecuzione delle coroutine e della coordinazione del loro funzionamento su thread o altri thread pool disponibili nel sistema.
+I dispatchers più comuni disponibili in Kotlin sono: 
+\begin{itemize}
+    \item \textbf{Dispatchers.Default}: viene utilizzato per eseguire le coroutine su un pool di thread con un numero di thread pari al numero di processori disponibili nel sistema o un multiplo di esso. È adatto per operazioni di CPU-bound, come elaborazioni intensive o calcoli.
+    \item \textbf{Dispatchers.IO}:  viene utilizzato per eseguire le coroutines su un pool di thread dedicato alle operazioni di I/O-bound, come operazioni di lettura/scrittura su file, operazioni di rete, o chiamate API. Questo dispatcher ha un pool di thread più grande rispetto a Dispatchers.Default per consentire un numero maggiore di operazioni di I/O contemporaneamente.
+    \item \textbf{Dispatchers.Main}: è specifico per le applicazioni Android e viene utilizzato per eseguire le coroutine sul thread principale della User Interface (UI). È importante utilizzare questo dispatcher quando si effettuano operazioni che coinvolgono l'interfaccia utente per evitare blocchi o rallentamenti dell'UI.
+    \item \textbf{Dispatchers.Unconfined}: Questo dispatcher esegue le coroutine in modo sequenziale sul thread chiamante, senza alcun thread pool dedicato. È utile in situazioni in cui si desidera eseguire il codice sul  thread chiamante fino a quando non è necessario passare ad un altro thread.
+\end{itemize}
+Tutti i coroutine builder, come \texttt{launch} e \texttt{async}, accettano opzionalmente un coroutine context come parametro che può essere usato per specificare esplicitamente il dispatcher e altri elementi per la nuova coroutine. 
+Quando un coroutine builder è utilizzato senza parametri, eredita il contesto (e quindi il dispatcher) dal coroutine scope dal quale è stato eseguito. 
+
+\section{Kotlin Flow}
+Kotlin flow è una libreria che offre un'API reattiva per gestire i flussi di dati asincroni in applicazioni Kotlin. Basato sul modello della programmazione reattiva, Kotlin Flow permette agli sviluppatori di creare, trasformare e combinare flussi di eventi in modo dichiarativo e componibile.
+Android descrive un flow come un tipo in grado di emettere valori in sequenza, a differenza delle suspending function, le quale restituiscono un solo valore. È possibile per esempio utilizzare un flow per ricevere aggiornamenti in tempo reale da un database. Concettualmente un flow è un flusso di dati che può essere calcolato in modo asincrono. 
+Un flow è molto simile ad un iteratore che produce una sequenza di valori, ma utilizza suspending function per produrre e consumare valori in modo asincrono. 
+Le entità coinvolte nei flow sono tre: 
+\begin{itemize}
+    \item \textbf{produttore}: produce i dati che sono aggiunti al flusso; 
+    \item \textbf{intermediario} (opzionale): può modificare ogni valore emesso nel flusso o il flusso stesso senza consumare i valori; 
+    \item \textbf{consumatore}: consuma i valori dal flusso. 
+\end{itemize}
+
+\subsection{Tipi di flow}
+Nel contesto dei Kotlin Flow, possiamo dividere i flussi in due categorie: \textbf{cold flow} e \textbf{hot flow}. 
+I cold flow emettono valori sono quando avviene una sottoscrizione. Ogni qualvolta un osservatore si sottoscrive ad un cold flow viene avviata la produzione dei valori dall'inizio del flusso di dati. Ogni sottoscrizione a questo tipo di flow ha quindi il proprio flusso di dati privato, il quale è indipendente dagli altri. 
+Un hot flow, al contrario, emette valori continuamente, indipendentemente dalla presenza o meno di sottoscrizioni attive. Quando un osservatore si sottoscrive a un hot flow, inizia a ricevere i valori emessi da quel momento in avanti, senza influenzare la produzione dei valori stessi. Non esistono flussi privati per ciascuna sottoscrizione, quindi tutti gli osservatori ricevono gli stessi valori emessi. 
+
+\subsubsection{Cold Flow}
+\label{sec:cold-flow}
+Come è possibile notare in~\Cref{fig:rp-flow-class-diagram}, tutti i tipi di flow estendono dall'interfaccia \textit{Flow}, il cui codice è consultabile al Listato~\ref{fig:rp-flow-interface}. 
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice dell'interfaccia Flow}, label = {fig:rp-flow-interface}]{listings/flow/flow.kt}
+
+L'interfaccia \texttt{Flow} ha un solo metodo \texttt{collect(collector: FlowCollector<T>)}. 
+Quando utilizziamo i flow builder, i quali saranno introdotti successivamente, come \texttt{asFlow()} o \texttt{flowOf()}, in realtà stiamo chiamando una funzione chiamata \texttt{flow()}, la quale accetta una lambda come parametro. Questa lambda ha come ricevitore implicito un \texttt{FlowCollector}, che è un'interfaccia contenente il solo metodo \texttt{emit()}.
+Quindi possiamo chiamare direttamente il metodo \texttt{emit()} su questa lambda per emettere valori nel flusso. Ad esempio, quando utilizziamo \texttt{Iterable.asFlow()}, per ogni elemento dell'iterabile, internamente viene chiamato il metodo \texttt{emit()} per emettere il valore all'interno del flusso.
+Kotlin permette questa sintassi grazie alla \textit{Single Abstract Method conversion} (SAM conversion), che consente di passare una lambda direttamente dove è richiesto un oggetto di un'interfaccia funzionale.
+Quindi, quando collezioniamo i valori di un flusso utilizzando il metodo \texttt{collect()}, in realtà stiamo invocando la lambda che abbiamo definito precedentemente all'interno di flow, e ogni volta che questa lambda viene eseguita, i valori vengono riemessi sul flusso utilizzando il metodo \texttt{emit()}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.80\linewidth]{figures/reactive-programming/flow-class-diagram.png}
+    \caption{Diagramma delle classi dei Kotlin Flow.}
+    \label{fig:rp-flow-class-diagram}
+\end{figure}
+
+\subsubsection{Hot Flow}
+Come anticipato, a differenza dei cold flow, i quali riemettono tutti i valori ad ogni nuova sottoscrizione, gli hot flow emettono elementi in continuazione. 
+Esistono due tipi di hot flow: \textbf{sharedFlow} e \textbf{stateFlow}. 
+In questo caso a livello implementativo sia l'emissione che la collezione degli elementi funziona in maniera leggermente differente rispetto ai cold flow. 
+
+\paragraph{SharedFlow}
+Uno SharedFlow rappresenta un flusso di dati condiviso che può essere letto da più collector contemporaneamente. È prevalentemente utilizzato quando si desidera condividere flussi di dati tra più parti dell'applicazione. 
+Internamente, SharedFlow ha un \textit{buffer} in grado di mantenere valori che saranno poi collezionati dagli osservatori. 
+Quando uno sharedFlow viene dichiarato, è possibile settare il parametro \texttt{replay}, il quale definisce il numeri di valori precedenti che vengono emessi ai nuovi collector all'atto della sottoscrizione. Ad esempio, se \texttt{replay} è settato a 2, il flusso emetterà gli ultimi due valori ai nuovi collector. 
+Un altro parametro che è possibile settare è \textbf{extraBufferCapacity}, il quale è utile per permettere agli osservatori più lenti di ricevere i valori senza sospendere gli emettitori. 
+L'ultimo parametro è \texttt{onBufferOverflow}, utile per scegliere la strategia con la quale gestire l'emissione di nuovi elementi in caso di \textit{buffer overflow}. 
+Quando un produttore invoca il metodo \texttt{emit()}, il valore viene aggiunto al buffer. 
+Il metodo \texttt{collect()}, come è possibile notare nel Listato~\ref{fig:rp-sharedflow-collect}, esegue un \texttt{ciclo while} che non termina mai, il che significa che il metodo \texttt{collect()} è bloccante e perciò necessita di essere eseguito in una coroutine dedicata. 
+Ad ogni iterazione, viene controllato se esiste un nuovo valore da collezionare. Se questo esiste viene richiamato il metodo \texttt{emit()} proprio come nel caso dei cold flow, descritti nella~\Cref{sec:cold-flow}. 
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice delL'implementazione del metodo collect negli sharedFlow.}, label = {fig:rp-sharedflow-collect}]{listings/flow/shared-flow-collect.kt}
+
+\paragraph{StateFlow}
+Uno StateFlow rappresenta uno stato in sola lettura con un singolo valore aggiornabile che emette aggiornamenti ai suoi collector. È particolarmente utile quando è necessario rappresentare qualsiasi tipo di stato. 
+A differenza dello SharedFlow, non ha un buffer interno. Lo stato viene gestito tramite un campo \texttt{value}, il quale viene sovrascritto ad ogni cambiamento di stato. 
+Questa caratteristica impedisce ai consumatori troppo lenti di leggere tutti gli elementi emessi sul flow. Infatti, nel caso di due emissioni consecutive sul flow, un osservatore troppo lento potrebbe accorgersi solo dell'ultimo stato. 
+Per dichiarare uno StateFlow è necessario settare uno stato iniziale. 
+Quando viene invocato il metodo \texttt{emit()}, da un produttore, in realtà quello che accade è l'aggiornamento del campo \texttt{value}. 
+Per quando riguarda la raccolta degli elementi, possiamo notare nel Listato~\ref{fig:rp-stateflow-collect}, che il metodo \texttt{collect()} è anche in questo caso un metodo bloccante, e che per controllare la disponibilità di nuovi valori, effettua un confronto fra il vecchio stato e quello attualmente presente nel campo \texttt{value}. 
+
+\lstinputlisting[float,language=Kotlin,caption = {odice delL'implementazione del metodo collect negli stateFlow.}, label = {fig:rp-stateflow-collect}]{listings/flow/state-flow-collect.kt}
+
+\subsection{Creazione di un flusso}
+Esistono diversi modi per inizializzare un flow, alcune dei metodi principali: 
+
+    \begin{itemize}
+        \item \textbf{cold flow}: 
+        \begin{itemize}
+            \item \texttt{flowOf()}: è possibile creare un flow fornendo una serie di valori come argomenti. 
+            \item \texttt{asFlow()}: serve per convertire una collezione, come ad esempio una lista, in un flow. 
+            \item \texttt{flow\string{\string}}: è possibile creare un flow emettendo direttamente i valori all'interno della lambda. 
+        \end{itemize}
+        \item \textbf{hot flow}: 
+        \begin{itemize}
+            \item \texttt{mutableSharedFlow<T>()}: per dichiarare uno SharedFlow occorre specificare il tipo di dato del flusso. 
+            \item \texttt{mutableStateFlow(value)}: per inizializzare uno StateFlow è necessario fornire un valore iniziale. 
+        \end{itemize}
+    \end{itemize}
+   
+
+Esempi di codice per inizializzare un flow sono disponibili al Listato~\ref{lst:flow-builder}.
+
+\lstinputlisting[float,language=Kotlin,caption = {Esempi di come i flow builder possono essere utilizzati per inizializzare nuovi flow.}, label={lst:flow-builder}]{listings/flow/flow-builder.kt}
+
+\subsection{Operatori}
+Gli operatori sono funzioni specializzate progettate per manipolare, trasformare e controllare i flussi. Gli operatori possono essere divisi in due categorie principali: 
+\begin{itemize}
+    \item \textbf{operatori intermediari}: permettono di manipolare il flusso, consentendo di creare pipeline di operazioni che verranno eseguite solo quando si attiva un operatore di terminazione. Gli operatori intermedi includono: 
+    \begin{itemize}
+        \item operatori di trasformazione come \textbf{map}, \textbf{flatmap} e \textbf{transform}; 
+        \item operatori di filtraggio come \textbf{filter}, \textbf{distinct} e \textbf{take}; 
+        \item operatori di combinazione come \textbf{zip} e \textbf{combine};
+        \item operatori di gestione degli errori come \textbf{catch} e \textbf{retry};
+        \item operatori di gestione del tempo come \textbf{debounce};
+    
+    \end{itemize}
+    \item \textbf{operatori di terminazione}: il comportamento di un operatore di terminazione è differente per quanto riguarda hot flows e cold flows. In un cold flow ogni sottoscrizione riavvia l'emissione dei dati dall'inizio della sorgente dati. Un operatore di terminazione quindi avvia l'esecuzione del flusso. In un hot flow, i dati sono già in corso di generazione, indipendentemente dalla presenza di sottoscrizioni. In questo caso un operatore di terminazione consente di iniziare a consumare i dati da qualsiasi punto essi si trovino, senza riavviare l'emissione dall'inizio. 
+    Gli operatori di terminazione includono: 
+    \begin{itemize}
+        \item \textbf{collect}: consuma i valori emessi dal flusso e li elabora. 
+        \item \textbf{toList, toSet, toMap}: raccolgono i valori emessi dal flusso e li convertono nella collezione desiderata. 
+        \item \textbf{reduce, fold}: riducono e aggregano rispettivamente i valori emessi dal flusso in un singolo valore. 
+    \end{itemize}
+\end{itemize}
 
 \backmatter
 
 %\nocite{*} % comment this to only show the referenced entries from the .bib file
 
+%----------------------------------------------------------------------------------------
+% BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
 \bibliographystyle{alpha}
 \bibliography{bibliography}
 
