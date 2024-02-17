@@ -525,6 +525,15 @@ Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{
 \end{figure}
 
 \chapter{Programmazione reattiva in Kotlin}
+
+\section{Kotlin}
+Kotlin~\footnote{https://kotlinlang.org/} è un linguaggio di programmazione, sviluppato dall'azienda JetBrains~\footnote{https://www.jetbrains.com/} nel 2011, il quale si pone come alternativa a linguaggio come Java e Scala, che girano su \textit{Java Virtual Machine} (JVM). La crescita di Kotlin è stata piuttosto rapida, affermandosi come linguaggio di programmazione di riferimento per applicazioni Android. 
+È possibile configurare Kotlin per essere eseguito su JVM, ma può essere compilato anche in codice Javascript o direttamente in nativo tramite la struttura di compilazione LLVM~\cite{DBLP:conf/lcpc/LattnerA04} per essere eseguito su dispositivi Android. 
+Kotlin è un linguaggio a tipizzazione statica che unisce i costrutti tipici della programmazione ad oggetti con alcuni di quelli della programmazione funzionale. 
+Una delle caratteristiche principali di Kotlin è la sua \textbf{concisione ed espressività}: in media è necessario scrivere il 40\% di codice in meno rispetto alla controparte Java per raggiungere le stesse funzionalità. Questo è possibile poiché i pattern più comuni sono supportati di default a livello di linguaggio. 
+Un'altra caratteristica fondamentale è la \textbf{null-safety}. In Kotlin i tipi definiscono se un oggetto può essere nullo o meno. Inoltre Kotlin è tipizzato staticamente, ciò significa che tutti i tipi sono conoscibili a tempo di compilazione, siano essi dichiarati esplicitamente o inferiti dal compilatore stesso. Gli eventuali errori vengono quindi intercettati prima dell'esecuzione del codice. 
+Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggio Java. È possibile quindi richiamare codice Kotlin da codice Java e viceversa.
+
 \section{Coroutines}
 Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. Quando si parla di una coroutine, solitamente ci si riferisce ad una \textit{suspending function}, ovvero una funzione la cui esecuzione può essere sospesa e ripristinata, preservandone lo stato anche durante la sospensione. 
 Kotlin definisce una coroutine come un istanza di una suspending function, ovvero una funzione che può sospendere temporaneamente la propria esecuzione, concettualmente simile ad un \textit{thread}, per il fatto che entrambi prendono un blocco di codice da eseguire e hanno un ciclo di vita simile. Le coroutines tuttavia, non sono limitate ad un singolo thread. La loro esecuzione può essere sospesa in un thread e può essere ripristinata in un altro. 
