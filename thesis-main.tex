@@ -448,6 +448,7 @@ I modelli presenti in letteratura sono due, ai quali si aggiunge un terzo, ibrid
 
 
 \section{Glitch}
+\label{sec:glitch}
 In programmazione reattiva un \textbf{glitch} indica un malfunzionamento dovuto ad una inconsistenza dei dati presenti nel grafo delle dipendenze computazionali. La prevenzioni dei glitch è un'altra proprietà che deve essere presa in considerazione in un linguaggio reattivo~\cite{DBLP:journals/csur/BainomugishaCCMM13}.
 Un glitch può essere provocato da una anomalia durante la propagazione di un cambiamento, oppure dal calcolo di un'espressione presente in un nodo prima della valutazione di tutte le sue dipendenze. Il risultato è una situazione nella quale un nodo esegue la propria computazione utilizzando alcuni dati aggiornati ed altri ormai obsoleti, provocando quasi certamente errori di calcolo e inconsistenze. 
 Consideriamo il seguente esempio: 
@@ -495,6 +496,13 @@ Un'entità osservatrice può instaurare una connessione (sottoscrizione) con un'
 Gli elementi all'interno di un flusso sono emessi in modo sequenziale, uno dopo l'altro, e vengono elaborati dall'entità osservatrice in modo consecutivo. Questa caratteristica impedisce la comparsa di corse critiche, mantenendo l'ordine delle operazioni e garantendo una gestione reattiva dei dati.
 Nel caso in cui un grande numero di dati o eventi venga emesso rapidamente dall'entità osservabile e l'entità osservatrice non sia in grado di elaborarli con la stessa velocità, è possibile adottare strategie come l'utilizzo di una \textit{coda degli eventi} o il meccanismo di \textit{buffering} per gestire in modo efficiente il flusso di dati e prevenire perdite o sovraccarichi.
 Infine, un'entità osservabile può essere sottoscritta da zero, una o più entità osservatrici contemporaneamente, permettendo una gestione flessibile e dinamica del flusso di dati o eventi all'interno di un'applicazione reattiva. 
+
+\section{Programmazione reattiva distribuita}
+Un linguaggio per la programmazione reattiva distribuita permette la ripartizione dei dati e del grafo delle dipendenze computazionali fra più nodi di una rete in un ambiente distribuito. 
+Prendendo come esempio l'espressione \texttt{var3 = var1 + var2}, le tre variabili e il relativo grafo delle dipendenze potrebbero trovarsi su nodi diversi della rete. 
+
+La progettazione di un linguaggio reattivo è di gran lunga più complicato rispetto ad un linguaggio tradizionale. La principale difficoltà risiede nel fatto che in questi contesti occorre considerare fattori come latenza, congestione della rete, guasti di essa e la mancanza di un orologio globale. Un linguaggio reattivo distribuito, come già anticipato in~\Cref{sec:glitch}, non riesce a garantire la completa rimozione delle inconsistenze dei dati nel grafo delle dipendenze, portando quindi a glitch. La presenza di un grafo delle dipendenze in un programma reattivo distribuito, oltre a portare alla presenza di glitch, tende ad accoppiare strettamente i componenti dell'applicazione, rendendoli quindi meno resistenti ad errori e riducendone la scalabilità complessiva~\cite{DBLP:journals/programming/MyterSM19}. 
+Una soluzione che potrebbe essere adottata è utilizzare un approccio centralizzato, nel quale un'entità avente un orologio centrale è responsabile dell'ordinamento degli aggiornamenti nel grafo delle dipendenze. Questo approccio introduce un \textit{singolo punto di rottura} e un eccessivo numero di comunicazioni dovute al fatto che tutte le parti coinvolte devono comunicare con una singola entità ogni qualvolta ricevono e propagano dati, limitando in questo modo la scalabilità dell'architettura. 
 
 \section{Il Manifesto Reattivo}
 Il 16 settembre 2014 è stata rilasciata la seconda versione del \textit{Manifesto Reattivo}~\footnote{https://www.reactivemanifesto.org/}, un documento redatto da esperti del settore tra cui Jonas Bonér, Dave Farley, Roland Kuhn e Martin Thompson. Questo manifesto, piuttosto che essere un trattato sulla programmazione reattiva, si presenta come una guida pratica per la progettazione di sistemi reattivi, delineando le caratteristiche chiave che tali sistemi dovrebbero possedere.
