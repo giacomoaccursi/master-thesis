@@ -292,6 +292,7 @@ L'approccio \textit{event-driven} si concentra sulla relazione causale tra gli e
 La scelta tra i due modelli dipende dal dominio di applicazione. Nei sistemi complessi, i due modelli dovrebbero coesistere per soddisfare requisiti contrastanti. Di conseguenza, un linguaggio di programmazione dovrebbe consentire al progettista di scegliere e mescolare astrazioni per catturare nel modo più espressivo possibile i concetti chiave legati a un problema specifico o a un sotto-problema. 
 
 \section{Simulatore Alchemist}
+\label{sec:alchemist}
 
 Alchemist~\cite{DBLP:journals/jos/PianiniMV13} è un simulatore ad eventi discreti open-source sviluppato all'interno dell'Università di Bologna, che permette la simulazione di scenari inerenti la computazione pervasiva ed ispirata alla natura. 
 Alchemist si basa sull'algoritmo \textit{Next Reaction Method}~\cite{doi:10.1021/jp993732q}, un algoritmo di simulazione stocastica più efficiente dell'algoritmo di Gillespie~\cite{doi:10.1021/j100540a008}, su cui si basa.
@@ -369,6 +370,7 @@ Il framework, la cui architettura ad alto livello è osservabile in~\Cref{fig:al
 \subsubsection{Engine}
 Di seguito si intende descrivere brevemente il funzionamento dell'algoritmo \textit{Next Reaction Method}, utilizzato da Alchemist per selezionare il prossimo evento da eseguire e il \textit{Dynamic Dependency Graph}, utilizzato per gestire le dipendenze fra le reazioni presenti all'interno dei nodi. 
 \paragraph{Next Reaction Method}
+\label{sec:next-reaction-method}
 Come anticipato, Alchemist si basa sull'algoritmo di simulazione stocastica \textit{Next Reaction Method}. Ad ogni step della simulazione è in grado di selezionare la prossima reazione da eseguire in tempo costante. L'algoritmo richiede tempo logaritmico per aggiornare la struttura dati interna. L'algoritmo non sceglie la prossima reazione da eseguire valutando la sua velocità, ma generando un tempo putativo e ordinando le reazioni per decidere quale sia la prossima da eseguire. L'algoritmo originale è stato modificato per consentire di aggiungere, rimuovere o spostare le reazioni in modo dinamico. 
 Le reazioni vengono memorizzate in una \textit{Dynamic Indexed Priority Queue}. Quest'ultima è un binary tree di reazioni, la sua proprietà principale è che ogni nodo memorizza una reazione il cui tempo di accadimento presunto è inferiore a quello di ciascuno dei suoi figli. Ciò significa che la prossima reazione da eseguire sarà sempre quella nella radice dell'albero e ci si potrà quindi accedere in tempo costante. 
 Un'altra proprietà importante della \textit{priority queue} è che in assenza dell'aggiunta di nuovi nodi all'albero, lo swap fra due nodi non ne modifica il bilanciamento. 
@@ -535,7 +537,7 @@ Un'altra caratteristica fondamentale è la \textbf{null-safety}. In Kotlin i tip
 Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggio Java. È possibile quindi richiamare codice Kotlin da codice Java e viceversa.
 
 \section{Coroutines}
-Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. Quando si parla di una coroutine, solitamente ci si riferisce ad una \textit{suspending function}, ovvero una funzione la cui esecuzione può essere sospesa e ripristinata, preservandone lo stato anche durante la sospensione. 
+Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. Quando si parla di una coroutine, solitamente ci si riferisce ad una istanza di una \textit{suspending function}, ovvero una funzione la cui esecuzione può essere sospesa e ripristinata, preservandone lo stato anche durante la sospensione. 
 Kotlin definisce una coroutine come un istanza di una suspending function, ovvero una funzione che può sospendere temporaneamente la propria esecuzione, concettualmente simile ad un \textit{thread}, per il fatto che entrambi prendono un blocco di codice da eseguire e hanno un ciclo di vita simile. Le coroutines tuttavia, non sono limitate ad un singolo thread. La loro esecuzione può essere sospesa in un thread e può essere ripristinata in un altro. 
 
 \subsection{Classificazione}
@@ -671,6 +673,7 @@ Quindi, quando collezioniamo i valori di un flusso utilizzando il metodo \texttt
 \end{figure}
 
 \subsubsection{Hot Flow}
+\label{sec:hot-flow}
 Come anticipato, a differenza dei cold flow, i quali riemettono tutti i valori ad ogni nuova sottoscrizione, gli hot flow emettono elementi in continuazione. 
 Esistono due tipi di hot flow: \textbf{sharedFlow} e \textbf{stateFlow}. 
 In questo caso a livello implementativo sia l'emissione che la collezione degli elementi funziona in maniera leggermente differente rispetto ai cold flow. 
@@ -739,6 +742,150 @@ Gli operatori sono funzioni specializzate progettate per manipolare, trasformare
         \item \textbf{reduce, fold}: riducono e aggregano rispettivamente i valori emessi dal flusso in un singolo valore. 
     \end{itemize}
 \end{itemize}
+
+\chapter{Progettazione e implementazione del prototipo}
+\section{Scelta delle tecnologie}
+Come linguaggio di programmazione per lo sviluppo del prototipo è stato scelto \textbf{Kotlin}. Le ragioni principali di questa decisione sono: 
+\begin{itemize}
+    \item \textbf{continuità con il codice preesistente}: il simulatore Alchemist, nel quale si intende integrare la soluzione, è stato inizialmente sviluppato utilizzando il linguaggio Java. Tuttavia, nel corso del tempo, lo sviluppo è stato portato avanti utilizzando Kotlin.  Questa transizione può essere stata motivata da diverse ragioni, tra cui la maggior espressività e la maggiore sicurezza del codice offerte da Kotlin rispetto a Java. Perciò, per mantenere la coerenza e la continuità con il codice già esistente, è logico che il prototipo venga sviluppato utilizzando Kotlin;
+    \item \textbf{vantaggi di Kotlin}: Kotlin è un linguaggio di programmazione moderno che offre numerosi vantaggi rispetto a Java. Tra questi vantaggi vi sono la concisione della sintassi, la null safety integrata, la gestione migliorata delle eccezioni e molte altre caratteristiche che consentono di scrivere codice più pulito, sicuro ed efficiente. Utilizzare Kotlin per lo sviluppo del prototipo permetterà quindi di beneficiare di queste caratteristiche, migliorando la produttività e la qualità del codice;
+    \item \textbf{interoperabilità con Java}: un altro punto importante da considerare è l'interoperabilità di Kotlin con Java. Essendo entrambi i linguaggi compatibili con la JVM, è possibile utilizzare liberamente librerie Java esistenti all'interno del codice Kotlin e viceversa. Questo significa che il prototipo sviluppato in Kotlin potrà facilmente integrarsi con il codice Java esistente nel simulatore Alchemist, sfruttando le funzionalità e le risorse già disponibili senza doverle riscrivere o adattare.
+\end{itemize}
+
+Per quando riguarda la libreria reattiva, è stata scelta \textbf{Kotlin Flow} rispetto all'alternativa \textbf{RxKotlin}. Questa decisione è stata presa considerando diversi fattori e vantaggi: 
+\begin{itemize}
+    \item \textbf{integrazione nativa con Kotlin}: Kotlin Flow è parte integrante della libreria standard di Kotlin, mentre RxKotlin è una libreria esterna. Kotlin Flow si integra quindi più naturalmente con il codice Kotlin e sfrutta le caratteristiche specifiche del linguaggio in modo più efficace;
+    \item \textbf{supporto per la programmazione asincrona strutturata}: Kotlin Flow è progettato per supportare la programmazione asincrona strutturata, facilitando la gestione di flussi di dati reattivi in modo più chiaro e intuitivo;
+    \item \textbf{gestione delle risorse}: Kotlin Flow offre un meccanismo integrato per la gestione delle risorse, consentendo di gestire automaticamente la chiusura delle risorse quando non sono più necessarie;
+    \item \textbf{compatibilità con coroutine}: Kotlin Flow è completamente compatibile con le coroutines di Kotlin, consentendo di combinare facilmente flussi reattivi con il modello asincrono basato su coroutine. 
+\end{itemize}
+
+\section{Progettazione}
+\label{sec:progettazione}
+Trattandosi dello sviluppo di un prototipo, avente come fine ultimo quello dell'integrazione nel simulatore Alchemist, è stato scelto di mantenere lo stesso modello del dominio, astraendo però dalla metafora chimica presente in Alchemist, descritta in~\Cref{sec:alchemist}. 
+A seguito di questa scelta, nel modello del dominio del prototipo non esiste il concetto di \textbf{reazione}, il quale viene sostituito con il concetto di \textbf{evento}. Non esiste nemmeno il concetto di \textbf{molecola}, il quale è sostituito da un generico \textbf{content}. Restano invariati invece gli altri concetti. 
+Come si può notare in figura, l'\textbf{environment} contiene al suo interno un insieme di \textbf{nodi} e tutti i \textbf{vicinati}. L'environment è anche responsabile di mantenere la \textbf{posizione} di ciascun nodo, consentirne l'aggiunta, la rimozione e lo spostamento. 
+Ogni nodo ha al suo interno \textbf{eventi}, i quali possono verificarsi ad un determinato istante, e \textbf{content}, ovvero contenitori di valori. 
+Ogni evento a sua volta contiene \textbf{condizioni}, le quali devono essere soddisfatte per garantire l'esecuzione dell'evento stesso, e le \textbf{azioni} che verranno eseguite a seguito della sua esecuzione.
+Ogni evento ha anche un \textbf{tempo putativo}, ovvero il tempo al quale è schedulata la sua prossima occorrenza.
+È possibile osservare il modello appena descritto in~\Cref{fig:design-class-diagram}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/design/class-diagram.png}
+    \caption{Design del modello del dominio.}
+    \label{fig:design-class-diagram}
+\end{figure}
+
+È stata prevista anche la presenza di un \textbf{engine}, ovvero il motore della simulazione, responsabile di far partire la simulazione e farla avanzare, e di uno \textbf{scheduler}, responsabile di mantenere una lista degli eventi futuri, ordinati per tempo di accadimento. 
+
+\subsection{Eliminazione grafo delle dipendenze}
+Come anticipato in sezione~\Cref{sec:alchemist}, Alchemist gestisce le dipendenze fra gli eventi utilizzando un grafo delle dipendenze, nel quale i nodi sono le reazioni (eventi) e gli archi connettono una reazione $r$ a tutti i nodi che dipendono da essa, ovvero quelli il cui tempo di attivazione deve essere aggiornato a seguito dell'esecuzione di $r$. 
+L'utilizzo di un grafo delle dipendenze in un simulatore ad eventi discreti per l'aggiornamento degli eventi dipendenti richiede molta capacità di calcolo, specialmente quando il sistema presenta una complessità elevata o un grande numero di eventi da gestire.
+Per affrontare la complessità computazionale derivante dalla gestione di un grafo delle dipendenze è stato scelto di eliminare tale grafo, optando invece per un approccio basato sulla programmazione reattiva. In questo contesto, ogni evento osserva gli eventi da cui dipende e reagisce di conseguenza aggiornando il proprio tempo di occorrenza, riducendo così la necessità di una gestione esplicita delle dipendenze tramite un grafo. Un evento può osservare gli altri eventi presenti all'interno dello stesso nodo e gli eventi presenti nei nodi del vicinato. 
+Utilizzando la programmazione reattiva, gli eventi possono essere modellati come flussi di dati che si propagano attraverso il sistema. Ogni evento può essere definito come un'unità indipendente che reagisce ai cambiamenti negli eventi osservati, senza la necessità di mantenere un grafo delle dipendenze centralizzato. 
+Poiché eventi e nodi possono essere rimossi dall'environment e i vicini possono cambiare in base alla regola di collegamento scelta, è fondamentale riconoscere che l'insieme di eventi osservati da un singolo evento può variare durante l'esecuzione della simulazione. Pertanto, oltre agli eventi da cui dipende direttamente, un evento deve essere in grado di reagire ai cambiamenti nell'insieme degli eventi presenti nel suo nodo, nonché ai cambiamenti nei nodi del suo vicinato.  
+
+\subsection{Gestione dei cambiamenti nell'ambiente}
+\label{sec:linking-rule}
+Come anticipato in precedenza, la creazione dei vicinati è affidata alla \textit{linking rule}, la quale ne definisce le regole per la creazione. La creazione dei vicinati può essere eseguita osservando la posizione dei nodi nell'\textit{environment}, i valori dei content all'interno dei nodi stessi, o altre parti arbitrarie dell'environment. 
+Per far fronte alla complessità della creazione e dell'aggiornamento dei vicinati, è stato scelto di adottare un approccio basato sulla programmazione reattiva. Ciò significa che la linking rule è implementata in modo da osservare reattivamente l'ambiente circostante e reagire di conseguenza agli eventi che coinvolgono i nodi.
+In pratica, la linking rule monitora ciò di cui ha bisogno per la creazione dei vicinati e osserva l'insieme dei nodi presenti nell'environment in modo da rilevare eventuali modifiche come l'aggiunta o la rimozione di nodi e aggiornare di conseguenza i vicinati dei nodi interessati. Potrebbe essere necessario osservare altri attributi dei nodi, come i valori contenuti al loro interno, per definire in modo più preciso i vicinati.
+Per esempio, se i vicinati vengono definiti in base alla loro posizione, occorre osservarne anche il cambiamento di posizione durante la simulazione.
+
+\section{Implementazione}
+Nel contesto di una simulazione è importante che gli osservatori ricevano tutti lo stesso stato al fine di garantire la coerenza dei risultati. Si è deciso quindi di utilizzare flow di tipo hot, descritti in~\Cref{sec:hot-flow}. 
+Come descritto precedentemente, i possibili hot flow utilizzabili nella libreria Kotlin Flow sono \textbf{MutableSharedFlow} e \textbf{MutableStateFlow}. Si è scelto di utilizzare i primi nel caso in cui il flusso dovesse rappresentare lo stato attuale di una determinata risorsa, mentre i secondi sono stati utilizzati nel caso in cui si volesse comunicare un determinato evento che è accaduto all'interno della simulazione. Le scelte in dettaglio verranno analizzate successivamente nel capitolo. 
+
+\subsection{Criticità nell'uso degli Hot Flow in simulazioni a step}
+In una simulazione a step è essenziale garantire uno stato consistente prima di procedere allo step successivo al fine di garantire risultati accurati ed affidabili. 
+L'utilizzo degli hot flow, con la loro natura asincrona e non deterministica, rende difficile garantire questa consistenza dello stato, poiché non esiste un momento definito in cui tutti gli osservatori hanno elaborato i dati e lo stato è completamente aggiornato. 
+Come anticipato in~\Cref{sec:hot-flow}, la chiamata alla funzione \texttt{collect}, la quale controlla costantemente la presenza di nuovi elementi da consumare, non termina mai ed è quindi necessario eseguire ciascuna di esse in una coroutine dedicata. Questa coroutine, rimarrà attiva fino al termine della simulazione, o fino a quando l'osservatore necessiterà dei dati emessi su tale flusso. 
+Quando viene emesso un nuovo elemento su un flusso hot, non c'è modo di controllare quando tutti gli osservatori hanno terminato di consumare il nuovo elemento, il controllo torna a chi ha emesso sul flusso non appena tutti gli osservatori hanno ricevuto il nuovo elemento. Ci si potrebbe quindi trovare nella situazione in cui inizia un nuovo step senza che gli aggiornamenti degli eventi dipendenti o la creazione dei nuovi vicinati sia stata effettivamente terminata. 
+Ogni osservatore, oltretutto, può a sua volta reagire alla presenza di un elemento su un flusso, emettendo a sua volta elementi su un altro flusso, creando così un albero di chiamate asincrone che può diventare complesso da gestire e sincronizzare. 
+Nel contesto di questo prototipo, il termine dello step non è il solo punto in cui è necessaria consistenza nello stato del sistema. Come è stato descritto in~\Cref{sec:progettazione}, l'occorrenza di un evento scatena l'esecuzione di una o più azioni, le quali potrebbero necessitare dello stato attuale dell'ambiente per prendere decisioni su come modificarlo. 
+Un altro punto nel quale è necessaria consistenza è quando un evento intende notificare gli eventi da esso dipendenti della sua effettiva esecuzione. Qui la consistenza è necessaria poiché le azioni eseguite potrebbero aver modificato la topologia dei vicinati, portando quindi ad una variazione nella lista degli eventi dal quale ogni singolo evento dipende. 
+La garanzia che tutti gli eventi dipendenti abbiano aggiornato il proprio tempo putativo prima di proseguire con lo step successivo è fondamentale per garantire che la lista di eventi futuri sia ordinata nel modo corretto. Quando si gestisce una simulazione a step, è essenziale mantenere un controllo accurato del tempo e degli eventi che devono accadere in specifici momenti temporali. Se un evento dovesse aggiornare il suo tempo dopo la fine dello step in cui dovrebbe effettivamente farlo, potrebbe causare un problema di inconsistenza temporale nell'ambiente di simulazione.
+Immaginiamo di avere un evento programmato per accadere in un certo momento temporale all'interno di uno step. Dopo la fine di questo step, l'evento potrebbe aggiornare il suo tempo per essere pianificato per il prossimo step. Tuttavia, se questo aggiornamento non avviene correttamente, potrebbe verificarsi una situazione in cui, al successivo step, l'evento si ritrovi nella lista degli eventi futuri con un tempo minore rispetto al tempo corrente.
+
+\subsection{Soluzione al problema}
+Come spiegato precedentemente il problema principale risiede nel fatto che la libreria Kotlin Flow non mette a disposizione meccanismi per controllare l'avvenuto consumo di un elemento sul flow. Si è deciso quindi di implementare un meccanismo per risolvere questa necessità. 
+L'idea di base è fare in modo che a seguito di ogni emissione sul flusso, si attenda una notifica da parte degli osservatori dell'avvenuta consumazione dell'elemento. Così facendo, il controllo torna all'entità che ha emesso sul flusso solo quando tutti gli osservatori hanno effettivamente consumato l'elemento. Utilizzando questo approccio non occorre preoccuparsi di possibili alberi di chiamate asincrone, poiché, nel caso in cui un osservatore emettesse elementi a sua volta su un ulteriore flusso, anch'esso aspetterebbe le notifiche dai consumatori di tale flusso, e il controllo tornerebbe all'emettitore alla radice solo quando tutto l'albero è stato risolto con successo.
+Per fare ciò, si sono utilizzate due classi ad-hoc: \textit{AwaitableMutableStateFlow} e \textit{AwaitableMutableSharedFlow}, il cui codice è disponibile al Listato~\ref{lst:awaitable-mutable-flow}, le quali attraverso il pattern \textbf{delegation}. Le suddette classi implementano rispettivamente le interfacce \textit{MutableStateFlow} e \textit{MutableSharedFlow}, delegando però l'effettiva implementazione a \textit{StateFlowImpl} e \textit{SharedFlowImpl}. Entrambe le classi implementate eseguono l'\textit{override} del metodo \texttt{emit}, aggiungendo la logica per attendere le notifica descritta sopra, e definiscono il metodo \texttt{notifyConsumed}, utilizzato dall'osservatore per comunicare l'effettivo consumo dell'elemento. La logica per attendere il consume degli elementi emessi è incapsulata all'interno del flow stesso, l'attesa è perciò trasparente lato emettitore. È stata creata anche una classe astratta \textit{AbstractAwaitableMutableFlow}, la quale è estesa da entrambe le classi implementate, per evitare ripetizione di codice. 
+In~\Cref{fig:extended-flow} è possibile notare come le classi implementate appena descritte si interfacciano con le classi definite nella libreria Kotlin Flow. 
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/implementation/extended-flow.png}
+    \caption{Diagramma delle classi dei Kotlin Flow estesa con le classi implementate ad-hoc.}
+    \label{fig:extended-flow}
+\end{figure}
+
+\lstinputlisting[float,language=Kotlin,caption = {Implementazione delle classi \textit{AwaitableMutableFlow}.}, label={lst:awaitable-mutable-flow}]{listings/implementation/awaitableMutableFlow.kt}
+
+\subsection{Gestione reattiva dipendenze fra eventi}
+In seguito si intende descrivere come tramite la programmazione reattiva si è implementata la gestione delle dipendenze fra eventi. 
+Come anticipato, ogni evento è dipendente dagli eventi che accadono all'interno dello stesso nodo e dagli eventi che accadono nei nodi del vicinato. La natura di questo insieme di eventi è dinamica, poiché durante la simulazione nodi ed eventi possono essere rimossi e la topologia del vicinato può cambiare. 
+Ciascun evento, tiene traccia degli eventi da cui dipende tramite l'utilizzo di due mappe, entrambe hanno come chiave l'evento osservato e come valore il \texttt{job} associato alla coroutine nella quale è stata avviata l'osservazione. La prima mappa, \textit{observedLocalEvents}, tiene traccia degli eventi locali al nodo, mentre la seconda tiene traccia degli eventi appartenenti ai nodi del vicinato. 
+Come si può notare nel Listato~\ref{lst:observe-local-events}, ciascun evento si mette in ascolto in attesa di cambiamenti nella lista degli eventi presenti nel nodo in cui risiede. Ad ogni cambiamento, inizia ad osservare nuovi eventi aggiunti e smette di osservare gli eventi che sono stati rimossi. 
+Nel Listato~\ref{lst:observe-neighbor-events}, invece, è consultabile il codice riferito all'osservazione degli eventi presenti nei nodi facenti parte il vicinato.
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice utilizzato per l'osservazione degli eventi locali al nodo.}, label={lst:observe-local-events}]{listings/implementation/observeLocalEvents.kt}
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice utilizzato per l'osservazione degli eventi presenti nei nodi del vicinato}, label={lst:observe-neighbor-events}]{listings/implementation/observeNeighborEvents.kt}
+
+\subsection{Gestione reattiva aggiornamento dell'environment}
+Come specificato in~\Cref{sec:linking-rule}, per aggiornare i vicinati, la \textit{linking rule} deve osservare i cambiamenti nella lista dei nodi presenti all'interno dell'environment e, a seconda della strategia di creazione dei vicinati scelta, altre parti arbitrarie dell'environment. 
+All'interno del prototipo è possibile trovare l'implementazione di una linking rule che crea i vicinati in base alla loro posizione nell'environment. Ciò non toglie la possibilità di aggiungere altre strategie al simulatore e scegliere ad ogni simulazione la strategia desiderata. 
+Nel Listato~\ref{lst:observe-environment} è presente il codice con il quale la classe \textit{Position Linking Rule} osserva la lista di nodi presenti nell'environment e la loro posizione all'interno di esso, ricreando ogni volta i vicinati corretti. 
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice utilizzato per l'osservazione dei nodi presenti all'interno dell'environment e della loro posizione.}, label={lst:observe-environment}]{listings/implementation/observeEnvironment.kt}
+
+\subsection{Fase di inizializzazione degli osservatori}
+Utilizzando flussi hot, occorre una fase di sincronizzazione iniziale nella la quale vi sia la certezza che al termine della creazione dell'istanza di un osservatore, qualunque esso sia, esso sia pronto immediatamente a collezionare gli elementi.
+Questa necessità è data dal fatto che, come descritto in precedenza, ogni osservazione viene eseguita all'interno di una coroutine separata, e pertanto il controllo del flusso torna immediatamente al chiamante, il quale potrebbe emettere elementi prima che l'osservatore sia effettivamente pronto per collezionarli. 
+Per ovviare a tale problema si è fatto uso del metodo \texttt{onSubscription}, fornito da \textit{SharedFlow} e \textit{StateFlow}. Il metodo in questione viene invocato quando la connessione al flow da parte dell'osservatore è stata effettivamente stabilita e consente di definire azioni da eseguire in quel determinato momento.
+In fase di inizializzazione dell'osservatore viene inizializzato un \textit{CountDownLatch}, il cui valore è pari al numero di flow su cui l'osservatore dovrà mettersi in ascolto. 
+Al momento di ogni effettiva sottoscrizione viene decrementato il latch. 
+Così facendo si ha la certezza che una volta terminata l'inizializzazione di un osservatore, questo sia effettivamente pronto per consumare gli elementi emessi sul flow. 
+
+\subsection{Engine e scheduler}
+L'\textit{engine}, come spiegato in~\Cref{sec:progettazione}, è responsabile di far partire la simulazione e del suo avanzamento. In fase di inizializzazione aggiorna il tempo putativo degli eventi presenti nell'environment, dopodiché li aggiunge allo scheduler. 
+Una volta terminata la fase di inizializzazione fa partire l'effettiva simulazione, la quale termina nel caso in cui sia stato raggiunto il limite massimo di step eseguibili o non ci fosse più nessun evento programmato per essere eseguito. 
+Ad ogni step della simulazione, l'\textit{engine}:
+\begin{enumerate}
+    \item preleva, se presente, il prossimo evento da eseguire dallo scheduler;
+    \item aggiorna il tempo della simulazione con il tempo dell'evento da eseguire;
+    \item controlla che le condizioni dell'evento da eseguire siano soddisfatte;
+    \item esegue effettivamente l'evento;
+    \item aggiorna il tempo putativo dell'evento appena eseguito;
+    \item comunica allo scheduler di ordinare la lista di eventi futuri, poiché i tempi putativi di alcuni eventi potrebbero essere cambiati. 
+\end{enumerate}
+Si noti che, a seguito della chiamata per eseguire l'evento, il controllo ritorni all'engine solo nel momento in cui tutte le azioni dell'evento sono state effettivamente eseguite, sono sono state aggiornate tutte le dipendenze fra eventi e gli eventi dipendenti da quello eseguito hanno aggiornato il proprio tempo putativo. 
+Il codice utilizzato per al gestione del singolo step appena descritto è consultabile al Listato~\ref{lst:engine-step}. 
+In questa fase prototipale è stato scelto di implementare lo \textit{scheduler} di eventi attraverso una semplice lista. Se il prototipo dovesse poi essere integrato nel simulatore Alchemist, questa soluzione sarebbe limitante dal punto di vista delle performance, poiché ad ogni step, viene effettuato un ordinamento completo della lista di eventi, in tal caso si renderebbe necessario l'utilizzo di meccanismi più efficienti, come quello già presente in Alchemist, descritto in~\Cref{sec:next-reaction-method}.
+
+\lstinputlisting[float,language=Kotlin,caption = {Codice per l'esecuzione di un singolo step all'interno della simulazione.}, label={lst:engine-step}]{listings/implementation/engineStep.kt}
+
+
+\section{Considerazioni sui risultati raggiunti}
+Il prototipo sviluppato è stato concepito con l'intento di essere poi integrato all'interno del simulatore Alchemist. Prima di immergersi nella fase di sviluppo del codice per Alchemist, è stato ritenuto fondamentale dedicare del tempo alla valutazione preliminare della fattibilità di tale integrazione. Questo approccio ha permesso di acquisire una comprensione approfondita dei requisiti tecnici, delle possibili criticità e delle opportunita associate all'integrazione. 
+Tuttavia, dato che si tratta di un prototipo, è importante sottolineare che esso astrae la complessità presente in Alchemist. Questo significa che al momento risultata difficile effettuare un confronto diretto fra la soluzione presentata e il simulatore. Eventuali valutazioni delle performance dovranno essere effettuate una volta completata l'integrazione. 
+L'implementazione della programmazione reattiva, caratterizzata da un flusso di lavoro asincrono, ha portato alla luce alcune criticità quando è stata combinata con la simulazione a step. In una simulazione a step, è fondamentale mantenere la consistenza dell'ambiente, specialmente prima di procedere allo step successivo. La natura asincrona della programmazione reattiva può causare situazioni in cui gli eventi vengono elaborati in tempi variabili, rendendo difficile garantire che lo stato dell'ambiente sia coerente e stabile. Si potrebbe definire l'approccio adottato per risolvere tale problema come un ``work around''. Questo perché la programmazione reattiva mira a gestire gli eventi in modo asincrono, senza dover attendere il completamento di un'operazione prima di procedere con altre attività. Aspettare che tutti gli osservatori consumino un elemento introduce una dipendenza sincrona che può rallentare l'esecuzione complessiva del programma.
+
+\subsection{Possibili miglioramenti}
+Trattandosi di un prototipo, avente come obiettivo l'analisi della fattibilità della creazione di un simulatore ad eventi discreti le cui dipendenze e aggiornamento dell'environment avvenissero in maniera reattiva, alcuni aspetti legati soprattutto alle performance sono stati trascurati. Questi aspetti, in sede di integrazione con il simulatore Alchemist dovranno sicuramente essere presi in considerazione per la riuscita del progetto. 
+Uno dei punti che si è scelto di trascurare è la creazione dei vicinati da parte della \textit{linking rule}. Attualmente essa, ad ogni cambiamento al quale è interessata, ricrea tutti i vicinati a partire dalle informazioni dei nodi dell'environment. Ovviamente questa scelta non è ottimale dal punto di vista delle performance. Per migliorare ciò si potrebbe prendere in considerazione l'aggiornamento dei vicinati solo dei nodi interessati. Questo miglioramento richiede che la linking rule mantenga internamente uno stato corrente di ciò a cui è interessata, e una volta ricevuto l'aggiornamento, capisca autonomamente quali sono stati i cambiamenti. 
+Un'altra implementazione piuttosto ``naive'' è quella dello scheduler, responsabile di mantenere una lista ordinata dei prossimi eventi da eseguire. 
+Utilizzare una semplice lista, che verrà riordinata ad ogni step, porta a problemi di performance, soprattutto in casi in cui il numero di eventi futuri è piuttosto elevato. 
+Implementazioni come quella attualmente presente nel simulatore Alchemist sono sicuramente più efficienti. 
+
+
+
+
+
+
 
 \backmatter
 
