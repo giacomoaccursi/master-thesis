@@ -16,11 +16,6 @@
 \session{IV}
 \academicyear{2022-2023}
 
-% Definition of acronyms
-% \acrodef{IoT}{Internet of Thing}
-% \acrodef{vm}[VM]{Virtual Machine}
-
-
 \mainlinespacing{1.241}
 
 \begin{document}
@@ -35,18 +30,18 @@ La programmazione reattiva, d'altro canto, sta guadagnando sempre più popolarit
 La tesi ha come obiettivo la progettazione e l'implementazione di un prototipo di simulatore reattivo basato sul simulatore Alchemist, ovvero un simulatore ad eventi discreto che utilizzi tecniche di programmazione reattiva, eliminando la necessità di un grafo per la gestione delle dipendenze fra eventi, attualmente presente in Alchemist. 
 \end{abstract}
 
-\begin{dedication} % this is optional
+\begin{dedication} 
 Optional. Max a few lines.
 \end{dedication}
 
-\begin{acknowledgements} % this is optional
+\begin{acknowledgements} 
 Optional. Max 1 page.
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
 \tableofcontents   
-\listoffigures     % (optional) comment if empty
-\lstlistoflistings % (optional) comment if empty
+\listoffigures    
+\lstlistoflistings 
 %----------------------------------------------------------------------------------------
 
 \mainmatter
@@ -675,11 +670,11 @@ Un hot flow, al contrario, emette valori continuamente, indipendentemente dalla 
 \subsubsection{Cold Flow}
 \label{sec:cold-flow}
 Come è possibile notare in~\Cref{fig:rp-flow-class-diagram}, tutti i tipi di flow estendono dall'interfaccia \textit{Flow}, il cui codice è consultabile al Listato~\ref{fig:rp-flow-interface}.
-L'interfaccia \texttt{Flow} ha un solo metodo \texttt{collect(collector: FlowCollector<T>)}. 
-Quando utilizziamo i flow builder, i quali saranno introdotti successivamente, come \texttt{asFlow()} o \texttt{flowOf()}, in realtà stiamo chiamando una funzione chiamata \texttt{flow()}, la quale accetta una lambda come parametro. Questa lambda ha come ricevitore implicito un \texttt{FlowCollector}, che è un'interfaccia contenente il solo metodo \texttt{emit}.
-Quindi possiamo chiamare direttamente il metodo \texttt{emit} su questa lambda per emettere valori nel flusso. Ad esempio, quando utilizziamo \texttt{Iterable.asFlow()}, per ogni elemento dell'iterabile, internamente viene chiamato il metodo \texttt{emit} per emettere il valore all'interno del flusso.
-Kotlin permette questa sintassi grazie alla \textit{Single Abstract Method conversion} (SAM conversion), che consente di passare una lambda direttamente dove è richiesto un oggetto di un'interfaccia funzionale.
-Quindi, quando collezioniamo i valori di un flusso utilizzando il metodo \texttt{collect}, in realtà stiamo invocando la lambda che abbiamo definito precedentemente all'interno di flow, e ogni volta che questa lambda viene eseguita, i valori vengono riemessi sul flusso utilizzando il metodo \texttt{emit}.
+Il \textit{Single Abstract Method conversion} (SAM conversion), è un meccanismo messo a disposizione da Kotlin mediante il quale è possibile implementare interfacce funzionali utilizzando funzioni lambda, offrendo una sintassi più concisa e leggibile.  
+L'interfaccia \texttt{FlowCollector} è un'interfaccia funzionale, ha quindi un solo metodo, che è \texttt{emit(value: T)}. 
+Quando l'osservatore invoca il metodo \texttt{collect} sul flow, sta quindi implementando il metodo \texttt{emit} appena descritto. 
+Tutti i flow builder messi a disposizione, di cui si parlerà successivamente, hanno come receiver implicito un \texttt{FlowCollector}. Questo permette di emettere nuovi elementi sul flusso chiamando semplicemente il metodo \texttt{emit}, il quale contiene la logica per consumare l'elemento.
+Tutti i flow builder di tipo cold emettono tutti i valori ad ogni nuova sottoscrizione, creando così un flusso privato per ogni singolo osservatore.  
 
 \lstinputlisting[float,language=Kotlin,caption = {Codice dell'interfaccia Flow}, label = {fig:rp-flow-interface}]{listings/flow/flow.kt}
 
@@ -694,7 +689,7 @@ Quindi, quando collezioniamo i valori di un flusso utilizzando il metodo \texttt
 \label{sec:hot-flow}
 Come anticipato, a differenza dei cold flow, i quali riemettono tutti i valori ad ogni nuova sottoscrizione, gli hot flow emettono elementi in continuazione. 
 Esistono due tipi di hot flow: \textbf{sharedFlow} e \textbf{stateFlow}. 
-In questo caso a livello implementativo sia l'emissione che la collezione degli elementi funziona in maniera leggermente differente rispetto ai cold flow. 
+In questo caso a livello implementativo sia l'emissione che la collezione degli elementi funziona in maniera differente rispetto ai cold flow. 
 
 \paragraph{SharedFlow}
 Uno SharedFlow rappresenta un flusso di dati condiviso che può essere letto da più collector contemporaneamente. È prevalentemente utilizzato quando si desidera condividere flussi di dati tra più parti dell'applicazione. 
