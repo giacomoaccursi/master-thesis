@@ -54,7 +54,7 @@ Optional. Max 1 page.
 \label{chap:introduzione}
 
 \section{Contesto e motivazioni}
-Le simulazioni computerizzate rappresentano un pilastro fondamentale nell'ambito della ricerca scientifica, dell'ingegneria, della progettazione e dell'apprendimento, permettendo di esplorare e comprendere fenomeni complessi, simulare scenari realistici e testare ipotesi in un ambiente controllato e riproducibile. 
+Le simulazioni computerizzate rappresentano un pilastro fondamentale nell'ambito della ricerca scientifica, dell'ingegneria, della progettazione e dell'apprendimento, permettendo di esplorare e comprendere fenomeni complessi, simulare scenari reali e testare ipotesi in un ambiente controllato e riproducibile. 
 Paul Humphreys~\cite{Humphreys1990-HUMCS} definisce le simulazioni computerizzate come ``qualsiasi metodo implementato al computer per esplorare le proprietà di modelli matematici dove i metodi analitici non sono disponibili''. 
 Le simulazioni computerizzate si riferiscono alla creazione di modelli digitali che riproducono il comportamento di sistemi reali o immaginari nel tempo. Questi modelli possono variare dalla semplice rappresentazione grafica alla simulazione di processi dinamici complessi, coinvolgendo l'interazione di molteplici variabili. 
 Le simulazioni sono diventate indispensabili in diverse aree, incluse la modellazione dei sistemi naturali, economici e sociali. 
@@ -72,12 +72,11 @@ Humphreys ha revisionato~\cite{Humphreys2004-HUMEOC-2} la sua definizione di sim
 
 \section{Obiettivi della tesi}
 Negli ultimi vent'anni è stato compiuto un lavoro significativo sul tema dei metodi e degli approcci per ottimizzare i modelli di simulazione a eventi discreti. Allora, come oggi, una delle sfide più grandi nell'ottimizzazione delle simulazioni a eventi discreti è l'incapacità di identificare precisamente la soluzione ottimale per un determinato modello di sistema. Questo è particolarmente vero quando lo spazio delle soluzioni possibili si espande.
-
-Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo e modellazione sono diminuiti e si sono verificati sviluppi teorici nel campo dell'ottimizzazione della simulazione. Tuttavia, la letteratura recente indica una mancanza di nuovi approcci innovativi per ottimizzare modelli di simulazione a eventi discreti su larga scala, così come un'assenza nel colmare il crescente divario tra il processo di modellazione della simulazione, ottimizzazione e miglioramento dei risultati. Molte delle ricerche e dei progressi compiuti nei primi anni '90 sono ancora citati oggi quando si discute dell'ottimizzazione della simulazione~\cite{DBLP:conf/scsc/Riley13}.
-Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione a eventi discreti è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione a eventi discreti si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni della simulazione.
+Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo e modellazione sono diminuiti e si sono verificati sviluppi teorici nel campo dell'ottimizzazione della simulazione~\cite{DBLP:conf/scsc/Riley13}.
+Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni di essa.
 
 Uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
-L'obiettivo della tesi è la progettazione e lo sviluppo di un simulatore ad eventi discreto reattivo, in grado di eliminare il grafo delle dipendenze fra eventi, utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
+L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreto reattivo, in grado di eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
 
 \section{Struttura della tesi}
 Nel capitolo 2 si intende effettuare una panoramica sulle simulazioni ad eventi discreti, introducendone il funzionamento e spiegando le differenze fra simulazioni ad eventi discrete e continue. Si intende inoltre fornire un confronto fra simulazioni ad eventi discrete event-driven e time-driven. Al termine del capitolo verranno descritte le caratteristiche principali del simulatore Alchemist e le peculiarità sul suo funzionamento. 
@@ -362,7 +361,7 @@ Il framework, la cui architettura ad alto livello è osservabile in~\Cref{fig:al
 
 \begin{figure}
     \centering
-    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-architecture.png}
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-architecture.jpg}
     \caption{Architettura di Alchemist. Gli elementi disegnati con linee continue indicano i componenti comuni a tutti gli scenari, quelli con linee tratteggiate rappresentano componenti che devono essere sviluppati da una specifica incarnazione~\cite{DBLP:journals/jos/PianiniMV13}.}
     \label{fig:alchemist-architecture}
 \end{figure}
@@ -545,7 +544,14 @@ Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggi
 
 \section{Coroutines}
 Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. 
-Kotlin definisce una coroutine come un'istanza di una \textit{suspending function}, ovvero una funzione che può sospendere temporaneamente la propria esecuzione, concettualmente simile ad un \textit{thread}, per il fatto che entrambi prendono un blocco di codice da eseguire e hanno un ciclo di vita simile. Le coroutines tuttavia, non sono limitate ad un singolo thread. La loro esecuzione può essere sospesa in un thread e può essere ripristinata in un altro. 
+Kotlin definisce una coroutine come un'istanza di una \textit{suspending function}, ovvero una funzione che può sospendere temporaneamente la propria esecuzione, concettualmente simile ad un \textit{thread}, per il fatto che entrambi prendono un blocco di codice da eseguire e hanno un ciclo di vita simile. Le coroutines tuttavia, non sono limitate ad un singolo thread. La loro esecuzione può essere sospesa in un thread e può essere ripristinata in un altro. La~\Cref{fig:suspending-function} mostra come, a seguito della sospensione di una coroutine, il thread possa continuare ad eseguire altre coroutines. La coroutine sospesa può infine essere ripristinata anche su un thread differente.  
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.90\linewidth]{figures/reactive-programming/suspending-function.png}
+    \caption{Quando una coroutine è sospesa, lo scheduler di Kotlin mette quest'ultima in uno stato sospeso e continua a processare le altre coroutines.}
+    \label{fig:suspending-function}
+\end{figure}
 
 \subsection{Classificazione}
 Ana Lucia De Moura e Roberto Ierusalimschy~\cite{DBLP:journals/toplas/MouraI09} classificano le coroutines secondo la loro implementazione: 
@@ -898,18 +904,13 @@ Implementazioni come quella attualmente presente nel simulatore Alchemist sono s
 % Conclusioni
 %----------------------------------------------------------------------------------------
 \chapter{Conclusioni}
-In questa tesi è stata eseguita una panoramica sulle simulazioni ad eventi discreti e sulla programmazione reattiva, in generale e applicata al linguaggio Kotlin. 
+In questa tesi è stata eseguita una panoramica sulle simulazioni ad eventi discreti, esplorando le loro fondamenta teoriche, metodologie di progettazione e implementazione, nonché le principali applicazioni in diversi settori. Inoltre, è stata analizzata e approfondita la programmazione reattiva, sia nel contesto generale che nel contesto specifico dell'applicazione al linguaggio Kotlin.
 Il prodotto della tesi condotta è la prototipazione di un simulatore ad eventi discreti reattivo. Il prototipo segue la modellazione del dominio presente in Alchemist, nel quale dovranno poi essere integrate le funzionalità sviluppate, eliminando la necessità del grafo delle dipendenze fra eventi, utilizzando tecniche di programmazione reattiva al fine di rendere implicite queste dipendenze. La programmazione reattiva è stata utilizzata anche per l'aggiornamento dei vicinati all'interno dell'ambiente. 
 Per raggiungere tale scopo è stata necessaria una estensione delle funzionalità messe a disposizione dalla libreria Kotlin Flow, al fine di gestire in modo adeguato la pubblicazione e il consumo degli elementi sul flusso. 
 Il prototipo sviluppato non è da intendersi come un prodotto finito, bensì come una base di partenza per integrare le funzionalità di cui si è interessati nel simulatore Alchemist; ragion per cui, alcuni aspetti relativi all'ottimizzazione delle performance sono stati trascurati. 
 Lo sviluppo di tale prototipo ha permesso di evidenziare le criticità e le opportunità delle strategie adottate. 
 
-
-
-
 \backmatter
-
-%\nocite{*} % comment this to only show the referenced entries from the .bib file
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
