@@ -7,7 +7,7 @@
 \usepackage{acronym}
 \school{\unibo}
 \programme{Corso di Laurea Magistrale in Ingegneria e Scienze Informatiche}
-\title{Fancy Title}
+\title{Progettazione e sviluppo di un prototipo di simulatore ad eventi discreti reattivo}
 \author{Giacomo Accursi}
 \date{\today}
 \subject{Laboratorio di Sistemi Software}
@@ -48,46 +48,46 @@ Optional. Max 1 page.
 \mainmatter
 
 %----------------------------------------------------------------------------------------
+% Introduzione
+%----------------------------------------------------------------------------------------
 \chapter{Introduzione}
 \label{chap:introduzione}
-%----------------------------------------------------------------------------------------
 
-% Write your intro here.
-% \sidenote{Add sidenotes in this way. They are named after the author of the thesis}
+\section{Contesto e motivazioni}
+Le simulazioni computerizzate rappresentano un pilastro fondamentale nell'ambito della ricerca scientifica, dell'ingegneria, della progettazione e dell'apprendimento, permettendo di esplorare e comprendere fenomeni complessi, simulare scenari realistici e testare ipotesi in un ambiente controllato e riproducibile. 
+Paul Humphreys~\cite{Humphreys1990-HUMCS} definisce le simulazioni computerizzate come ``qualsiasi metodo implementato al computer per esplorare le proprietà di modelli matematici dove i metodi analitici non sono disponibili''. 
+Le simulazioni computerizzate si riferiscono alla creazione di modelli digitali che riproducono il comportamento di sistemi reali o immaginari nel tempo. Questi modelli possono variare dalla semplice rappresentazione grafica alla simulazione di processi dinamici complessi, coinvolgendo l'interazione di molteplici variabili. 
+Le simulazioni sono diventate indispensabili in diverse aree, incluse la modellazione dei sistemi naturali, economici e sociali. 
 
-% You can use acronyms that your defined previously,
-% such as \ac{IoT}.
-% %
-% If you use acronyms twice,
-% they will be written in full only once
-% (indeed, you can mention the \ac{IoT} now without it being fully explained).
-% %
-% In some cases, you may need a plural form of the acronym.
-% %
-% For instance,
-% that you are discussing \acp{vm},
-% you may need both \ac{vm} and \acp{vm}.
-
-% \paragraph{Structure of the Thesis}
-
-% \note{At the end, describe the structure of the paper}
-
-% \chapter{State of the art}
-
-% I suggest referencing stuff as follows: \cref{fig:random-image} or \Cref{fig:random-image}
+Ad alto livello, è possibile considerare una simulazione computerizzata come un metodo per lo studio di sistemi. In questa accezione più ampia del termine, ci riferisce all'intero processo, il quale include la scelta di un modello, la ricerca di un modo per implementare il modello in una forma che possa essere eseguita su un computer, il calcolo dell'output dell'algoritmo e la visualizzazione e lo studio dei dati risultati. Secondo Winsberg~\cite{Winsberg_2003}: 
+\begin{quotation}
+    "Gli studi di simulazione di successo fanno più che calcolare numeri. Fanno uso di una varietà di tecniche per trarre inferenze da questi numeri. Le simulazioni fanno uso creativo di tecniche di calcolo che possono essere motivate solo extra-matematicamente ed extra-teoricamente. Come tale, a differenza delle semplici computazioni che possono essere eseguite su un computer, i risultati delle simulazioni non sono automaticamente affidabili. Molto impegno e competenza vanno nel decidere quali risultati delle simulazioni sono affidabili e quali no." 
+\end{quotation}
+La definizione sopracitata interpreta la simulazione computerizzata come l'uso di un computer per risolvere o approssimare la soluzione delle equazioni matematiche di un modello che si intende rappresentare, sia esso reale o ipotetico. Un altro approccio è cercare di definire una simulazione come indipendente dalla nozione di simulazione al computer e poi definire ``simulazione al computer'' come una simulazione eseguita da un computer digitale programmato. Utilizzando questo approccio, una simulazione è qualsiasi sistema che si crede abbia un comportamento dinamico sufficientemente simile ad un altro sistema tale che il primo possa essere studiato per apprendere il secondo. Questo è in linea con la definizione data da Hartmann~\cite{Hartmann1996-HARTWA-2}, secondo il quale ``una simulazione imita un processo con un altro processo'', dove in questo caso il termine processo si riferisce unicamente a qualche oggetto o sistema il cui stato cambia nel tempo. Questa definizione verrà poi corretta da Huges~\cite{Hughes_1999}, il quale obiettò che la definizione di Hartmann escludeva simulazioni che imitano la struttura di un sistema piuttosto che le sue dinamiche. 
+Humphreys ha revisionato~\cite{Humphreys2004-HUMEOC-2} la sua definizione di simulazione per accordarsi con le osservazioni di Hartmann e Hughes come segue: 
+\begin{quotation}
+    Il sistema $S$ fornisce una simulazione di base di un oggetto o processo $B$ nel caso in cui $S$ sia un dispositivo computazionale concreto che produce, attraverso un processo temporale, soluzioni a un modello computazionale che rappresenta correttamente $B$, sia dinamicamente che staticamente. Se inoltre il modello computazionale utilizzato da $S$ rappresenta correttamente la struttura del sistema reale $R$, allora $S$ fornisce una simulazione di base del sistema $R$ rispetto a $B$. 
+\end{quotation}
 
 
-% \section{Some cool topic}
+\section{Obiettivi della tesi}
+Negli ultimi vent'anni è stato compiuto un lavoro significativo sul tema dei metodi e degli approcci per ottimizzare i modelli di simulazione a eventi discreti. Allora, come oggi, una delle sfide più grandi nell'ottimizzazione delle simulazioni a eventi discreti è l'incapacità di identificare precisamente la soluzione ottimale per un determinato modello di sistema. Questo è particolarmente vero quando lo spazio delle soluzioni possibili si espande.
 
-% \chapter{Contribution}
+Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo e modellazione sono diminuiti e si sono verificati sviluppi teorici nel campo dell'ottimizzazione della simulazione. Tuttavia, la letteratura recente indica una mancanza di nuovi approcci innovativi per ottimizzare modelli di simulazione a eventi discreti su larga scala, così come un'assenza nel colmare il crescente divario tra il processo di modellazione della simulazione, ottimizzazione e miglioramento dei risultati. Molte delle ricerche e dei progressi compiuti nei primi anni '90 sono ancora citati oggi quando si discute dell'ottimizzazione della simulazione~\cite{DBLP:conf/scsc/Riley13}.
+Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione a eventi discreti è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione a eventi discreti si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni della simulazione.
 
-% You may also put some code snippet (which is NOT float by default), eg: \cref{lst:random-code}.
+Uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
+L'obiettivo della tesi è la progettazione e lo sviluppo di un simulatore ad eventi discreto reattivo, in grado di eliminare il grafo delle dipendenze fra eventi, utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
 
-% \lstinputlisting[float,language=Java,label={lst:random-code}]{listings/HelloWorld.java}
+\section{Struttura della tesi}
+Nel capitolo 2 si intende effettuare una panoramica sulle simulazioni ad eventi discreti, introducendone il funzionamento e spiegando le differenze fra simulazioni ad eventi discrete e continue. Si intende inoltre fornire un confronto fra simulazioni ad eventi discrete event-driven e time-driven. Al termine del capitolo verranno descritte le caratteristiche principali del simulatore Alchemist e le peculiarità sul suo funzionamento. 
+Il capitolo 3 mira a descrivere la filosofia della programmazione reattiva, analizzandone vantaggi e criticità, astraendo però dalla loro implementazione. 
+Il capitolo 4 descrive l'implementazione reattiva nel linguaggio Kotlin, parlando di come sono implementate le kotlin Coroutine e i Kotlin Flow. 
+Nel capitolo 5 si potrà trovare la progettazione e l'implementazione del prototipo di simulatore. 
 
 
 %----------------------------------------------------------------------------------------
-% Discrete Event Simulation
+% Simulazioni ad eventi discreti
 %----------------------------------------------------------------------------------------
 \chapter{Simulazioni ad Eventi Discreti}
 \section{Panoramica sulle simulazioni ad eventi discreti}
@@ -202,7 +202,6 @@ I meccanismi di sincronizzazione ottimistici possono sfruttare il parallelismo i
     \item per poter effettuare i rollback lo stato di ogni LP deve essere salvato periodicamente, comportando un maggiore utilizzo di memoria.
 \end{itemize}
 
-
 \subsection{Cenni Storici}
 La storia delle simulazioni ad eventi discreti si estende per oltre mezzo secolo, risalendo ai primi anni dell'era informatica. La necessità di modellare e comprendere il comportamento dinamico dei sistemi complessi spinse i ricercatori a sviluppare metodologie e strumenti per simulare il funzionamento di tali sistemi.
 Le radici concettuali delle simulazioni ad eventi discreti possono essere rintracciate nella teoria dei processi stocastici, che ha trovato applicazioni pratiche nell'ambito dell'ingegneria, della gestione delle operazioni aziendali e della logistica. 
@@ -216,9 +215,7 @@ Molte aziende, in particolare nel settore manifatturiero, utilizzarono le simula
 
 A livello informatico il nuovo millennio è stato caratterizzato dalla potenza sempre crescente dei personal computer, dalla diminuzione del prezzo di questi ultimi e dal World Wide Web~\cite{DBLP:journals/jors/Robinson05}. Le simulazioni hanno cominciato a integrare intelligenza artificiale e machine learning per migliorare la previsione e l'ottimizzazione dei sistemi. Inoltre, la crescente disponibilità di dati in tempo reale ha portato all'adozione di approcci di simulazione ibrida che combinano modelli ad eventi discreti con dati reali per migliorare la precisione delle previsioni e delle decisioni.
 
-
 \subsection{Aree di impiego}
-
 L'adozione delle simulazioni ad eventi discreti riveste un ruolo cruciale in numerose aree di studio e applicazioni pratiche, offrendo un metodo efficace per esplorare e comprendere il comportamento dei sistemi complessi. Attraverso l'utilizzo di modelli matematici e algoritmi appropriati, le simulazioni ad eventi discreti consentono di esaminare scenari variabili, prendendo in considerazione la casualità e la complessità intrinseche dei processi reali.
 In vari ambiti l'adozione di simulazioni ad eventi discreti offre numerosi vantaggi. Queste simulazioni consentono di valutare strategie, ottimizzare processi, identificare aree di miglioramento e prevedere l'andamento futuro dei sistemi analizzati. Grazie alla possibilità di eseguire esperimenti virtuali ripetibili e controllati, le simulazioni ad eventi discreti permettono agli operatori e agli studiosi di testare diverse ipotesi e strategie senza dover intervenire direttamente sui sistemi reali, riducendo così i costi e i rischi associati all'implementazione di nuove soluzioni.
 
@@ -388,12 +385,15 @@ Mantenere il grafo delle dipendenze aggiornato durante la simulazione è uno dei
     \item \textbf{globale}: la reazione influenza tutte le altre reazioni. 
 \end{itemize}
 
-Ogni reazione ha un \textit{contesto di input}, ovvero il contesto più piccolo in cui una reazione può leggere informazioni, e un \textit{contesto di output}, ovvero il contesto più piccolo nel quale una reazione può effettuare modifiche. 
+Ogni reazione ha un \textbf{contesto di input}, ovvero il contesto più piccolo in cui una reazione può leggere informazioni, e un \textbf{contesto di output}, ovvero il contesto più piccolo nel quale una reazione può effettuare modifiche. 
 La scelta del contesto giusto è cruciale: se è troppo ristretto la simulazione sarà invalida, se viene scelto troppo grande, questo impatterà pesantemente sulle performance. 
 
 L'aggiunta di una reazione implica la verifica delle sue dipendenze con tutte le reazioni del sistema. Se esiste, questa dipendenza viene aggiunta al grafo delle dipendenze. La rimozione di una reazione richiede l'eliminazione di tutte le dipendenze in cui quest'ultima è coinvolta, sia come influenzante che come influenzata. 
-In caso di cambiamento della topologia del sistema è necessario un ulteriore controllo delle dipendenze tra le reazioni appartenenti ai nodi che hanno subito un cambiamento del proprio vicinato. Occorre eseguire una scansione in questi nodi, calcolando le nuove dipendenze con le reazioni appartenenti ai nuovi vicini e cancellando quelle con i nodi che non appartengono più al vicinato. 
+In caso di cambiamento della topologia del sistema è necessario un ulteriore controllo delle dipendenze tra le reazioni appartenenti ai nodi che hanno subito un cambiamento del proprio vicinato. Occorre eseguire una scansione in questi nodi, calcolando le nuove dipendenze con le reazioni appartenenti ai nuovi vicini e cancellando quelle con i nodi che non appartengono più al vicinato.
 
+%----------------------------------------------------------------------------------------
+% Programmazione reattiva
+%----------------------------------------------------------------------------------------
 \chapter{Programmazione reattiva}
 \section{Concetti chiave}
 L'uso del termine \textbf{programmazione reattiva} nella letteratura scientifica risale alla metà degli anni `60. Una definizione rilevante è stata data da G. Berry nel 1991~\cite{DBLP:journals/pieee/BenvenisteB91}. Berry descrive i \textit{programmi reattivi} in relazione alla loro controparte duale, i \textit{programmi interattivi}: 
@@ -530,8 +530,11 @@ Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{
     \label{fig:rp-reactive-manifesto}
 \end{figure}
 
-\chapter{Programmazione reattiva in Kotlin}
 
+%----------------------------------------------------------------------------------------
+% Programmazione reattiva in kotlin
+%----------------------------------------------------------------------------------------
+\chapter{Programmazione reattiva in Kotlin}
 \section{Kotlin}
 \textbf{Kotlin}~\footnote{https://kotlinlang.org/} è un linguaggio di programmazione, sviluppato dall'azienda JetBrains~\footnote{https://www.jetbrains.com/} nel 2011, il quale si pone come alternativa a linguaggi come Java e Scala, che girano su \textit{Java Virtual Machine} (JVM). La crescita di Kotlin è stata piuttosto rapida, affermandosi come linguaggio di programmazione di riferimento per applicazioni Android. 
 È possibile configurare Kotlin per essere eseguito su JVM, ma può essere compilato anche in codice Javascript o direttamente in nativo tramite la struttura di compilazione LLVM~\cite{DBLP:conf/lcpc/LattnerA04} per essere eseguito su dispositivi Android. 
@@ -748,6 +751,9 @@ Gli operatori sono funzioni specializzate progettate per manipolare, trasformare
     \end{itemize}
 \end{itemize}
 
+%----------------------------------------------------------------------------------------
+% Progettazione e implementazione del prototipo
+%----------------------------------------------------------------------------------------
 \chapter{Progettazione e implementazione del prototipo}
 \section{Scelta delle tecnologie}
 Come linguaggio di programmazione per lo sviluppo del prototipo è stato scelto \textbf{Kotlin}. Le ragioni principali di questa decisione sono: 
@@ -888,7 +894,15 @@ Utilizzare una semplice lista, che verrà riordinata ad ogni step, porta a probl
 Implementazioni come quella attualmente presente nel simulatore Alchemist sono sicuramente più efficienti. 
 
 
-
+%----------------------------------------------------------------------------------------
+% Conclusioni
+%----------------------------------------------------------------------------------------
+\chapter{Conclusioni}
+In questa tesi è stata eseguita una panoramica sulle simulazioni ad eventi discreti e sulla programmazione reattiva, in generale e applicata al linguaggio Kotlin. 
+Il prodotto della tesi condotta è la prototipazione di un simulatore ad eventi discreti reattivo. Il prototipo segue la modellazione del dominio presente in Alchemist, nel quale dovranno poi essere integrate le funzionalità sviluppate, eliminando la necessità del grafo delle dipendenze fra eventi, utilizzando tecniche di programmazione reattiva al fine di rendere implicite queste dipendenze. La programmazione reattiva è stata utilizzata anche per l'aggiornamento dei vicinati all'interno dell'ambiente. 
+Per raggiungere tale scopo è stata necessaria una estensione delle funzionalità messe a disposizione dalla libreria Kotlin Flow, al fine di gestire in modo adeguato la pubblicazione e il consumo degli elementi sul flusso. 
+Il prototipo sviluppato non è da intendersi come un prodotto finito, bensì come una base di partenza per integrare le funzionalità di cui si è interessati nel simulatore Alchemist; ragion per cui, alcuni aspetti relativi all'ottimizzazione delle performance sono stati trascurati. 
+Lo sviluppo di tale prototipo ha permesso di evidenziare le criticità e le opportunità delle strategie adottate. 
 
 
 
