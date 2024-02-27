@@ -62,8 +62,10 @@ Ad alto livello, è possibile considerare una simulazione computerizzata come un
 \begin{quotation}
     "Gli studi di simulazione di successo fanno più che calcolare numeri. Fanno uso di una varietà di tecniche per trarre inferenze da questi numeri. Le simulazioni fanno uso creativo di tecniche di calcolo che possono essere motivate solo extra-matematicamente ed extra-teoricamente. Come tale, a differenza delle semplici computazioni che possono essere eseguite su un computer, i risultati delle simulazioni non sono automaticamente affidabili. Molto impegno e competenza vanno nel decidere quali risultati delle simulazioni sono affidabili e quali no." 
 \end{quotation}
-La definizione sopracitata interpreta la simulazione computerizzata come l'uso di un computer per risolvere o approssimare la soluzione delle equazioni matematiche di un modello che si intende rappresentare, sia esso reale o ipotetico. Un altro approccio è cercare di definire una simulazione come indipendente dalla nozione di simulazione al computer e poi definire ``simulazione al computer'' come una simulazione eseguita da un computer digitale programmato. Utilizzando questo approccio, una simulazione è qualsiasi sistema che si crede abbia un comportamento dinamico sufficientemente simile ad un altro sistema tale che il primo possa essere studiato per apprendere il secondo. Questo è in linea con la definizione data da Hartmann~\cite{Hartmann1996-HARTWA-2}, secondo il quale ``una simulazione imita un processo con un altro processo'', dove in questo caso il termine processo si riferisce unicamente a qualche oggetto o sistema il cui stato cambia nel tempo. Questa definizione verrà poi corretta da Huges~\cite{Hughes_1999}, il quale obiettò che la definizione di Hartmann escludeva simulazioni che imitano la struttura di un sistema piuttosto che le sue dinamiche. 
-Humphreys ha revisionato~\cite{Humphreys2004-HUMEOC-2} la sua definizione di simulazione per accordarsi con le osservazioni di Hartmann e Hughes come segue: 
+La definizione sopracitata interpreta la simulazione computerizzata come l'uso di un computer per risolvere o approssimare la soluzione delle equazioni matematiche di un modello che si intende rappresentare, sia esso reale o ipotetico. 
+
+Un altro approccio è cercare di definire una simulazione come indipendente dalla nozione di simulazione al computer e poi definire ``simulazione al computer'' come una simulazione eseguita da un computer digitale programmato. Utilizzando questo approccio, una simulazione è qualsiasi sistema che si crede abbia un comportamento dinamico sufficientemente simile ad un altro sistema tale che il primo possa essere studiato per apprendere il secondo. Questo è in linea con la definizione data da Hartmann~\cite{Hartmann1996-HARTWA-2}, secondo il quale ``una simulazione imita un processo con un altro processo'', dove in questo caso il termine processo si riferisce unicamente a qualche oggetto o sistema il cui stato cambia nel tempo. Questa definizione verrà poi corretta da Huges~\cite{Hughes_1999}, il quale obiettò che la definizione di Hartmann escludeva simulazioni che imitano la struttura di un sistema piuttosto che le sue dinamiche. 
+Humphreys ha revisionato~\cite{Humphreys2004-HUMEOC-2} la sua definizione per accordarsi con le osservazioni di Hartmann e Hughes come segue: 
 \begin{quotation}
     Il sistema $S$ fornisce una simulazione di base di un oggetto o processo $B$ nel caso in cui $S$ sia un dispositivo computazionale concreto che produce, attraverso un processo temporale, soluzioni a un modello computazionale che rappresenta correttamente $B$, sia dinamicamente che staticamente. Se inoltre il modello computazionale utilizzato da $S$ rappresenta correttamente la struttura del sistema reale $R$, allora $S$ fornisce una simulazione di base del sistema $R$ rispetto a $B$. 
 \end{quotation}
@@ -75,13 +77,13 @@ Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo 
 Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni di essa.
 
 Uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
-L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreto reattivo, in grado di eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
+L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreti, in grado di eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
 
 \section{Struttura della tesi}
 Nel capitolo 2 si intende effettuare una panoramica sulle simulazioni ad eventi discreti, introducendone il funzionamento e spiegando le differenze fra simulazioni ad eventi discrete e continue. Si intende inoltre fornire un confronto fra simulazioni ad eventi discrete event-driven e time-driven. Al termine del capitolo verranno descritte le caratteristiche principali del simulatore Alchemist e le peculiarità sul suo funzionamento. 
 Il capitolo 3 mira a descrivere la filosofia della programmazione reattiva, analizzandone vantaggi e criticità, astraendo però dalla loro implementazione. 
-Il capitolo 4 descrive l'implementazione reattiva nel linguaggio Kotlin, parlando di come sono implementate le kotlin Coroutine e i Kotlin Flow. 
-Nel capitolo 5 si potrà trovare la progettazione e l'implementazione del prototipo di simulatore. 
+Il capitolo 4 descrive l'implementazione reattiva nel linguaggio Kotlin, parlando di come sono implementate le kotlin Coroutines e i Kotlin Flow. 
+Nel capitolo 5 si potrà trovare la progettazione e l'implementazione del prototipo di simulatore sviluppato. 
 
 
 %----------------------------------------------------------------------------------------
@@ -111,7 +113,7 @@ Una simulazione ad eventi discreti procede acquisendo una sequenza di \textit{sn
 \subsection{Algoritmo Event-scheduling Time-advance}
 \label{sec:time-advance-algorithm}
 La dinamicità intrinseca delle simulazioni ad eventi discreti impone la necessità di gestire attentamente il flusso temporale attraverso il monitoraggio costante del clock. 
-Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``\textit{event-scheduling time-advance}'', basato sull'utilizzo della future event list (FEL).
+Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``\textit{event-scheduling time-advance}'', basato sull'utilizzo della future event list.
 
 \begin{figure}
     \centering
@@ -139,7 +141,7 @@ Importante è anche l'operazione di modifica, in cui una ricerca di evento esist
 
 Esistono tre criteri principali per determinare l'efficacia della struttura dati e dell'algoritmo per la gestione della FEL: 
 \begin{itemize}
-    \item \textbf{velocità}: la struttura dati e l'algoritmo per inserire ed eliminare un evento devono essere ottimizzate per minimizzare il tempo di esecuzione. Per ottenere tempi di esecuzione rapidi è fondamentale una ricerca degli eventi efficiente. Un algoritmo efficiente tende a valutare il  il minor numero di eventi possibile per l'inserimento o la cancellazione;
+    \item \textbf{velocità}: la struttura dati e l'algoritmo per inserire ed eliminare un evento devono essere ottimizzate per minimizzare il tempo di esecuzione. Per ottenere tempi di esecuzione rapidi è fondamentale una ricerca degli eventi efficiente. Un algoritmo efficiente tende a valutare il minor numero di eventi possibile per l'inserimento o la cancellazione;
     \item  \textbf{robustezza}: è necessaria una gestione efficace degli errori per affrontare scenari imprevisti. Occorre una validazione dei dati durante l'inserimento per garantire l'integrità della struttura dati; 
     \item \textbf{adattabilità}: la FEL dovrebbe consentire la configurazione di parametri chiave per adattarsi a diverse modalità di gestione degli eventi o politiche temporali. Dovrebbe inoltre essere progettata in modo che nuove funzionalità o tipi di eventi possano essere facilmente integrati senza modificare drasticamente il codice esistente. 
 \end{itemize}
@@ -154,8 +156,8 @@ La terminazione può invece essere raggiunta tramite diversi meccanismi:
 \end{itemize}
 Nel secondo e nel terzo caso il tempo per eseguire la simulazione non è conosciuto a priori e può variare di simulazione in simulazione.
 
-Le esecuzioni di una simulazione possono essere classificate in \textbf{transient} e \textbf{steady state}. La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che vogliamo analizzare. Con il termine \textit{transient} ci si riferisce ad una simulazione che termina, per causa di un evento speciale o grazie ad un tempo prefissato. 
-Una simulazione \textit{steady state}, al contrario, non termina mai. L'obiettivo in questo caso è studiare il comportamento a lungo termine del sistema. 
+Le esecuzioni di una simulazione possono essere classificate in \textbf{transient} e \textbf{steady state}. La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che si intende analizzare. Con il termine transient ci si riferisce ad una simulazione che termina, per causa di un evento speciale o grazie ad un tempo prefissato. 
+Una simulazione steady state, al contrario, non termina mai. L'obiettivo in questo caso è studiare il comportamento a lungo termine del sistema. 
 
 \subsection{Distribuzioni di probabilità}
 Il successo di una simulazione richiede un approccio completo che va oltre la semplice creazione di un diagramma di flusso del sistema in esame, la sua traduzione in un ``programma'' per computer e la replicazione di alcune configurazioni proposte del sistema. L'uso della probabilità e della statistica è un aspetto fondamentale di uno studio di simulazione, tanto che ogni team di modellazione dovrebbe includere almeno un esperto con una solida formazione in queste tecniche~\cite{Law15}.
@@ -194,7 +196,7 @@ La sincronizzazione conservativa presenta due principali svantaggi:
 Nella sincronizzazione di tipo ottimistico, le violazioni del vincolo di causalità locale possono verificarsi, ma il meccanismo di sincronizzazione rileva le violazioni e le recupera. Anche in questo caso ogni LP simula la propria porzione di modello in avanti nel tempo, ma non aspetta di ricevere messaggi da altri processi. 
 Il meccanismo \textit{time-warp}~\cite{DBLP:journals/toplas/Jefferson85} è il più noto approccio ottimistico. Se un LP riceve un messaggio che avrebbe dovuto ricevere nel suo passato (e che quindi potrebbe influenzare le sue azioni da quel momento in poi), viene effettuato un \textit{rollback} nell'LP ricevente che porta il suo clock all'ora del messaggio in arrivo.
 Parte del lavoro annullato potrebbe consistere nell'invio di messaggi ad altri LP. L'invio di questi messaggi viene anch'esso annullato grazie all'invio del corrispondente anti-messaggio. L'invio di anti-messaggi può generare a sua volta rollback secondari negli LP di destinazione.
-I meccanismi di sincronizzazione ottimistici possono sfruttare il parallelismo in modo migliore rispetto agli approcci conservativi, poiché non sono limitati dallo scenario peggiore. Tutta via presentano comunque alcuni svantaggi: 
+I meccanismi di sincronizzazione ottimistici possono sfruttare il parallelismo in modo migliore rispetto agli approcci conservativi, poiché non sono limitati dallo scenario peggiore. Tuttavia presentano comunque alcuni svantaggi: 
 \begin{itemize}
     \item comportano costi computazionali maggiori legati all'esecuzione dei rollback; 
     \item per poter effettuare i rollback lo stato di ogni LP deve essere salvato periodicamente, comportando un maggiore utilizzo di memoria.
@@ -208,7 +210,7 @@ Nel corso degli anni '50 e '60, con l'avvento dei primi computer e l'espansione 
 
 Negli anni '60 e '70, con l'avanzamento della tecnologia informatica e l'introduzione di linguaggi di programmazione più potenti, come FORTRAN e ALGOL, la simulazione ad eventi discreti divenne sempre più praticabile e diffusa. Durante questo periodo furono sviluppati i primi linguaggi di programmazione specificamente progettati per la simulazione, come SIMSCRIPT~\cite{DBLP:journals/ibmsj/DimsdaleM64} e GPSS~\cite{DBLP:journals/tssc/HollandM68}, i quali permisero ai ricercatori di modellare e analizzare sistemi complessi in modo più efficace e efficiente.
 
-Negli anni successivi, con il continuo avanzamento della tecnologia informatica e l'introduzione di nuovi concetti e metodologie, come la simulazione ad oggetti e la simulazione basata su agenti, le simulazioni ad eventi discreti continuarono ad evolversi e a trovare sempre più applicazioni in una vasta gamma di settori. 
+Negli anni successivi, con il continuo avanzamento della tecnologia informatica e l'introduzione di nuovi concetti e metodologie, le simulazioni ad eventi discreti continuarono ad evolversi e a trovare sempre più applicazioni in una vasta gamma di settori. 
 Molte aziende, in particolare nel settore manifatturiero, utilizzarono le simulazioni come strumento di supporto alle decisioni. 
 
 A livello informatico il nuovo millennio è stato caratterizzato dalla potenza sempre crescente dei personal computer, dalla diminuzione del prezzo di questi ultimi e dal World Wide Web~\cite{DBLP:journals/jors/Robinson05}. Le simulazioni hanno cominciato a integrare intelligenza artificiale e machine learning per migliorare la previsione e l'ottimizzazione dei sistemi. Inoltre, la crescente disponibilità di dati in tempo reale ha portato all'adozione di approcci di simulazione ibrida che combinano modelli ad eventi discreti con dati reali per migliorare la precisione delle previsioni e delle decisioni.
@@ -218,8 +220,8 @@ L'adozione delle simulazioni ad eventi discreti riveste un ruolo cruciale in num
 In vari ambiti l'adozione di simulazioni ad eventi discreti offre numerosi vantaggi. Queste simulazioni consentono di valutare strategie, ottimizzare processi, identificare aree di miglioramento e prevedere l'andamento futuro dei sistemi analizzati. Grazie alla possibilità di eseguire esperimenti virtuali ripetibili e controllati, le simulazioni ad eventi discreti permettono agli operatori e agli studiosi di testare diverse ipotesi e strategie senza dover intervenire direttamente sui sistemi reali, riducendo così i costi e i rischi associati all'implementazione di nuove soluzioni.
 
 \subsubsection{Sistemi di Produzione e Movimentazione dei Materiali}
-I sistemi di produzione e movimentazione dei materiali rappresentano una delle applicazioni più importanti della simulazione. La simulazione è stata utilizzata con successo come supporto nella progettazione di nuove strutture produttive, magazzini e centri di distribuzione.
-Le simulazioni ad eventi discreti sono utilizzate per condurre analisi sulla capacità di produzione degli impianti, considerando le specifiche delle risorse disponibili come macchinari, manodopera e materiali. Questo aiuta ad individuare sovraccarichi o sottoutilizzazioni delle risorse e a pianificare la capacità in modo efficiente. 
+I sistemi di produzione e movimentazione dei materiali rappresentano una delle applicazioni più importanti della simulazione. La simulazione è stata utilizzata con successo come supporto nella progettazione di nuove strutture produttive, magazzini e centri di distribuzione~\cite{KENDALL1998711}~\cite{Ingemansson2002ASO}.
+Le simulazioni ad eventi discreti sono utilizzate per condurre analisi sulla capacità di produzione degli impianti, considerando le specifiche delle risorse disponibili come macchinari, manodopera e materiali. Questo aiuta ad individuare sovraccarichi o sottoutilizzazioni delle risorse e a pianificare la capacità in modo efficiente~\cite{sunmanufacturing}. 
 Oltre alla produzione, viene impiegata anche per ottimizzare la logistica, comprese le operazioni di movimentazione dei materiali, lo stoccaggio, il prelievo, il trasporto e la distribuzione. Questo comprende l'analisi della disposizione degli impianti, dei percorsi di movimentazione e delle politiche di gestione degli inventari per massimare l'efficienza complessiva e ridurre i costi operativi. 
 I simulatori ad eventi discreti consentono di modellare anche i sistemi di trasporto e distribuzione dei materiali sia all'interno che all'esterno dell'impianto manifatturiero. Ciò include la pianificazione delle rotte di trasporto, l'ottimizzazione dei tempi di consegna e l'analisi dei flussi di traffico per garantire una distribuzione efficiente dei materiali.
 Infine, è possibile valutare le performance attuali del sistema di produzione e movimentazione dei materiali e testare strategie di miglioramento. Questo può includere l'implementazione di nuove tecnologie, l'ottimizzazione dei processi o la riduzione degli sprechi, contribuendo a migliorare complessivamente l'efficienza e la produttività del sistema.
@@ -227,14 +229,14 @@ Infine, è possibile valutare le performance attuali del sistema di produzione e
 
 \subsubsection{Sistemi informatici}
 La simulazione dei sistemi informatici consente di modellare e analizzare il comportamento di reti di computer, server e sistemi distribuiti. 
-I simulatori possono essere utilizzati per valutare le prestazioni del sistema, misurare latenza di rete, analizzare il throughput e identificare eventuali bottleneck. Inoltre, consentono di simulare il carico di lavoro sui sistemi, aiutando a ridimensionare correttamente l'infrastruttura e a pianificare l'allocazione di risorse. 
+I simulatori possono essere utilizzati per valutare le prestazioni del sistema, analizzare il throughput e identificare eventuali bottleneck~\cite{LEROUDIER197950}. Inoltre, consentono di simulare il carico di lavoro sui sistemi, aiutando a ridimensionare correttamente l'infrastruttura e a pianificare l'allocazione di risorse. 
 È possibile simulare anche l'utilizzo di nuovi algoritmi o politiche di gestione delle risorse, come strategie di scheduling dei processi e politiche di gestione della memoria.
 Modellare scenari di fallimento e valutare l'impatto dei guasti, valutando l'impatto di questi ultimi sulle prestazioni del sistema e sulla disponibilità dei servizi, consente di valutare la tolleranza ai guasti di sistemi informatici complessi. 
 Anche la sicurezza del sistema può essere valutata, simulando scenari di minaccia e attacchi informatici, così da identificare eventuali vulnerabilità.
 
 \subsubsection{Reti Informatiche}
 La simulazione di reti informatiche consente di comprendere il comportamento dinamico delle reti e consente di valutare le prestazioni di quest'ultima, misurando parametri chiave come la \textit{latenza} e il \textit{throughput}. Questo permette di identificare e risolvere eventuali punti critici che potrebbero compromettere le prestazioni della rete. 
-Studiando il traffico di rete è possibile individuare possibili congestioni di rete e adottare strategie di routing per garantire una gestione efficiente delle risorse. 
+Studiando il traffico di rete è possibile individuare possibili congestioni di rete e adottare strategie di routing per garantire una gestione efficiente delle risorse~\cite{Varga2003THEOD}. 
 Un altro aspetto importante è la possibilità di valutare la scalabilità della rete, ovvero la sua capacità di gestire un aumento del carico di lavoro o del numero di utenti. 
 Il testing di nuovi protocolli e tecnologie consente di valutare le prestazioni di nuove soluzioni prima della loro effettiva implementazione su larga scala. 
 Anche in questo caso, modellando scenari di attacco e valutando la robustezza delle contromisure di sicurezza adottate, è possibile analizzare la sicurezza della rete, proteggendola da minacce esterne e garantendo la sicurezza dei dati sensibili. 
@@ -260,7 +262,7 @@ Ci sono diverse ragioni per cui le simulazioni a tempo continuo non possono esse
     \item algoritmi di integrazione numerica: nelle simulazioni a tempo continuo, le equazioni differenziali che descrivono il sistema devono essere risolte numericamente utilizzando algoritmi di integrazione numerica, come ad esempio il metodo di Runge-Kutta. Questi algoritmi discretizzano implicitamente il tempo per calcolare l'evoluzione del sistema nel tempo.
 \end{itemize}
 
-In generale, poiché la simulazione in tempo continuo tiene traccia dello stato del sistema in modo continuo, è più granulare e, in certe situazioni (soprattutto nelle scienze naturali), più accurata. D'altra parte, la simulazione in tempo continuo può richiedere più risorse computazionali, perché il tracciamento continuo degli stati del sistema può essere costoso.
+In generale, poiché la simulazione in tempo continuo tiene traccia dello stato del sistema in modo continuo, è più granulare e in certe situazioni (soprattutto nelle scienze naturali) più accurata. D'altra parte, la simulazione in tempo continuo può richiedere più risorse computazionali, perché il tracciamento continuo degli stati del sistema può essere costoso.
 
 Un'altra differenza tra le simulazioni a tempo continuo e quelle ad eventi discreti è la loro adattabilità a problemi sia continui che discreti~\cite{zgn2009DiscreteVC}. Più precisamente:
 \begin{itemize}
@@ -345,7 +347,7 @@ Nel caso di \textbf{Protelis}, la concentrazione è definita come Java Object. I
 Per configurare una simulazione in Alchemist, è necessario fornire un file in formato YAML\footnote{https://yaml.org/}. Nel file di configurazione occorre specificare quali classi e parametri utilizzare. Le entità vengono identificate tramite chiavi. Al livello zero è possibile trovare: 
 \begin{itemize}
     \item \textbf{incarnation}: è l'unica chiave obbligatoria. Serve a specificare quale incarnazione si intende utilizzare; 
-    \item \textbf{seed}: specifica il seme da utilizzare per generazione di numeri casuali. Questo serve a garantire la riproducibilità degli esperimenti scientifici. È essenziale, a fini di debug, riuscire a garantire simulazioni sempre uguali partendo dalla stessa configurazione nel file YAML;
+    \item \textbf{seed}: specifica il seme da utilizzare per la generazione di numeri casuali. Questo serve a garantire la riproducibilità degli esperimenti scientifici. È essenziale, a fini di debug, riuscire a garantire simulazioni sempre uguali partendo dalla stessa configurazione nel file YAML;
     \item \textbf{variables}: i valori che si intendono riutilizzare all'interno del file di configurazione;
     \item \textbf{environment}: la tipologia di ambiente dentro al quale si intende eseguire la simulazione;
     \item \textbf{network-model}: permette di decidere come devono essere collegati fra loro i nodi;
@@ -539,7 +541,7 @@ Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{
 Kotlin è un linguaggio a tipizzazione statica che unisce i costrutti tipici della programmazione ad oggetti con alcuni di quelli della programmazione funzionale. 
 Una delle caratteristiche principali di Kotlin è la sua \textbf{concisione} ed \textbf{espressività}: in media è necessario scrivere il 40\% di codice in meno rispetto alla controparte Java per raggiungere le stesse funzionalità. Questo è possibile poiché i pattern più comuni sono supportati di default a livello di linguaggio. 
 Un'altra caratteristica fondamentale è la \textbf{null-safety}. In Kotlin i tipi definiscono se un oggetto può essere nullo o meno. Inoltre Kotlin è tipizzato staticamente, ciò significa che tutti i tipi sono conoscibili a tempo di compilazione, siano essi dichiarati esplicitamente o inferiti dal compilatore stesso. Gli eventuali errori vengono quindi intercettati prima dell'esecuzione del codice. 
-Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggio Java. È possibile quindi richiamare codice Kotlin da codice Java e viceversa.
+Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggio Java, è possibile quindi richiamare codice Kotlin da codice Java e viceversa.
 
 \section{Coroutines}
 Sebbene siano utilizzate da oltre 50 anni, non esiste una definizione universale su cosa sia una \textit{coroutine}. 
@@ -603,7 +605,7 @@ Prima di tutto, Kotlin mira a garantire \textbf{l'indipendenza dalle specifiche 
 
 Inoltre, Kotlin si impegna a essere altamente \textbf{adattabile alle implementazioni esistenti}. Essendo relativamente nuovo, il linguaggio presta particolare attenzione all'interoperabilità con il codice già esistente, con un'enfasi speciale sul lavoro con il codice Java sulla piattaforma JVM in modo trasparente. Considerando che esistono già approcci consolidati per la gestione del codice asincrono su piattaforme specifiche (come ad esempio le promise in JavaScript o le operazioni di input/output non bloccanti su JVM), Kotlin mira a integrare senza soluzione di continuità tali API nel suo ecosistema.
 
-Infine, Kotlin punta a fornire un \textbf{supporto per la programmazione asincrona pragmatica}. L'avvento e la diffusione dell'approccio async/await, rispetto ad altri stili di programmazione asincrona, hanno evidenziato l'importanza della leggibilità del codice. Anche se l'approccio async/await potrebbe essere meno espressivo rispetto a quello basato sulle coroutine, copre la maggior parte dei casi d'uso pratici e offre anche prestazioni migliori.
+Infine, Kotlin punta a fornire un \textbf{supporto per la programmazione asincrona pragmatica}. L'avvento e la diffusione dell'approccio async/await, rispetto ad altri stili di programmazione asincrona, hanno evidenziato l'importanza della leggibilità del codice.
 
 \subsection{Coroutine builder}
 I \textbf{coroutine builder} sono funzioni che consentono di creare e avviare coroutine in Kotlin. In Kotlin sono disponibili diversi coroutine builder, i più utilizzati sono:
@@ -855,7 +857,7 @@ Nel Listato~\ref{lst:observe-neighbor-events}, invece, è consultabile il codice
 \subsection{Gestione reattiva aggiornamento dell'environment}
 Come specificato in~\Cref{sec:linking-rule}, per aggiornare i vicinati, la \textit{linking rule} deve osservare i cambiamenti nella lista dei nodi presenti all'interno dell'environment e, a seconda della strategia di creazione dei vicinati scelta, altre parti arbitrarie dell'environment. 
 All'interno del prototipo è possibile trovare l'implementazione di una linking rule che crea i vicinati in base alla posizione dei nodi nell'environment. Ciò non toglie la possibilità di aggiungere altre strategie al simulatore e scegliere ad ogni simulazione la strategia desiderata. 
-Nel Listato~\ref{lst:observe-environment} è presente il codice con il quale la classe \textit{Position Linking Rule} osserva la lista di nodi presenti nell'environment e la loro posizione all'interno di esso, ricreando ogni volta i vicinati corretti. 
+Nel Listato~\ref{lst:observe-environment} è presente il codice con il quale la classe \textit{PositionLinkingRule} osserva la lista di nodi presenti nell'environment e la loro posizione all'interno di esso, ricreando ogni volta i vicinati corretti. 
 
 \lstinputlisting[float,language=Kotlin,caption = {Codice utilizzato per l'osservazione dei nodi presenti all'interno dell'environment e della loro posizione.}, label={lst:observe-environment}]{listings/implementation/observeEnvironment.kt}
 
