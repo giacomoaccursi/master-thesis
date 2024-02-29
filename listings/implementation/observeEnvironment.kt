@@ -12,12 +12,12 @@ private fun startToObserveFlow(flow: AwaitableMutableStateFlow<*>) {
             this.onSubscription {
                 initLatch.countDown()
             }.collect {
-                // i nuovi vicinati vengono ricalcolati in base ai nodi presenti e alle loro posizioni.
+                // The new neighborhoods are recalculated based on the actual nodes and their positions.
                 val newNeighborhoods = environment.getAllNodes().associate { node ->
                     node.id to SimpleNeighborhood(node, computeNeighbors(node, environment))
                 }
                 environment.updateNeighborhoods(newNeighborhoods)
-                // notifica del consumo del flow.
+                // Notification to the flow of actual consumption.
                 this.notifyConsumed()
             }
         }
