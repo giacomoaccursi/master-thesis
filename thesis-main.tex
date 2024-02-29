@@ -80,8 +80,8 @@ Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo 
 Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni di essa.
 
 Per quanto riguarda i simulatori ad eventi discreti, uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
-Il simulatore Alchemist utilizza attualmente un grafo per gestire le dipendenze fra eventi. La creazione e l'aggiornamento del grafo possono portare a problemi di performance nel caso in cui il grafo presenti un elevato numero di nodi. 
-Mediante l'uso della programmazione reattiva è possibile eliminare la necessità di un grafo, descrivendo le dipendenze come relazione osservante/osservato, in cui ciascun evento osserva gli eventi di interesse e reagisce in maniera asincrona alla loro occorrenza. Un evento che non dipende più da un altro evento, termina semplicemente l'osservazione. 
+Il simulatore Alchemist utilizza attualmente un grafo per gestire le dipendenze fra eventi. La creazione e l'aggiornamento del grafo possono portare a problemi di performance in presenza di un elevato numero di nodi. 
+Mediante l'uso della programmazione reattiva è possibile eliminare la necessità di un grafo, descrivendo le dipendenze come relazione osservante/osservato, in cui ciascun evento osserva gli eventi di interesse e reagisce in maniera asincrona alla loro occorrenza. Un evento che non dipende più da un altro evento ne termina semplicemente l'osservazione. 
 L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreti che utilizzi le tecniche di programmazione reattiva per eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist.
 
 \section{Struttura della tesi}
@@ -262,7 +262,7 @@ Le radici concettuali delle simulazioni ad eventi discreti possono essere rintra
 
 Nel corso degli anni '50 e '60, con l'avvento dei primi computer e l'espansione dei linguaggi di programmazione, emersero i primi tentativi di simulare sistemi complessi utilizzando modelli basati su eventi discreti. Questi primi sforzi furono spesso limitati dalle risorse computazionali disponibili e dalle limitazioni dei linguaggi di programmazione dell'epoca.
 
-Negli anni '60 e '70, con l'avanzamento della tecnologia informatica e l'introduzione di linguaggi di programmazione più potenti, come FORTRAN e ALGOL, la simulazione ad eventi discreti divenne sempre più praticabile e diffusa. Durante questo periodo furono sviluppati i primi linguaggi di programmazione specificamente progettati per la simulazione, come SIMSCRIPT~\cite{DBLP:journals/ibmsj/DimsdaleM64} e GPSS~\cite{DBLP:journals/tssc/HollandM68}, i quali permisero ai ricercatori di modellare e analizzare sistemi complessi in modo più efficace e efficiente.
+Negli anni `60 e `70, con l'avanzamento della tecnologia informatica e l'introduzione di linguaggi di programmazione più potenti, come FORTRAN e ALGOL, la simulazione ad eventi discreti divenne sempre più praticabile e diffusa. Durante questo periodo furono sviluppati i primi linguaggi di programmazione specificamente progettati per la simulazione, come SIMSCRIPT~\cite{DBLP:journals/ibmsj/DimsdaleM64} e GPSS~\cite{DBLP:journals/tssc/HollandM68}, i quali permisero ai ricercatori di modellare e analizzare sistemi complessi in modo più efficace e efficiente.
 
 Negli anni successivi, con il continuo avanzamento della tecnologia informatica e l'introduzione di nuovi concetti e metodologie, le simulazioni ad eventi discreti continuarono ad evolversi e a trovare sempre più applicazioni in una vasta gamma di settori. 
 Molte aziende, in particolare nel settore manifatturiero, iniziarono ad utilizzare le simulazioni come strumento di supporto alle decisioni. 
@@ -291,7 +291,7 @@ Anche la sicurezza del sistema può essere valutata, simulando scenari di minacc
 
 \subsection{Wireless Sensor Network}
 Le Wireless Sensor Network (WSN) sono sistemi distribuiti di sensori interconnessi tramite comunicazione wireless, utilizzati in una vasta gamma di settori, tra cui il monitoraggio ambientale, l'agricoltura di precisione, sanità e sorveglianza. 
-La simulazione ad eventi discreti è importante per la valutazione dei protocolli di comunicazione e di routing specifici per le WSN. I protocolli utilizzati devono gestire alcuni aspetti peculiari delle reti wireless, come la limitata capacità energetica dei nodi sensori e e le comunicazioni intermittenti a causa dell'ambiente circostante. 
+La simulazione ad eventi discreti è importante per la valutazione dei protocolli di comunicazione e di routing specifici per le WSN. I protocolli utilizzati devono gestire alcuni aspetti peculiari delle reti wireless, come la limitata capacità energetica dei nodi sensori e le comunicazioni intermittenti a causa dell'ambiente circostante. 
 La simulazione in questo caso è utile anche per valutare la distribuzione dei nodi sensori nello spazio fisico e per analizzare la copertura della rete. Il simulatore \textbf{OMNeT++}~\cite{10.5555/1416222.1416290} è stato utilizzato per localizzare i sensori wireless all'interno della rete~\cite{1656681} e per stimare la corretta allocazione di sensori di qualità dell'acqua in aree rurali estese~\cite{9476333}. 
 
 \subsection{Traffico stradale}
@@ -782,11 +782,11 @@ Gli operatori sono funzioni specializzate progettate per manipolare, trasformare
 %     \item \textbf{compatibilità con coroutine}: Kotlin Flow è completamente compatibile con le coroutines di Kotlin, consentendo di combinare facilmente flussi reattivi con il modello asincrono basato su coroutine. 
 % \end{itemize}
 \section{Analisi}
-Trattandosi dello sviluppo di un prototipo, avente come fine ultimo quello dell'integrazione, è opportuno mantenere un modello del dominio che sia il più fedele possibile a quello del simulatore Alchemist. Tuttavia, occorre definire ulteriori vincoli affinché le tecniche di programmazione reattiva possa essere utilizzata adeguatamente. 
+Trattandosi dello sviluppo di un prototipo, avente come fine ultimo quello dell'integrazione, è opportuno mantenere un modello del dominio che sia il più fedele possibile a quello del simulatore Alchemist. Tuttavia, occorre definire ulteriori vincoli affinché le tecniche di programmazione reattiva possano essere utilizzata adeguatamente. 
 
 La programmazione reattiva introduce aspetti asincroni non presenti attualmente in Alchemist. Uno degli aspetti fondamentali per una esecuzione corretta di una simulazione a step è la consistenza dello stato del sistema, uno step non può cominciare fintanto che l'ambiente allo step precedente non si trova in uno stato consistente. Questo serve a garantire che le decisioni prese in uno step siano influenzate dallo snapshot acquisito allo step precedente e non da una rappresentazione parziale di esso. 
 Occorre inoltre considerare il vincolo di causalità fra eventi: ad ogni step l'evento che viene eseguito deve essere quello con il tempo di occorrenza minore, garantendo così la corretta sequenza di esecuzione e la coerenza temporale della simulazione. 
-L'esecuzione di tutte le azioni di un evento devono avvenire in maniera sequenziale. Questo assicura che ciascuna azione possa prendere decisioni basandosi su uno stato consistente del sistema. La consistenza dell'ambiente all'inizio di ciascuno step assicura anche che tutte le condizioni che un evento necessità per essere eseguito possano essere prese basandosi su una rappresentazione fedele di esso
+L'esecuzione di tutte le azioni di un evento devono avvenire in maniera sequenziale. Questo assicura che ciascuna azione possa prendere decisioni basandosi su uno stato consistente del sistema. La consistenza dell'ambiente all'inizio di ciascuno step assicura anche che tutte le condizioni che un evento necessita per essere eseguito possano essere valutate basandosi su una rappresentazione fedele di esso
 In una simulazione ad eventi discreti un evento necessità di uno stato consistente dell'environment per aggiornare il proprio tempo. Solo quando l'ambiente è coerente, il tempo di accadimento di un evento può essere aggiornato in base alle regole definite nel modello di simulazione, assicurando che l'evoluzione di essa avvenga in modo corretto, riflettendo il comportamento del sistema che si intende simulare. 
 La simulazione, come in Alchemist, avanza per step discreti, in ognuno dei quali viene eseguito l'evento imminente e il tempo della simulazione avanza in relazione al tempo di accadimento dell'evento. 
 
@@ -833,9 +833,18 @@ Ad ogni step della simulazione, l'\textit{engine}:
     \item aggiorna il tempo putativo dell'evento appena eseguito;
     \item comunica allo scheduler di ordinare la lista di eventi futuri, poiché i tempi putativi di alcuni eventi potrebbero essere cambiati. 
 \end{enumerate}
+Il funzionamento appena descritto e osservabile in~\Cref{fig:engine-sequence-diagram}.
+
 Si noti che, a seguito della chiamata per eseguire l'evento, il controllo deve ritornare all'engine solo nel momento in cui tutte le azioni dell'evento sono state effettivamente eseguite, tutte le dipendenze fra eventi sono state aggiornate e gli eventi dipendenti da quello eseguito hanno aggiornato il proprio tempo putativo. 
 
 Lo scheduler deve mantenere una lista degli eventi futuri ordinati per tempo di accadimento. Oltre a ciò, deve fornire la possibilità di rimuovere eventi dalla propria lista e di aggiungerne di nuovi. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/design/engine-sequence-diagram.pdf}
+    \caption{Diagramma di sequenza che modella l'inizializzazione e l'avanzamento degli step nella simulazione.}
+    \label{fig:engine-sequence-diagram}
+\end{figure}
 
 \subsection{Eliminazione grafo delle dipendenze}
 Come anticipato in sezione~\Cref{sec:alchemist}, Alchemist gestisce le dipendenze fra gli eventi utilizzando un grafo delle dipendenze, nel quale i nodi sono le reazioni (eventi) e gli archi connettono una reazione $r$ a tutti i nodi che dipendono da essa, ovvero quelli il cui tempo di attivazione deve essere aggiornato a seguito dell'esecuzione di $r$. 
@@ -856,13 +865,20 @@ Per esempio, se i vicinati vengono definiti in base alla loro posizione, occorre
 In una simulazione a step è essenziale garantire uno stato consistente prima di procedere allo step successivo al fine di garantire risultati accurati ed affidabili. 
 L'utilizzo degli hot flow, con la loro natura asincrona e non deterministica, rende difficile garantire questa consistenza dello stato, poiché non esiste un momento definito in cui tutti gli osservatori hanno elaborato i dati e lo stato è completamente aggiornato. 
 Come anticipato in~\Cref{sec:hot-flow}, la chiamata alla funzione \texttt{collect}, la quale controlla costantemente la presenza di nuovi elementi da consumare, non termina mai ed è quindi necessario eseguire ciascuna di esse in una coroutine dedicata. Questa coroutine, rimarrà attiva fino al termine della simulazione, o fino a quando l'osservatore necessiterà dei dati emessi su tale flusso. 
-Quando un nuovo elemento viene emesso su un flusso hot, non è possibile controllare con precisione quando tutti gli osservatori hanno finito di elaborare il nuovo elemento; il controllo ritorna al punto di emissione del flusso non appena tutti gli osservatori lo hanno ricevuto. Ci si potrebbe quindi trovare nella situazione in cui inizia un nuovo step senza che gli aggiornamenti degli eventi dipendenti o la creazione dei nuovi vicinati sia stata effettivamente terminata. 
+Quando un nuovo elemento viene emesso su un flusso hot, non è possibile controllare con precisione quando tutti gli osservatori hanno finito di elaborarlo; come è possibile notare in~\Cref{fig:flow-call-tree}, il controllo ritorna all'entità che emette sul flusso non appena tutti gli osservatori hanno ricevuto notifica della presenza dell'elemento. Ci si potrebbe quindi trovare nella situazione in cui inizia un nuovo step senza che gli aggiornamenti degli eventi dipendenti o la creazione dei nuovi vicinati sia stata effettivamente terminata. 
 Ogni osservatore, oltretutto, può a sua volta reagire alla presenza di un elemento su un flusso, emettendo a sua volta elementi su un altro flusso, creando così un albero di chiamate asincrone che può diventare complesso da gestire e sincronizzare. 
 
 Nel contesto di questo prototipo, il termine dello step non è il solo punto in cui è necessaria consistenza nello stato del sistema. L'occorrenza di un evento scatena l'esecuzione di una o più azioni, le quali potrebbero necessitare dello stato attuale dell'ambiente per prendere decisioni su come modificarlo. 
 Un altro punto nel quale è necessaria consistenza è quando un evento intende notificare gli eventi da esso dipendenti della sua effettiva esecuzione. Qui la consistenza è necessaria poiché le azioni eseguite potrebbero aver modificato la topologia dei vicinati, portando quindi ad una variazione nella lista degli eventi dal quale ogni singolo evento dipende. 
 La garanzia che tutti gli eventi dipendenti abbiano aggiornato il proprio tempo putativo prima di proseguire con lo step successivo è fondamentale per garantire che la lista di eventi futuri sia ordinata nel modo corretto. Quando si gestisce una simulazione a step, è essenziale mantenere un controllo accurato del tempo e degli eventi che devono accadere in specifici momenti temporali. Se un evento dovesse aggiornare il suo tempo dopo la fine dello step in cui dovrebbe effettivamente farlo, potrebbe causare un problema di inconsistenza temporale nell'ambiente di simulazione.
 Si immagini di avere un evento programmato per accadere in un certo momento temporale all'interno di uno step. Dopo la fine di questo step, l'evento potrebbe aggiornare il suo tempo per essere pianificato per il prossimo step. Tuttavia, se questo aggiornamento non avviene correttamente, potrebbe verificarsi una situazione in cui, al successivo step, l'evento si ritrovi nella lista degli eventi futuri con un tempo minore rispetto al tempo corrente.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/design/flow-call-tree.pdf}
+    \caption{Diagramma di sequenza che mostra come il controllo a seguito di un emissione su un flow ritorni all'emettitore senza possibilità di controllare quando l'elemento viene effettivamente consumato.}
+    \label{fig:flow-call-tree}
+\end{figure}
 
 \section{Implementazione}
 Nel contesto di una simulazione è importante che gli osservatori ricevano tutti lo stesso stato al fine di garantire la coerenza dei risultati. Si è deciso quindi di utilizzare flow di tipo hot, descritti in~\Cref{sec:hot-flow}. 
@@ -911,8 +927,8 @@ Al momento di ogni effettiva sottoscrizione viene decrementato il latch.
 Così facendo si ha la certezza che una volta terminata l'inizializzazione di un osservatore, questo sia effettivamente pronto per consumare gli elementi emessi sul flow. 
 
 \subsection{Engine e scheduler}
-Il codice utilizzato per al gestione del singolo step appena descritto è consultabile al Listato~\ref{lst:engine-step}. 
-In questa fase prototipale è stato scelto di implementare lo \textit{scheduler} di eventi attraverso una semplice lista. Se il prototipo dovesse poi essere integrato nel simulatore Alchemist, questa soluzione sarebbe limitante dal punto di vista delle performance, poiché ad ogni step, viene effettuato un ordinamento completo della lista di eventi, in tal caso si renderebbe necessario l'utilizzo di meccanismi più efficienti, come quello già presente in Alchemist, descritto in~\Cref{sec:next-reaction-method}. 
+Il codice utilizzato per al gestione di un singolo step della simulazione è consultabile al Listato~\ref{lst:engine-step}. 
+In questa fase prototipale è stato scelto di implementare lo \textit{scheduler} di eventi attraverso una semplice lista. Se il prototipo dovesse poi essere integrato nel simulatore Alchemist, questa soluzione sarebbe limitante dal punto di vista delle performance poiché ad ogni step viene effettuato un ordinamento completo della lista di eventi, in tal caso si renderebbe necessario l'utilizzo di meccanismi più efficienti, come quello già presente in Alchemist, descritto in~\Cref{sec:next-reaction-method}. 
 
 \lstinputlisting[float,language=Kotlin,caption = {Codice per l'esecuzione di un singolo step all'interno della simulazione.}, label={lst:engine-step}]{listings/implementation/engineStep.kt}
 
