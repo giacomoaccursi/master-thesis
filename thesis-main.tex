@@ -27,7 +27,10 @@ Le simulazioni rappresentano una delle metodologie più importanti per l'analisi
 
 La programmazione reattiva, d'altro canto, sta guadagnando sempre più popolarità nell'industria del software grazie alla sua capacità di affrontare le sfide poste dalle applicazioni moderne, concentrandosi sulla gestione efficiente di flussi di dati asincroni. 
 
-La tesi ha come obiettivo la progettazione e l'implementazione di un prototipo di simulatore reattivo basato sul simulatore Alchemist, ovvero un simulatore ad eventi discreto che utilizzi tecniche di programmazione reattiva, eliminando la necessità di un grafo per la gestione delle dipendenze fra eventi, attualmente presente in Alchemist. 
+In un simulatore ad eventi discreti, la costruzione e l'aggiornamento del grafo delle dipendenze fra eventi rappresentano attività critiche, soggette a potenziali problemi di performance in presenza di un numero elevato di nodi.
+Utilizzando la programmazione reattiva è possibile definire implicitamente le dipendenze fra eventi. Ciascun evento osserva gli eventi di interesse e reagisce in maniera asincrona alla loro occorrenza, eliminando la necessità del grafo.  
+
+La tesi ha come obiettivo la progettazione e l'implementazione di un prototipo di simulatore ad eventi discreti reattivo basato sul simulatore Alchemist, ovvero un simulatore ad eventi discreti che utilizzi tecniche di programmazione reattiva per eliminare la necessità di un grafo per la gestione delle dipendenze fra eventi, attualmente presente in Alchemist. 
 \end{abstract}
 
 \begin{dedication} 
@@ -53,21 +56,21 @@ Optional. Max 1 page.
 \label{chap:introduzione}
 
 \section{Contesto e motivazioni}
-Le simulazioni computerizzate rappresentano un pilastro fondamentale nell'ambito della ricerca scientifica, dell'ingegneria, della progettazione e dell'apprendimento, permettendo di esplorare e comprendere fenomeni complessi, simulare scenari reali e testare ipotesi in un ambiente controllato e riproducibile. 
-Paul Humphreys~\cite{Humphreys1990-HUMCS} definisce le simulazioni computerizzate come ``qualsiasi metodo implementato al computer per esplorare le proprietà di modelli matematici dove i metodi analitici non sono disponibili''. 
-Le simulazioni computerizzate si riferiscono alla creazione di modelli digitali che riproducono il comportamento di sistemi reali o immaginari nel tempo. Questi modelli possono variare dalla semplice rappresentazione grafica alla simulazione di processi dinamici complessi, coinvolgendo l'interazione di molteplici variabili. 
+Le simulazioni computerizzate (o semplicemente \textit{simulazioni}) rappresentano un pilastro fondamentale nell'ambito della ricerca scientifica, dell'ingegneria, della progettazione e dell'apprendimento, permettendo di esplorare e comprendere fenomeni complessi, simulare scenari reali e testare ipotesi in un ambiente controllato e riproducibile. 
+Paul Humphreys~\cite{Humphreys1990-HUMCS} definisce le simulazioni come ``qualsiasi metodo implementato al computer per esplorare le proprietà di modelli matematici dove i metodi analitici non sono disponibili''. 
+Le simulazioni si riferiscono alla creazione di modelli digitali che riproducono il comportamento di sistemi reali o immaginari nel tempo. Questi modelli possono variare dalla semplice rappresentazione grafica alla simulazione di processi dinamici complessi. Un esempio di sistema che è possibile simulare è il sistema climatico terrestre, il quale è estremamente dinamico e complesso e influenzato da una vasta gamma di fattori, tra cui temperatura, umidità, correnti oceaniche, venti e attività solare.  
 Le simulazioni sono diventate indispensabili in diverse aree, incluse la modellazione dei sistemi naturali, economici e sociali. 
 
-Ad alto livello, è possibile considerare una simulazione computerizzata come un metodo per lo studio di sistemi. In questa accezione più ampia del termine, ci riferisce all'intero processo, il quale include la scelta di un modello, la ricerca di un modo per implementare il modello in una forma che possa essere eseguita su un computer, il calcolo dell'output dell'algoritmo e la visualizzazione e lo studio dei dati risultati. Secondo Winsberg~\cite{Winsberg_2003}: 
+Ad alto livello, è possibile considerare una simulazione come un metodo per lo studio di sistemi. In questa accezione più ampia del termine, ci riferisce all'intero processo, il quale include la scelta di un modello, la ricerca di un modo per implementare il modello in una forma che possa essere eseguita su un computer, il calcolo dell'output dell'algoritmo e la visualizzazione e lo studio dei dati risultati. Secondo Winsberg~\cite{Winsberg_2003}: 
 \begin{quotation}
     ``Gli studi di simulazione di successo fanno più che calcolare numeri. Fanno uso di una varietà di tecniche per trarre inferenze da questi numeri. Le simulazioni fanno uso creativo di tecniche di calcolo che possono essere motivate solo extra-matematicamente ed extra-teoricamente. Come tale, a differenza delle semplici computazioni che possono essere eseguite su un computer, i risultati delle simulazioni non sono automaticamente affidabili. Molto impegno e competenza vanno nel decidere quali risultati delle simulazioni sono affidabili e quali no.''
 \end{quotation}
-La definizione sopracitata interpreta la simulazione computerizzata come l'uso di un computer per risolvere o approssimare la soluzione delle equazioni matematiche di un modello che si intende rappresentare, sia esso reale o ipotetico. 
+La definizione sopracitata interpreta la simulazione come l'uso di un computer per risolvere o approssimare la soluzione delle equazioni matematiche di un modello che si intende rappresentare, sia esso reale o ipotetico. 
 
 Un altro approccio è cercare di definire una simulazione come indipendente dalla nozione di simulazione al computer e poi definire ``simulazione al computer'' come una simulazione eseguita da un computer digitale programmato. Utilizzando questo approccio, una simulazione è qualsiasi sistema che si crede abbia un comportamento dinamico sufficientemente simile ad un altro sistema tale che il primo possa essere studiato per apprendere il secondo. Questo è in linea con la definizione data da Hartmann~\cite{Hartmann1996-HARTWA-2}, secondo il quale ``una simulazione imita un processo con un altro processo'', dove in questo caso il termine processo si riferisce unicamente a qualche oggetto o sistema il cui stato cambia nel tempo. Questa definizione verrà poi corretta da Huges~\cite{Hughes_1999}, il quale obiettò che la definizione di Hartmann escludeva simulazioni che imitano la struttura di un sistema piuttosto che le sue dinamiche. 
 Humphreys ha revisionato~\cite{Humphreys2004-HUMEOC-2} la sua definizione per accordarsi con le osservazioni di Hartmann e Hughes come segue: 
 \begin{quotation}
-    Il sistema $S$ fornisce una simulazione di base di un oggetto o processo $B$ nel caso in cui $S$ sia un dispositivo computazionale concreto che produce, attraverso un processo temporale, soluzioni a un modello computazionale che rappresenta correttamente $B$, sia dinamicamente che staticamente. Se inoltre il modello computazionale utilizzato da $S$ rappresenta correttamente la struttura del sistema reale $R$, allora $S$ fornisce una simulazione di base del sistema $R$ rispetto a $B$. 
+    ``Il sistema $S$ fornisce una simulazione di base di un oggetto o processo $B$ nel caso in cui $S$ sia un dispositivo computazionale concreto che produce, attraverso un processo temporale, soluzioni a un modello computazionale che rappresenta correttamente $B$, sia dinamicamente che staticamente. Se inoltre il modello computazionale utilizzato da $S$ rappresenta correttamente la struttura del sistema reale $R$, allora $S$ fornisce una simulazione di base del sistema $R$ rispetto a $B$.'' 
 \end{quotation}
 
 
@@ -76,13 +79,15 @@ Negli ultimi vent'anni è stato compiuto un lavoro significativo sul tema dei me
 Negli ultimi vent'anni la velocità di calcolo è aumentata, i costi di calcolo e modellazione sono diminuiti e si sono verificati sviluppi teorici nel campo dell'ottimizzazione della simulazione~\cite{DBLP:conf/scsc/Riley13}.
 Gli approcci di ottimizzazione algoritmica si sono evoluti nel tempo man mano che la simulazione è diventata più diffusa. Le tecniche di ottimizzazione coinvolgono numerose valutazioni dinamiche dello spazio delle soluzioni multidimensionale di una simulazione nella ricerca di una soluzione ottimale. Il lavoro nell'ambito dell'ottimizzazione della simulazione si è concentrato principalmente sulla progettazione e valutazione di vari approcci algoritmici ed euristici nella ricerca dello spazio delle soluzioni di essa.
 
-Uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
-L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreti, in grado di eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist, facendo uso di tecniche di programmazione reattiva. 
+Per quanto riguarda i simulatori ad eventi discreti, uno degli aspetti critici, quando si parla di performance, è la gestione e l'aggiornamento delle dipendenze fra eventi duranti la simulazione. 
+Il simulatore Alchemist utilizza attualmente un grafo per gestire le dipendenze fra eventi. La creazione e l'aggiornamento del grafo possono portare a problemi di performance nel caso in cui il grafo presenti un elevato numero di nodi. 
+Mediante l'uso della programmazione reattiva è possibile eliminare la necessità di un grafo, descrivendo le dipendenze come relazione osservante/osservato, in cui ciascun evento osserva gli eventi di interesse e reagisce in maniera asincrona alla loro occorrenza. Un evento che non dipende più da un altro evento, termina semplicemente l'osservazione. 
+L'obiettivo della tesi è lo studio delle simulazioni ad eventi discreti e dei principi della programmazione reattiva, aventi come fine la progettazione e lo sviluppo di un simulatore ad eventi discreti che utilizzi le tecniche di programmazione reattiva per eliminare il grafo delle dipendenze fra eventi utilizzato attualmente nel simulatore Alchemist.
 
 \section{Struttura della tesi}
 Nel capitolo 2 si intende effettuare una panoramica sulle simulazioni ad eventi discreti, introducendone il funzionamento e spiegando le differenze fra simulazioni ad eventi discrete e continue. Si intende inoltre fornire un confronto fra simulazioni ad eventi discrete event-driven e time-driven. Al termine del capitolo verranno descritte le caratteristiche principali del simulatore Alchemist e le peculiarità sul suo funzionamento. 
 Il capitolo 3 mira a descrivere la filosofia della programmazione reattiva, analizzandone vantaggi e criticità, astraendo però dalla loro implementazione. 
-Il capitolo 4 descrive l'implementazione reattiva nel linguaggio Kotlin, parlando di come sono implementate le kotlin Coroutines e i Kotlin Flow. 
+Il capitolo 4 descrive l'implementazione reattiva nel linguaggio Kotlin, parlando di come sono implementate le Kotlin Coroutines e i Kotlin Flow. 
 Nel capitolo 5 si potrà trovare la progettazione e l'implementazione del prototipo di simulatore sviluppato. 
 
 
@@ -90,13 +95,12 @@ Nel capitolo 5 si potrà trovare la progettazione e l'implementazione del protot
 % Simulazioni ad eventi discreti
 %----------------------------------------------------------------------------------------
 \chapter{Simulazioni ad Eventi Discreti}
-\section{Panoramica sulle simulazioni ad eventi discreti}
 \label{sec:panoramica-des}
-Un \textbf{sistema ad eventi discreti} è un sistema a stati discreti guidato da eventi, il cui il progresso del tempo è determinato dall'occorrenza di eventi grazie ai quali il sistema evolve. Nel contesto di una simulazione ad eventi discreti, un \textbf{evento} rappresenta un cambiamento nello stato del sistema. 
+Un \textbf{sistema ad eventi discreti} è un sistema a stati discreti guidato da eventi, il cui il progresso del tempo è determinato dall'occorrenza di eventi grazie ai quali il sistema evolve. Nel contesto di una simulazione ad eventi discreti, un \textbf{evento} rappresenta un cambiamento nello stato del sistema, mentre lo \textbf{stato} riguarda la rappresentazione del sistema, in termini di proprietà, variabili e relazioni fra le entità, in un dato istante di tempo.
 Gli esempi di eventi possono includere l'arrivo di un messaggio in un sistema di comunicazione, il completamento di un processo, o qualsiasi altro avvento che influenzi il comportamento del sistema. La simulazione avanza di passi discreti, con ogni passo che corrisponde all'accadimento di un nuovo evento. 
 Questo approccio è spesso utilizzato per modellare e analizzare sistemi complessi, come reti di computer, catene di approvvigionamento, code di attesa o altri scenari in cui gli eventi guidano il comportamento del sistema. 
 
-\subsection{Terminologia e componenti}
+\section{Terminologia e componenti}
 I concetti alla base di un sistema ad eventi discreti sono i seguenti: 
 \begin{itemize}
     \item \textbf{Sistema}: collezione di entità che interagiscono fra loro nel tempo per raggiungere determinati obiettivi.
@@ -110,7 +114,7 @@ I concetti alla base di un sistema ad eventi discreti sono i seguenti:
 \end{itemize}
 Una simulazione ad eventi discreti procede acquisendo una sequenza di \textit{snapshot}, i quali rappresentano l'evoluzione del sistema nel tempo. Uno snapshot ad un determinato istante $t$, include non solo lo stato del sistema al tempo $t$, ma anche la lista degli eventi futuri e lo stato di tutte le entità del sistema.
 
-\subsection{Algoritmo Event-scheduling Time-advance}
+\section{Algoritmo Event-scheduling Time-advance}
 \label{sec:time-advance-algorithm}
 La dinamicità intrinseca delle simulazioni ad eventi discreti impone la necessità di gestire attentamente il flusso temporale attraverso il monitoraggio costante del clock. 
 Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione, rispettando l'ordine cronologico degli eventi, è rappresentato dall'algoritmo ``\textit{event-scheduling time-advance}'', basato sull'utilizzo della future event list.
@@ -122,7 +126,7 @@ Un meccanismo fondamentale per garantire l'evoluzione accurata della simulazione
     \label{fig:next-event-flow}
 \end{figure}
 
-L'algoritmo in questione, il cui flusso di controllo è illustrato in figura~\ref{fig:next-event-flow}, è suddiviso in tre sezioni chiave: \textit{inizializzazione}, \textit{ciclo di elaborazione degli eventi} e \textit{fase di output}.
+L'algoritmo in questione, il cui flusso di controllo è illustrato in~\Cref{fig:next-event-flow}, è suddiviso in tre sezioni chiave: \textit{inizializzazione}, \textit{ciclo di elaborazione degli eventi} e \textit{fase di output}.
 La simulazione inizia al tempo 0, quando il \textit{main program} dà avvio alla simulazione invocando la \textit{initialization routine}, nella quale il clock viene settato a 0 e le entità e le variabili di stato sono inizializzate.
 Il controllo torna poi al main program, il quale invoca una \textit{timing routine} per identificare il prossimo evento da eseguire.
 La lista degli eventi futuri contiene tutti gli eventi ordinati per tempo di accadimento: $FEL = [t_1, t_2, \dots t_n], t_1 \leq t_2 \leq \dots \leq t_n$. 
@@ -132,11 +136,11 @@ L'esecuzione dell'evento imminente, seguita dalla generazione di uno snapshot co
 Il processo si ripete ciclicamente fino alla conclusione della simulazione. 
 Durante la fase di output vengono invece elaborate e registrate le statistiche di interesse. 
 
-\subsubsection{Gestione Future Event List}
-Una Future Event List, come anticipato, è la struttura dati che contiene l'elenco degli eventi programmati per verificarsi in futuro. Tradizionalmente l'elenco è ordinato in base al tempo di esecuzione al quale l'evento è stato schedulato, ma questo non è un requisito. 
+\subsection{Gestione Future Event List}
+Una FEL, come anticipato, è la struttura dati che contiene l'elenco degli eventi programmati per verificarsi in futuro. Tradizionalmente l'elenco è ordinato in base al tempo di esecuzione al quale l'evento è stato schedulato, ma questo non è un requisito. 
 La gestione efficiente della FEL è di fondamentale importanza, alcuni modelli di simulazione impiegano più tempo CPU nella gestione della lista piuttosto che qualsiasi altro aspetto, come per esempio la generazione di numeri casuali, l'elaborazione di eventi, l'esecuzione di operazioni aritmetiche varie ecc\dots
 
-Nella gestione degli eventi che compongono la FEL, ci sono due operazioni critiche: l'operazione di inserimento (\textit{enqueue}) e l'operazione di cancellazione (\textit{dequeue}). Un'operazione di cancellazione viene eseguita per elaborare l'evento o perché un evento, precedentemente pianificato deve essere annullato per qualche motivo. L'inserimento e la cancellazione possono verificarsi in una posizione precisa nella lista degli eventi, oppure potrebbe essere necessario avviare una ricerca per determinare la giusta posizione. 
+Nella gestione degli eventi che compongono la FEL, ci sono due operazioni critiche: l'operazione di inserimento (\textit{enqueue}) e l'operazione di cancellazione (\textit{dequeue}). Un'operazione di cancellazione viene eseguita per elaborare l'evento o perché un evento, precedentemente pianificato, deve essere annullato per qualche motivo. L'inserimento e la cancellazione possono verificarsi in una posizione precisa nella lista degli eventi, oppure potrebbe essere necessario avviare una ricerca per determinare la giusta posizione. 
 Importante è anche l'operazione di modifica, in cui una ricerca di evento esistente presente in lista è seguita da una modifica di qualche aspetto dell'evento stesso, come ad esempio la modifica del tempo di accadimento al quale è schedulato. 
 
 Esistono tre criteri principali per determinare l'efficacia della struttura dati e dell'algoritmo per la gestione della FEL: 
@@ -146,7 +150,7 @@ Esistono tre criteri principali per determinare l'efficacia della struttura dati
     \item \textbf{adattabilità}: la FEL dovrebbe consentire la configurazione di parametri chiave per adattarsi a diverse modalità di gestione degli eventi o politiche temporali. Dovrebbe inoltre essere progettata in modo che nuove funzionalità o tipi di eventi possano essere facilmente integrati senza modificare drasticamente il codice esistente. 
 \end{itemize}
 
-\subsection{Partenza e terminazione}
+\section{Partenza e terminazione}
 Nella \Cref{sec:time-advance-algorithm} è stato descritto come la simulazione avanza durante la sua esecuzione. Tipicamente per far partire una simulazione, in fase di inizializzazione viene generato un evento specifico che viene poi inserito nella lista di eventi futuri. 
 La terminazione può invece essere raggiunta tramite diversi meccanismi: 
 \begin{itemize}
@@ -154,28 +158,78 @@ La terminazione può invece essere raggiunta tramite diversi meccanismi:
     \item eventi speciali di terminazione: il tempo di esecuzione $T_e$ è determinato dalla simulazione stessa. In genere $T_e$ dipende dal numero di occorrenze di un determinato evento. Per esempio, potrebbe essere il tempo del completamento del centesimo servizio presso un determinato centro di assistenza;  
     \item terminazione quando la FEL è vuota.
 \end{itemize}
-Nel secondo e nel terzo caso il tempo per eseguire la simulazione non è conosciuto a priori e può variare di simulazione in simulazione.
+Nel secondo e nel terzo caso il tempo per eseguire la simulazione non è conosciuto a priori e può variare da una simulazione all'altra.
 
 Le esecuzioni di una simulazione possono essere classificate in \textbf{transient} e \textbf{steady state}. La selezione del tipo di simulazione è particolarmente importante e la decisione deve essere presa in base all'output che si intende analizzare. Con il termine transient ci si riferisce ad una simulazione che termina, per causa di un evento speciale o grazie ad un tempo prefissato. 
 Una simulazione steady state, al contrario, non termina mai. L'obiettivo in questo caso è studiare il comportamento a lungo termine del sistema. 
 
-\subsection{Distribuzioni di probabilità}
+\section{Distribuzioni di probabilità}
 Il successo di una simulazione richiede un approccio completo che va oltre la semplice creazione di un diagramma di flusso del sistema in esame, la sua traduzione in un ``programma'' per computer e la replicazione di alcune configurazioni proposte del sistema. L'uso della probabilità e della statistica è un aspetto fondamentale di uno studio di simulazione, tanto che ogni team di modellazione dovrebbe includere almeno un esperto con una solida formazione in queste tecniche~\cite{Law15}.
 Per effettuare una simulazione, utilizzando input casuali come i tempi di arrivo o le dimensioni della domanda, occorre specificare le loro distribuzioni di probabilità. La scelta delle corrette distribuzioni determina in maniera importante l'accuratezza del modello. 
 
 Nelle simulazioni ad eventi discreti è comune modellare il tempo trascorso tra gli arrivi successivi degli eventi utilizzando distribuzioni di probabilità. 
 Ad esempio, nel caso di una coda di attesa in un sistema di servizio, i tempi tra gli arrivi dei clienti possono essere modellati utilizzando una \textbf{distribuzione esponenziale} o di \textbf{Poisson}. Queste distribuzioni consentono di rappresentare realisticamente il processo di arrivo degli eventi e di stimare la frequenza con cui si verificano.
 I tempi di servizio potrebbero essere invece costanti o probabilistici. Se i tempi sono completamente casuali, potrebbe essere necessario dover utilizzare una \textbf{distribuzione esponenziale}. Potrebbe anche accadere che i tempi di servizio siano costanti, ma una variabilità casuale causi fluttuazioni in modo negativo o positivo. Ad esempio, il tempo impiegato da un tornio per attraversare un albero di 10 centimetri dovrebbe essere costante. Tuttavia, il materiale potrebbe presentare lievi differenze di durezza o lo strumento potrebbe usurarsi. Qualsiasi evento potrebbe causare tempi di lavorazione diversi. In questi casi la \textbf{distribuzione normale} potrebbe descrivere il tempo di servizio~\cite{DBLP:books/daglib/0034857}.
-Oltre ai tempi di arrivo e di servizio, le simulazioni possono coinvolgere altre variabili casuali che influenzeranno il comportamento del sistema: i ritardi tra l'arrivo di un evento e la sua elaborazione possono essere modellati utilizzando distribuzioni di probabilità per rappresentare il tempo impiegato per completare determinate attività o processi. 
+Oltre ai tempi di arrivo e di servizio, le simulazioni possono coinvolgere altre variabili casuali che influenzeranno il comportamento del sistema: i ritardi tra l'arrivo di un evento e la sua elaborazione possono essere modellati utilizzando distribuzioni di probabilità per rappresentare il tempo impiegato per completare determinate attività o processi.
 
-\subsection{Simulazione parallela}
+\section{Simulazioni ad eventi discreti vs continue}
+Ogni modello di simulazione è la specifica di un sistema fisico (o una parte di esso) in termini di un insieme di stati ed eventi. 
+Effettuare una simulazione significa imitare l'occorrenza degli eventi che evolvono nel tempo e riconoscerne gli effetti, rappresentati come stati~\cite{PDES}. 
+Gli eventi futuri indotti dagli stati devono essere pianificati. Come è possibile notare in~\Cref{fig:Continuous-vs-Discrete}, in una simulazione continua i cambiamenti di stato avvengono continuamente nel tempo, mentre in una simulazione discreta il verificarsi di un evento è istantaneo e limitato a un punto selezionato nel tempo. 
+Il concetto di tempo continuo modella il tempo come un continuum di punti temporali successivi. Questo implica che i dati forniti per un certo arco di tempo sono specificati come una funzione continua nel tempo. In genere si assume che questa funzione sia anche differenziabile, in modo che i cambiamenti della variabile di stato nel tempo possano essere modellate come la derivata prima della variabile stessa. Gli intervalli di tempo non svolgono un ruolo specifico come principio organizzativo. Naturalmente si può considerare qualsiasi intervallo di tempo, ma non intervalli di tempo predefiniti di lunghezza finita che strutturano l'intero modello~\cite{Ossimitz2008TheBO}. 
+\begin{figure}
+    \centering
+    \includegraphics[width=.8\linewidth]{figures/discrete-event-simulation/Discrete-vs-Continuous-Simulation.png}
+    \caption{Cambiamento di stato nel tempo in simulazioni continue vs simulazioni ad eventi discreti~\cite{Helal2008AHS}.}
+    \label{fig:Continuous-vs-Discrete}
+\end{figure}
+
+Ad esempio, il livello dell'acqua in un serbatoio (la quale è una variabile di stato) può cambiare in modo continuo (ovvero con incrementi e decrementi infinitamente piccoli) e in qualsiasi punto del tempo continuo. Spesso questi modelli sono descritti da equazioni differenziali che specificano i tassi di variazione degli stati nel tempo.
+Le simulazioni a tempo continuo non sono veramente continue nel senso matematico del termine, poiché per ragioni computazionali è impossibile rappresentare il tempo in modo continuo su un computer.
+Ci sono diverse ragioni per cui le simulazioni a tempo continuo non possono essere veramente continue:
+\begin{itemize}
+    \item limitazioni computazionali: i computer hanno una quantità finita di memoria e risorse di calcolo. Per simulare un processo continuo, il tempo deve essere discretizzato in intervalli finiti. Questo porta a una rappresentazione approssimata del tempo continuo, con una risoluzione determinata dalla precisione temporale della simulazione;
+    \item errori numerici: anche con un elevato numero di punti discreti nel tempo, l'approssimazione del tempo continuo introduce errori numerici. Questi errori possono accumularsi nel tempo e influenzare l'accuratezza complessiva della simulazione;
+    \item algoritmi di integrazione numerica: nelle simulazioni a tempo continuo, le equazioni differenziali che descrivono il sistema devono essere risolte numericamente utilizzando algoritmi di integrazione numerica, come ad esempio il metodo di Runge-Kutta. Questi algoritmi discretizzano implicitamente il tempo per calcolare l'evoluzione del sistema nel tempo.
+\end{itemize}
+
+In generale, poiché la simulazione in tempo continuo tiene traccia dello stato del sistema in modo continuo, è più granulare e in certe situazioni (soprattutto nelle scienze naturali) più accurata. D'altra parte, la simulazione in tempo continuo può richiedere più risorse computazionali, perché il tracciamento continuo degli stati del sistema può essere costoso.
+
+Un'altra differenza tra le simulazioni a tempo continuo e quelle ad eventi discreti è la loro adattabilità a problemi sia continui che discreti~\cite{zgn2009DiscreteVC}. Più precisamente:
+\begin{itemize}
+    \item la simulazione in tempo continuo può essere utilizzata per modellare processi continui e discreti. Sebbene i processi discreti non siano continui per natura, i modelli in tempo continuo possono modellarli con successo e generare risultati validi. Ad esempio, può succedere che fenomeni come il flusso del traffico di veicoli, siano approssimati da un modello a tempo continuo considerando il traffico come un fluido. Tuttavia, un modello in tempo continuo richiederebbe più tempo e calcoli per lo stesso problema discreto. Inoltre, per alcuni sistemi discreti, l'output di un modello di simulazione in tempo continuo potrebbe non avere senso;
+    \item i modelli discreti potrebbero, in teoria, essere applicati anche ai sistemi a tempo continuo. Tuttavia, un modello a eventi discreti ne fornirebbe una visione meno raffinata, a causa della sua natura.
+\end{itemize}
+
+In conclusione, è preferibile utilizzare un modello ad eventi discreti quando: 
+\begin{itemize}
+    \item il sistema da modellare è caratterizzato da eventi distinti che influenzano il comportamento complessivo, come code di attesa, processi di produzione e reti di computer.
+    \item il sistema mostra comportamenti che possono essere modellati efficacemente attraverso una serie di eventi distinti e continui; 
+    \item le risorse computazionali sono limitate o gli eventi significativi sono rari nel tempo.
+\end{itemize}
+Mentre è da preferire la simulazione continua quando: 
+\begin{itemize}
+    \item il sistema è meglio descritto da equazioni differenziali o processi che si evolvono in modo continuo nel tempo, come sistemi meccanici o processi chimici; 
+    \item è necessaria una rappresentazione accurata dei cambiamenti nel tempo, specialmente quando i dettagli più sottili del comportamento sono cruciali per l'analisi; 
+    \item si dispone di risorse computazionali sufficienti per gestire la complessità richiesta.
+\end{itemize}
+
+\section{Simulazioni Time-Driven vs Event-Driven}
+Esistono due tipi di simulazione discreta che possono essere distinti per quanto riguarda le politiche di avanzamento nel tempo all'interno della simulazione. In una simulazione discreta \textit{time-driven} il tempo simulato avanza in passaggi temporali (o \textit{ticks}) di dimensioni constanti $\Delta$, ovvero, l'osservazione del sistema dinamico simulato è discretizzata in intervalli di tempo unitari. La scelta di $\Delta$ determina la precisione della simulazione e il tempo di simulazione trascorso: i \textit{ticks} abbastanza brevi da garantire la precisione richiesta generalmente implicano un tempo di simulazione più lungo. Intuitivamente, per strutture event-driven irregolarmente distribuite nel tempo, l'approccio \textit{time-driven} genera algoritmi di simulazione inefficienti. 
+
+La simulazione discreta con approccio \textit{event-driven} discretizza l'osservazione del sistema simulato negli istanti in cui si verificano gli eventi. Una simulazione ad eventi discreti, quando eseguita sequenzialmente, elabora ripetutamente l'occorrenza degli eventi nel tempo simulato, mantenendo una lista di eventi ordinata per tempo che tiene traccia degli eventi temporizzati programmati per accadere in futuro, un orologio globale che indica il tempo corrente e la variabili di stato $S = (s_1, s_2, \dots, s_n)$, che definiscono lo stato attuale del sistema. Come già descritto nella \Cref{sec:panoramica-des}, un motore di simulazione guida la simulazione prendendo continuamente il primo evento dalla lista degli eventi futuri, simulando l'effetto dell'evento, cambiando le variabili di stato e eventualmente rimuovendo anche gli eventi obsoleti. Questo viene eseguito fino a quando viene raggiunto un tempo di fine predefinito, o non ci sono più eventi che devono verificarsi.
+
+L'approccio \textit{event-driven} si concentra sulla relazione causale tra gli eventi esterni e le azioni eseguite da un sistema, ovvero sul \textbf{perché} accade qualcosa, mentre il modello \textit{time-driven} si concentra sul tempismo delle azioni, ovvero sul \textbf{quando} accade qualcosa. Nel primo caso, le azioni vengono eseguite \textbf{il prima possibile} all'arrivo degli eventi, e il tempo può essere gestito mediante segnali temporali trattati come eventi esterni asincroni. Al contrario, nel secondo caso le azioni vengono eseguite \textbf{al momento giusto} secondo un programma, e gli eventi esterni possono essere gestiti mediante meccanismi di polling~\cite{TISATO199531}.
+La scelta tra i due modelli dipende dal dominio di applicazione. Nei sistemi complessi, i due modelli dovrebbero coesistere per soddisfare requisiti contrastanti. Di conseguenza, un linguaggio di programmazione dovrebbe consentire al progettista di scegliere e mescolare astrazioni per catturare nel modo più espressivo possibile i concetti chiave legati a un problema specifico o a un sotto-problema. 
+
+\section{Simulazione parallela}
 La \textbf{simulazione parallela a eventi discreti} (PDES) riguarda l'esecuzione di un singolo programma di simulazione a eventi discreti su un computer sfruttando il calcolo parallelo~\cite{DBLP:journals/cacm/Fujimoto90}. Distribuendo l'esecuzione di una simulazione su più processori, si cerca di ridurre notevolmente il tempo di esecuzione del modello, fino a un fattore pari al numero di processori. Questo concetto è valido in teoria, in realtà la \textbf{legge di Amdahl} stabilisce che il miglioramento della velocità di esecuzione di un programma parallelizzabile su un sistema multi-core è limitato dalla frazione sequenziale del programma~\cite{DBLP:conf/afips/Amdahl67}. In altra parole, anche se una parte del programma può essere eseguita in modo parallelo, ci sarà sempre una parte sequenziale che non può essere parallelizzata. La legge di Amdahl può essere espressa con la seguente formula: 
 $$
-Speedup_{max} = \frac{1}{(1-P)+\frac{P}{N}}
+S_{max} = \frac{1}{(1-P)+\frac{P}{N}}
 $$
 Dove: 
 \begin{itemize}
-    \item $Speedup_{max}$ è il miglioramento massimo della velocità di esecuzione ottenibile parallelizzando il programma. 
+    \item $S_{max}$ è il miglioramento massimo della velocità di esecuzione ottenibile parallelizzando il programma. 
     \item $P$ è la frazione di codice che può essere parallelizzata. 
     \item $N$ è il numero di core disponibili.
 \end{itemize}
@@ -198,12 +252,12 @@ Il meccanismo \textit{time-warp}~\cite{DBLP:journals/toplas/Jefferson85} è il p
 Parte del lavoro annullato potrebbe consistere nell'invio di messaggi ad altri LP. L'invio di questi messaggi viene anch'esso annullato grazie all'invio del corrispondente anti-messaggio. L'invio di anti-messaggi può generare a sua volta rollback secondari negli LP di destinazione.
 I meccanismi di sincronizzazione ottimistici possono sfruttare il parallelismo in modo migliore rispetto agli approcci conservativi, poiché non sono limitati dallo scenario peggiore. Tuttavia presentano comunque alcuni svantaggi: 
 \begin{itemize}
-    \item comportano costi computazionali maggiori legati all'esecuzione dei rollback; 
+    \item comportano costi computazionali maggiori legati all'esecuzione dei rollback \cite{Ziganurova2019SynchronizationAO}; 
     \item per poter effettuare i rollback lo stato di ogni LP deve essere salvato periodicamente, comportando un maggiore utilizzo di memoria.
 \end{itemize}
 
-\subsection{Cenni Storici}
-La storia delle simulazioni ad eventi discreti si estende per oltre mezzo secolo, risalendo ai primi anni dell'era informatica. La necessità di modellare e comprendere il comportamento dinamico dei sistemi complessi spinse i ricercatori a sviluppare metodologie e strumenti per simulare il funzionamento di tali sistemi.
+\section{Cenni Storici}
+La storia delle simulazioni ad eventi discreti si estende per oltre mezzo secolo, risalendo ai primi anni dell'era informatica. La necessità di modellare e comprendere il comportamento dinamico dei sistemi complessi spinse i ricercatori a sviluppare metodologie e strumenti per simularne il funzionamento.
 Le radici concettuali delle simulazioni ad eventi discreti possono essere rintracciate nella teoria dei processi stocastici, che ha trovato applicazioni pratiche nell'ambito dell'ingegneria, della gestione delle operazioni aziendali e della logistica. 
 
 Nel corso degli anni '50 e '60, con l'avvento dei primi computer e l'espansione dei linguaggi di programmazione, emersero i primi tentativi di simulare sistemi complessi utilizzando modelli basati su eventi discreti. Questi primi sforzi furono spesso limitati dalle risorse computazionali disponibili e dalle limitazioni dei linguaggi di programmazione dell'epoca.
@@ -211,85 +265,46 @@ Nel corso degli anni '50 e '60, con l'avvento dei primi computer e l'espansione 
 Negli anni '60 e '70, con l'avanzamento della tecnologia informatica e l'introduzione di linguaggi di programmazione più potenti, come FORTRAN e ALGOL, la simulazione ad eventi discreti divenne sempre più praticabile e diffusa. Durante questo periodo furono sviluppati i primi linguaggi di programmazione specificamente progettati per la simulazione, come SIMSCRIPT~\cite{DBLP:journals/ibmsj/DimsdaleM64} e GPSS~\cite{DBLP:journals/tssc/HollandM68}, i quali permisero ai ricercatori di modellare e analizzare sistemi complessi in modo più efficace e efficiente.
 
 Negli anni successivi, con il continuo avanzamento della tecnologia informatica e l'introduzione di nuovi concetti e metodologie, le simulazioni ad eventi discreti continuarono ad evolversi e a trovare sempre più applicazioni in una vasta gamma di settori. 
-Molte aziende, in particolare nel settore manifatturiero, utilizzarono le simulazioni come strumento di supporto alle decisioni. 
+Molte aziende, in particolare nel settore manifatturiero, iniziarono ad utilizzare le simulazioni come strumento di supporto alle decisioni. 
 
-A livello informatico il nuovo millennio è stato caratterizzato dalla potenza sempre crescente dei personal computer, dalla diminuzione del prezzo di questi ultimi e dal World Wide Web~\cite{DBLP:journals/jors/Robinson05}. Le simulazioni hanno cominciato a integrare intelligenza artificiale e machine learning per migliorare la previsione e l'ottimizzazione dei sistemi. Inoltre, la crescente disponibilità di dati in tempo reale ha portato all'adozione di approcci di simulazione ibrida che combinano modelli ad eventi discreti con dati reali per migliorare la precisione delle previsioni e delle decisioni.
+A livello informatico il nuovo millennio è stato caratterizzato dalla potenza sempre crescente dei personal computer e dalla diminuzione del prezzo di questi ultimi. La disponibilità crescente di capacità di calcolo ha permesso di simulare scenari sempre più complessi. Le simulazioni hanno cominciato a integrare intelligenza artificiale e machine learning per migliorare la previsione e l'ottimizzazione dei sistemi. Inoltre, la crescente disponibilità di dati in tempo reale ha portato all'adozione di approcci di simulazione ibrida che combinano modelli ad eventi discreti con dati reali per migliorare la precisione delle previsioni e delle decisioni.
 
-\subsection{Aree di impiego}
+\section{Aree di impiego}
 L'adozione delle simulazioni ad eventi discreti riveste un ruolo cruciale in numerose aree di studio e applicazioni pratiche, offrendo un metodo efficace per esplorare e comprendere il comportamento dei sistemi complessi. Attraverso l'utilizzo di modelli matematici e algoritmi appropriati, le simulazioni ad eventi discreti consentono di esaminare scenari variabili, prendendo in considerazione la casualità e la complessità intrinseche dei processi reali.
 In vari ambiti l'adozione di simulazioni ad eventi discreti offre numerosi vantaggi. Queste simulazioni consentono di valutare strategie, ottimizzare processi, identificare aree di miglioramento e prevedere l'andamento futuro dei sistemi analizzati. Grazie alla possibilità di eseguire esperimenti virtuali ripetibili e controllati, le simulazioni ad eventi discreti permettono agli operatori e agli studiosi di testare diverse ipotesi e strategie senza dover intervenire direttamente sui sistemi reali, riducendo così i costi e i rischi associati all'implementazione di nuove soluzioni.
 
-\subsubsection{Sistemi di Produzione e Movimentazione dei Materiali}
+\subsection{Sistemi di Produzione e Movimentazione dei Materiali}
 I sistemi di produzione e movimentazione dei materiali rappresentano una delle applicazioni più importanti della simulazione. La simulazione è stata utilizzata con successo come supporto nella progettazione di nuove strutture produttive, magazzini e centri di distribuzione~\cite{KENDALL1998711}~\cite{Ingemansson2002ASO}.
 Le simulazioni ad eventi discreti sono utilizzate per condurre analisi sulla capacità di produzione degli impianti, considerando le specifiche delle risorse disponibili come macchinari, manodopera e materiali. Questo aiuta ad individuare sovraccarichi o sottoutilizzazioni delle risorse e a pianificare la capacità in modo efficiente~\cite{sunmanufacturing}. 
 Oltre alla produzione, viene impiegata anche per ottimizzare la logistica, comprese le operazioni di movimentazione dei materiali, lo stoccaggio, il prelievo, il trasporto e la distribuzione. Questo comprende l'analisi della disposizione degli impianti, dei percorsi di movimentazione e delle politiche di gestione degli inventari per massimare l'efficienza complessiva e ridurre i costi operativi. 
 I simulatori ad eventi discreti consentono di modellare anche i sistemi di trasporto e distribuzione dei materiali sia all'interno che all'esterno dell'impianto manifatturiero. Ciò include la pianificazione delle rotte di trasporto, l'ottimizzazione dei tempi di consegna e l'analisi dei flussi di traffico per garantire una distribuzione efficiente dei materiali.
 Infine, è possibile valutare le performance attuali del sistema di produzione e movimentazione dei materiali e testare strategie di miglioramento. Questo può includere l'implementazione di nuove tecnologie, l'ottimizzazione dei processi o la riduzione degli sprechi, contribuendo a migliorare complessivamente l'efficienza e la produttività del sistema.
+Un esempio di simulatore attualmente utilizzato per gli scopi appena descritti è \textbf{AnyLogic}~\footnote{\url{https://www.anylogic.com}}, il quale viene utilizzato~\cite{pr9081362} per modellare sistemi di produzione e logistica, comprese le catene di approvvigionamento, le reti di distribuzione e gli impianti di produzione.  
+Un altro simulatore presente sul mercato è \textbf{Witness}, il quale è stato utilizzato per l'ottimizzazione di processi di produzione~\cite{Chramcov}. 
 
-
-\subsubsection{Sistemi informatici}
+\subsection{Sistemi informatici}
 La simulazione dei sistemi informatici consente di modellare e analizzare il comportamento di reti di computer, server e sistemi distribuiti. 
 I simulatori possono essere utilizzati per valutare le prestazioni del sistema, analizzare il throughput e identificare eventuali bottleneck~\cite{LEROUDIER197950}. Inoltre, consentono di simulare il carico di lavoro sui sistemi, aiutando a ridimensionare correttamente l'infrastruttura e a pianificare l'allocazione di risorse. 
 È possibile simulare anche l'utilizzo di nuovi algoritmi o politiche di gestione delle risorse, come strategie di scheduling dei processi e politiche di gestione della memoria.
 Modellare scenari di fallimento e valutare l'impatto dei guasti, valutando l'impatto di questi ultimi sulle prestazioni del sistema e sulla disponibilità dei servizi, consente di valutare la tolleranza ai guasti di sistemi informatici complessi. 
 Anche la sicurezza del sistema può essere valutata, simulando scenari di minaccia e attacchi informatici, così da identificare eventuali vulnerabilità.
 
-\subsubsection{Reti Informatiche}
-La simulazione di reti informatiche consente di comprendere il comportamento dinamico delle reti e consente di valutare le prestazioni di quest'ultima, misurando parametri chiave come la \textit{latenza} e il \textit{throughput}. Questo permette di identificare e risolvere eventuali punti critici che potrebbero compromettere le prestazioni della rete. 
-Studiando il traffico di rete è possibile individuare possibili congestioni di rete e adottare strategie di routing per garantire una gestione efficiente delle risorse~\cite{Varga2003THEOD}. 
-Un altro aspetto importante è la possibilità di valutare la scalabilità della rete, ovvero la sua capacità di gestire un aumento del carico di lavoro o del numero di utenti. 
-Il testing di nuovi protocolli e tecnologie consente di valutare le prestazioni di nuove soluzioni prima della loro effettiva implementazione su larga scala. 
-Anche in questo caso, modellando scenari di attacco e valutando la robustezza delle contromisure di sicurezza adottate, è possibile analizzare la sicurezza della rete, proteggendola da minacce esterne e garantendo la sicurezza dei dati sensibili. 
+\subsection{Wireless Sensor Network}
+Le Wireless Sensor Network (WSN) sono sistemi distribuiti di sensori interconnessi tramite comunicazione wireless, utilizzati in una vasta gamma di settori, tra cui il monitoraggio ambientale, l'agricoltura di precisione, sanità e sorveglianza. 
+La simulazione ad eventi discreti è importante per la valutazione dei protocolli di comunicazione e di routing specifici per le WSN. I protocolli utilizzati devono gestire alcuni aspetti peculiari delle reti wireless, come la limitata capacità energetica dei nodi sensori e e le comunicazioni intermittenti a causa dell'ambiente circostante. 
+La simulazione in questo caso è utile anche per valutare la distribuzione dei nodi sensori nello spazio fisico e per analizzare la copertura della rete. Il simulatore \textbf{OMNeT++}~\cite{10.5555/1416222.1416290} è stato utilizzato per localizzare i sensori wireless all'interno della rete~\cite{1656681} e per stimare la corretta allocazione di sensori di qualità dell'acqua in aree rurali estese~\cite{9476333}. 
 
-\section{Simulazioni ad eventi discreti vs continue}
-Ogni modello di simulazione è la specifica di un sistema fisico (o una parte di esso) in termini di un insieme di stati ed eventi. 
-Effettuare una simulazione significa imitare l'occorrenza degli eventi che evolvono nel tempo e riconoscerne gli effetti, rappresentati come stati~\cite{PDES}. 
-Gli eventi futuri indotti dagli stati devono essere pianificati. Come è possibile notare in~\Cref{fig:Continuous-vs-Discrete}, in una simulazione continua i cambiamenti di stato avvengono continuamente nel tempo, mentre in una simulazione discreta il verificarsi di un evento è istantaneo e limitato a un punto selezionato nel tempo. 
-Il concetto di tempo continuo modella il tempo come un continuum di punti temporali successivi. Questo implica che i dati forniti per un certo arco di tempo sono specificati come una funzione continua nel tempo. In genere si assume che questa funzione sia anche differenziabile, in modo che i cambiamenti della variabile di stato nel tempo possano essere modellate come la derivata prima della variabile stessa. Gli intervalli di tempo non svolgono un ruolo specifico come principio organizzativo. Naturalmente si può considerare qualsiasi intervallo di tempo, ma non intervalli di tempo predefiniti di lunghezza finita che strutturano l'intero modello~\cite{Ossimitz2008TheBO}. 
-\begin{figure}
-    \centering
-    \includegraphics[width=.8\linewidth]{figures/discrete-event-simulation/Discrete-vs-Continuous-Simulation.png}
-    \caption{Cambiamento di stato nel tempo in simulazioni continue vs simulazioni ad eventi discreti~\cite{Helal2008AHS}.}
-    \label{fig:Continuous-vs-Discrete}
-\end{figure}
+\subsection{Traffico stradale}
+Le simulazioni sono ampiamente utilizzate nella simulazione di traffico stradale. Esse permettono di modellare il comportamento dei veicoli in una rete stradale. Ogni veicolo viene rappresentato come un'entità che si muove lungo la strada in base a regole specifiche di accelerazione, decelerazione, cambio di corsia e altre dinamiche di guida. È possibile modellare anche la rete stradale, includendo strade, incroci, semafori, segnaletica stradale e definirne la topologia e le relazioni di connessione tra le varie strade e incroci. 
+Una simulazione può essere utilizzata per simulare il flusso di traffico~\cite{537860}, tenendo conto di variabili come il volume di quest'ultimo, la velocità media e il comportamento degli automobilisti, e per simulare le performance di strade con incroci a più corsie e intersezioni multiple~\cite{6606228}. 
 
-Ad esempio, il livello dell'acqua in un serbatoio (la quale è una variabile di stato) può cambiare in modo continuo (ovvero con incrementi e decrementi infinitamente piccoli) e in qualsiasi punto del tempo continuo. Spesso questi modelli sono descritti da equazioni differenziali che specificano i tassi di variazione degli stati nel tempo.
-Le simulazioni a tempo continuo non sono veramente continue nel senso matematico del termine, poiché per ragioni computazionali è impossibile rappresentare il tempo in modo continuo su un computer. Anche se il concetto di tempo continuo è utilizzato nella modellazione e nella simulazione, il computer deve comunque discretizzare il tempo per eseguire le simulazioni in maniera efficiente e accurata.
-Ci sono diverse ragioni per cui le simulazioni a tempo continuo non possono essere veramente continue:
+\section{Simulatori presenti sul mercato}
+Di seguito verranno descritti brevemente alcuni tra i più famosi ed utilizzati simulatori ad eventi discreti presenti sul mercato: 
 \begin{itemize}
-    \item limitazioni computazionali: i computer hanno una quantità finita di memoria e risorse di calcolo. Per simulare un processo continuo, il tempo deve essere discretizzato in intervalli finiti. Questo porta a una rappresentazione approssimata del tempo continuo, con una risoluzione determinata dalla precisione temporale della simulazione;
-    \item errori numerici: anche con un elevato numero di punti discreti nel tempo, l'approssimazione del tempo continuo introduce errori numerici. Questi errori possono accumularsi nel tempo e influenzare l'accuratezza complessiva della simulazione;
-    \item algoritmi di integrazione numerica: nelle simulazioni a tempo continuo, le equazioni differenziali che descrivono il sistema devono essere risolte numericamente utilizzando algoritmi di integrazione numerica, come ad esempio il metodo di Runge-Kutta. Questi algoritmi discretizzano implicitamente il tempo per calcolare l'evoluzione del sistema nel tempo.
+    \item \textbf{Arena}: sviluppato da Rockwell Automation~\cite{1261426}, offre tre tipologie di simulatore: ``basic'', ``standard'' e ``professional''. L'edizione basic è utilizzata principalmente per modellare processi aziendali e sistemi che richiedono analisi di alto livello. Per modellare sistemi più complessi è necessaria l'edizione standard, la quale utilizza un approccio basato sugli oggetti per modellare la logiche di sistema e le componenti fisiche. La versione professional consente la creazione di oggetti di simulazione personalizzati, consentendo di riflettere fedelmente i componenti e i processi reali del sistema. Gli utilizzi più frequenti di questo simulatore sono la modellazione dei processi aziendali, l'analisi delle catene di approvvigionamento, l'ottimizzazione della produzione e l'analisi del traffico. 
+    \item \textbf{SIMUL8}: sviluppato da SIMUL8 Corporation~\footnote{url{https://www.simul8.com}}, consente la creazione di modelli attraverso interfaccia grafica. SIMUL8 mette a disposizione \textit{templates} e \textit{componenti}. I template si concentrano su particolari tipi di decisioni ricorrenti che possono essere rapidamente parametrizzate per adattarsi ad un problema specifico. I componenti invece sono icone definite dall'utente per essere riutilizzate e condivise tra simulazioni differenti. Viene utilizzato in diversi settori, tra cui il settore manifatturiero, sanitario e farmaceutico~\footnote{\url{https://www.simul8.com/applications}}. Il simulatore è disponibile in due versioni: ``standard'' e ``professional''. Entrambe mettono a disposizione le stesse features per la simulazione, ma la versione professional aggiunge la possibilità della visualizzazione 3D. 
+    \item \textbf{Witness}: sviluppato da Lanner Group\footnote{\url{https://www.lanner.com/en-gb/technology/witness-simulation-software.html}}, offre un interfaccia grafica per la creazione di modelli in modo intuitivo. Gli oggetti grafici rappresentano elementi del sistema come macchine, risorse, code e trasportatori, e possono essere collegati per modellare il flusso di lavoro. Witness fornisce diversi strumenti per elaborare i risultati mediante grafici e report dettagliati per valutare le prestazioni del sistema e identificare le aree di criticità. Witness è utilizzato in settori come l'aviazione, la difesa, la sanità, la logistica e il settore manifatturiero~\footnote{\url{https://www.lanner.com/en-gb/sectors/}}. 
 \end{itemize}
-
-In generale, poiché la simulazione in tempo continuo tiene traccia dello stato del sistema in modo continuo, è più granulare e in certe situazioni (soprattutto nelle scienze naturali) più accurata. D'altra parte, la simulazione in tempo continuo può richiedere più risorse computazionali, perché il tracciamento continuo degli stati del sistema può essere costoso.
-
-Un'altra differenza tra le simulazioni a tempo continuo e quelle ad eventi discreti è la loro adattabilità a problemi sia continui che discreti~\cite{zgn2009DiscreteVC}. Più precisamente:
-\begin{itemize}
-    \item la simulazione in tempo continuo può essere utilizzata per modellare processi continui e discreti. Sebbene i processi discreti non siano continui per natura, i modelli in tempo continuo possono modellarli con successo e generare risultati validi. Ad esempio, può succedere che fenomeni come il flusso del traffico di veicoli, siano approssimati da un modello a tempo continuo considerando il traffico come un fluido. Tuttavia, un modello in tempo continuo richiederebbe più tempo e calcoli per lo stesso problema discreto. Inoltre, per alcuni sistemi discreti, l'output di un modello di simulazione in tempo continuo potrebbe non avere senso;
-    \item i modelli discreti potrebbero, in teoria, essere applicati anche ai sistemi a tempo continuo. Tuttavia, un modello a eventi discreti ne fornirebbe una visione meno raffinata, a causa della sua natura.
-\end{itemize}
-
-In conclusione, è preferibile utilizzare un modello ad eventi discreti quando: 
-\begin{itemize}
-    \item il sistema da modellare è caratterizzato da eventi distinti che influenzano il comportamento complessivo, come code di attesa, processi di produzione, reti di computer etc\dots
-    \item il sistema mostra comportamenti che possono essere modellati efficacemente attraverso una serie di eventi distinti e continui; 
-    \item le risorse computazionali sono limitate o gli eventi significativi sono rari nel tempo.
-\end{itemize}
-Mentre è da preferire la simulazione continua quando: 
-\begin{itemize}
-    \item il sistema è meglio descritto da equazioni differenziali o processi che si evolvono in modo continuo nel tempo, come sistemi meccanici, flussi di traffico o processi chimici; 
-    \item è necessaria una rappresentazione accurata dei cambiamenti nel tempo, specialmente quando i dettagli più sottili del comportamento sono cruciali per l'analisi; 
-    \item si dispone di risorse computazionali sufficienti per gestire la complessità richiesta.
-\end{itemize}
-
-\section{Simulazioni Time-Driven vs Event-Driven}
-Esistono due tipi di simulazione discreta che possono essere distinti per quanto riguarda le politiche di avanzamento nel tempo all'interno della simulazione. In una simulazione discreta \textit{time-driven} il tempo simulato avanza in passaggi temporali (o \textit{ticks}) di dimensioni constanti $\Delta$, ovvero, l'osservazione del sistema dinamico simulato è discretizzata in intervalli di tempo unitari. La scelta di $\Delta$ determina la precisione della simulazione e il tempo di simulazione trascorso: i \textit{ticks} abbastanza brevi da garantire la precisione richiesta generalmente implicano un tempo di simulazione più lungo. Intuitivamente, per strutture event-driven irregolarmente distribuite nel tempo, l'approccio \textit{time-driven} genera algoritmi di simulazione inefficienti. 
-
-La simulazione discreta con approccio \textit{event-driven} discretizza l'osservazione del sistema simulato negli istanti in cui si verificano gli eventi. Una simulazione ad eventi discreti, quando eseguita sequenzialmente, elabora ripetutamente l'occorrenza degli eventi nel tempo simulato, mantenendo una lista di eventi ordinata per tempo che tiene traccia degli eventi temporizzati programmati per accadere in futuro, un orologio globale che indica il tempo corrente e la variabili di stato $S = (s_1, s_2, \dots, s_n)$, che definiscono lo stato attuale del sistema. Come già descritto nella \Cref{sec:panoramica-des}, un motore di simulazione guida la simulazione prendendo continuamente il primo evento dalla lista degli eventi futuri, simulando l'effetto dell'evento, cambiando le variabili di stato e eventualmente rimuovendo anche gli eventi obsoleti. Questo viene eseguito fino a quando viene raggiunto un tempo di fine predefinito, o non ci sono più eventi che devono verificarsi.
-
-L'approccio \textit{event-driven} si concentra sulla relazione causale tra gli eventi esterni e le azioni eseguite da un sistema, ovvero sul \textbf{perché} accade qualcosa, mentre il modello \textit{time-driven} si concentra sul tempismo delle azioni, ovvero sul \textbf{quando} accade qualcosa. Nel primo caso, le azioni vengono eseguite \textbf{il prima possibile} all'arrivo degli eventi, e il tempo può essere gestito mediante segnali temporali trattati come eventi esterni asincroni. Al contrario, nel secondo caso le azioni vengono eseguite \textbf{al momento giusto} secondo un programma, e gli eventi esterni possono essere gestiti mediante meccanismi di polling~\cite{TISATO199531}.
-La scelta tra i due modelli dipende dal dominio di applicazione. Nei sistemi complessi, i due modelli dovrebbero coesistere per soddisfare requisiti contrastanti. Di conseguenza, un linguaggio di programmazione dovrebbe consentire al progettista di scegliere e mescolare astrazioni per catturare nel modo più espressivo possibile i concetti chiave legati a un problema specifico o a un sotto-problema. 
 
 \section{Simulatore Alchemist}
 \label{sec:alchemist}
@@ -300,7 +315,7 @@ Alchemist si basa sull'algoritmo \textit{Next Reaction Method}~\cite{doi:10.1021
 \subsection{Modello del dominio}
 Il dominio di Alchemist, rappresentato in~\Cref{fig:alchemist-model}, è descritto dalle seguenti entità: 
 \begin{itemize}
-    \item \textbf{Molecola}: il nome dei data item. Se Alchemist fosse un linguaggio imperativo, una molecola potrebbe rappresentare il nome di una variabile. 
+    \item \textbf{Molecola}: se Alchemist fosse un linguaggio imperativo, una molecola potrebbe rappresentare il nome di una variabile. 
     \item \textbf{Concentrazione}: il valore associato a una particolare molecola. In un linguaggio imperativo la concentrazione sarebbe il valore associato alla variabile. 
     \item \textbf{Nodo}: un contenitore di molecole e reazioni, che vivono all'interno di un environment. 
     \item \textbf{Environment}: è l'astrazione di Alchemist per lo spazio. È un contenitore di nodi con le seguenti funzionalità: 
@@ -325,14 +340,14 @@ Il dominio di Alchemist, rappresentato in~\Cref{fig:alchemist-model}, è descrit
 
 \begin{figure}
     \centering
-    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-reaction.png}
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-reaction.pdf}
     \caption{Rappresentazione grafica del funzionamento di una reazione.}
     \label{fig:alchemist-reaction}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-model.png}
+    \includegraphics[width=.85\linewidth]{figures/discrete-event-simulation/alchemist-meta-model.pdf}
     \caption{Meta-modello alla base di Alchemist.}
     \label{fig:alchemist-model}
 \end{figure}
@@ -340,26 +355,24 @@ Il dominio di Alchemist, rappresentato in~\Cref{fig:alchemist-model}, è descrit
 Una delle caratteristiche principali del simulatore è la sua generalità. Essa viene raggiunta attraverso l'uso delle \textbf{incarnazioni}, ovvero le istanze concrete del meta-modello in cui ogni entità viene mappata ad un corrispettivo concetto dell'universo di interesse. 
 Un'incarnazione di Alchemist include una definizione del tipo di concentrazione ed eventualmente un insieme di condizioni specifiche, azioni e (raramente) ambienti e reazioni che operano su tali tipi. 
 Incarnazioni diverse possono modellare universi completamente diversi. Per esempio, come nel caso di \textbf{Biochemistry}, se la concentrazione viene definita come un numero intero positivo e vengono fornite azioni e condizioni adeguate, Alchemist diventa un simulatore stocastico di chimica con compartimenti interconnessi e mobili.
-\textbf{SAPERE} è l'incarnazione più vecchia. In questa incarnazione le concentrazioni sono un insieme di tuple Linda-Like. È stata utilizzata per simulare evacuazione di folle, l'adattamento anticipato e l'esplorazione di risorse.  
-Nel caso di \textbf{Protelis}, la concentrazione è definita come Java Object. In questa incarnazione i nodi eseguono specifiche scritte nel linguaggio Protelis~\cite{DBLP:conf/sac/PianiniVB15}. \textbf{Scafi} è dedicata alla programmazione aggregata ed è basata sul framework Scafi~\cite{DBLP:journals/softx/CasadeiVAP22}.
+Nell'incarnazione \textbf{SAPERE} le concentrazioni sono un insieme di tuple Linda-Like, ovvero sequenze ordinate di valori utilizzate dal linguaggio di programmazione Linda per la comunicazione asincrona tra processi o thread. È stata utilizzata per simulare evacuazione di folle, l'adattamento anticipato e l'esplorazione di risorse.  
+\textbf{Scafi} è dedicata alla programmazione aggregata ed è basata sul framework Scafi~\cite{DBLP:journals/softx/CasadeiVAP22}. Anche \textbf{Protelis} è utilizzata per la programmazione aggregata. La concentrazione è definita come Java Object. In questa incarnazione i nodi eseguono specifiche scritte nel linguaggio Protelis~\cite{DBLP:conf/sac/PianiniVB15}. 
 
 \subsection{Funzionalità e utilizzo del simulatore}
-Per configurare una simulazione in Alchemist, è necessario fornire un file in formato YAML\footnote{https://yaml.org/}. Nel file di configurazione occorre specificare quali classi e parametri utilizzare. Le entità vengono identificate tramite chiavi. Al livello zero è possibile trovare: 
+Per configurare una simulazione in Alchemist, è necessario fornire un file in formato YAML\footnote{\url{https://yaml.org/}}. Nel file di configurazione occorre specificare quali classi e parametri utilizzare. Le entità vengono identificate tramite chiavi. Al livello zero è possibile trovare: 
 \begin{itemize}
     \item \textbf{incarnation}: è l'unica chiave obbligatoria. Serve a specificare quale incarnazione si intende utilizzare; 
     \item \textbf{seed}: specifica il seme da utilizzare per la generazione di numeri casuali. Questo serve a garantire la riproducibilità degli esperimenti scientifici. È essenziale, a fini di debug, riuscire a garantire simulazioni sempre uguali partendo dalla stessa configurazione nel file YAML;
     \item \textbf{variables}: i valori che si intendono riutilizzare all'interno del file di configurazione;
-    \item \textbf{environment}: la tipologia di ambiente dentro al quale si intende eseguire la simulazione;
-    \item \textbf{network-model}: permette di decidere come devono essere collegati fra loro i nodi;
-    \item \textbf{export}: permette la configurazione e la scelta dei dati della simulazione che si intende esportare; 
-    \item \textbf{deployment}: permette di definire quali sono i nodi del sistema e dove si trovano. 
+    \item \textbf{environment}: la tipologia di ambiente dentro al quale si intende eseguire la simulazione. Specificando come tipo \texttt{ImageEnvironment}, è possibile specificare l'immagine da caricare. Il simulatore caricherà l'immagine convertendo i pixel di un colore selezionato in ostacoli fisici.  
+    \item \textbf{network-model}: permette di decidere come devono essere collegati fra loro i nodi. È possibile ad esempio utilizzare \texttt{connectWithinDistance} per creare i vicinati in base alla posizione dei nodi nell'environment. 
+    \item \textbf{export}: permette la configurazione e la scelta dei dati della simulazione che si intende esportare. È possibile esportare i dati in un database \textbf{mongoDB} definendo \texttt{MongoDBExporter} come tipo. 
+    \item \textbf{deployment}: permette di definire quali sono i nodi del sistema e dove si trovano. Ad esempio è possibile scegliere di definire i nodi come \texttt{point} per poi definirne la posizione all'interno dell'environment.
 \end{itemize}
 Il simulatore può essere eseguito in due modalità: \textit{interattiva} o \textit{batch}. Nella prima viene eseguita una sola simulazione per volta mentre nella seconda vengono eseguite molteplici simulazioni che dipendono dai valori delle variabili impostati dall'utente. Impostando multipli valori per ciascuna variabile, il simulatore eseguirà una simulazione per ogni possibile combinazione di esse. 
 
 Alchemist supporta il caricamento delle planimetrie e delle mappe geografiche. Il caricamento di una planimetria avviene a partire da un'immagine, convertendo i pixel adiacenti del colore specificato in ostacoli. Il supporto agli standard GPX e GPS rende invece possibile il caricamento di mappe. 
 \subsection{Architettura}
-Il framework è stato progettato per essere modulare ed estendibile. L'engine può essere re-implementato senza toccare niente del modello e il modello può essere esteso senza necessità di modificare l'engine. 
-
 \subsubsection{Engine}
 Di seguito si intende descrivere brevemente il funzionamento dell'algoritmo \textit{Next Reaction Method}, utilizzato da Alchemist per selezionare il prossimo evento da eseguire e il \textit{Dynamic Dependency Graph}, utilizzato per gestire le dipendenze fra le reazioni presenti all'interno dei nodi. 
 \paragraph{Next Reaction Method}
@@ -396,7 +409,7 @@ L'uso del termine \textbf{programmazione reattiva} nella letteratura scientifica
 I programmi interattivi concretizzano l'idea di un modello di calcolo ``\textit{pull-based}'', in cui il programma - in questo caso il consumatore - ha il controllo sulla velocità con cui i dai vengono richiesti e gestiti. 
 Un esempio perfetto di programma interattivo è una struttura di flusso di controllo come un \textit{ciclo for} che itera su un insieme di dati: il programma ha il controllo della velocità con cui i dati vengono recuperati dalla collezione e richiederà l'elemento successivo solo aver terminato la gestione di quello attuale. 
 
-I programmi reattivi, al contrario, incarnano l'idea di un modello di calcolo ``\textit{push based}'', in cui la velocità con la quale il programma interagisce con l'ambiente è determinata dall'ambiente stesso piuttosto che dal programma. In altre parole, ora è il produttore dei dati a determinare la velocità con cui si verificheranno gli eventi, mentre il ruolo del programma si riduce a quello di un osservatore silenzioso che reagisce alla ricezione di essi. Esempi standard di tali sistemi sono le applicazioni con \textit{graphical user interface} (GUI) che si occupano di vari eventi originati dall'input dell'utente, come per esempio il click del mouse. Queste applicazioni sono difficili da programmare con i tradizionali approcci di programmazione sequenziale, perché è impossibile prevedere o controllare l'ordine di arrivo degli eventi esterni. Inoltre quando si verifica un cambiamento di stato in un calcolo o in un dato, il programmatore deve aggiornare tutti gli altri che dipendono da esso. Questa gestione manuale dei cambiamenti di stato e delle dipendenze dei dati è complessa e soggetta ad errori.
+I programmi reattivi, al contrario, incarnano l'idea di un modello di calcolo ``\textit{push-based}'', in cui la velocità con la quale il programma interagisce con l'ambiente è determinata dall'ambiente stesso piuttosto che dal programma. In altre parole, ora è il produttore dei dati a determinare la velocità con cui si verificheranno gli eventi, mentre il ruolo del programma si riduce a quello di un osservatore silenzioso che reagisce alla ricezione di essi. Esempi standard di tali sistemi sono le applicazioni con \textit{graphical user interface} (GUI) che si occupano di vari eventi originati dall'input dell'utente, come per esempio il click del mouse. Queste applicazioni sono difficili da programmare con i tradizionali approcci di programmazione sequenziale, perché è impossibile prevedere o controllare l'ordine di arrivo degli eventi esterni. Inoltre quando si verifica un cambiamento di stato in un calcolo o in un dato, il programmatore deve aggiornare tutti gli altri che dipendono da esso. Questa gestione manuale dei cambiamenti di stato e delle dipendenze dei dati è complessa e soggetta ad errori.
 
 Utilizzando soluzioni di programmazione tradizionali, le applicazioni interattive sono tipicamente costruite attorno alla nozione di \textit{callback} asincrone. 
 Coordinare le callback può essere un compito arduo, poiché numerosi frammenti di codice isolati possono manipolare gli stessi dati e il loro ordine di esecuzione non è prevedibile. Inoltre, le callback solitamente non hanno un valore di ritorno, quindi sono richiesti side-effect per modificare lo stato dell'applicazione~\cite{DBLP:phd/us/Cooper08}. 
@@ -483,14 +496,14 @@ Esistono diverse strategie per effettuare il lifting:
 
 \section{Entità osservabili e osservatrici}
 Nel contesto della programmazione reattiva, le fonti di dati o eventi che emettono informazioni vengono chiamate \textbf{entità osservabili}, mentre le \textbf{entità osservatrici} sono quelle che si collegano a queste fonti per monitorare e reagire ai dati o agli eventi emessi. In questa sezione vengono descritte le due entità, evidenziando le loro caratteristiche. 
-\subsection{Entità osservabile}
+\paragraph{Entità osservabile}
 Un'entità osservabile rappresenta un flusso continuo di dati o eventi che può essere emesso in modo regolare o completamente asincrono. Questo flusso può essere caratterizzato da una quantità variabile di elementi, incluso zero, uno o un numero infinito di essi. Questo concetto è fondamentale per gestire dati in tempo reale le interazioni utente in applicazioni moderne, consentendo una gestione dinamica dei flussi di informazioni.
 
 Tuttavia, l'entità osservabile va oltre la semplice emissione di dati o eventi. Essa può concludersi in due modi principali: notificando un completamento avvenuto o segnalando un errore anomalo durante la sua esecuzione. Il completamento avvenuto è tipicamente utilizzato quando il flusso di dati ha termini definiti e finiti, ad esempio dopo il completamento di una sequenza di operazioni. D'altra parte, l'errore può essere segnalato in caso di malfunzionamenti imprevisti, come errori di connessione di rete o eccezioni di programmazione.
 
 Se consideriamo un'entità osservabile con un flusso infinito di elementi, come ad esempio gli eventi di click dell'utente in un'applicazione Android, è importante notare che non sarà mai in grado di emettere un messaggio di completamento, questo perché il completamento è riservato solo al termine naturale del flusso di eventi disponibili, il quale, se infinito, non si verifica mai. Tuttavia, è possibile che l'entità osservabile termini in modo anomalo, segnalando un errore, nel caso si verifichino anomalie durante la sua esecuzione. In tal caso, l'entità osservabile con un flusso infinito terminerà anticipatamente e non emetterà ulteriori elementi.
 
-\subsection{Entità Osservatrice}
+\paragraph{Entità Osservatrice}
 Un'entità osservatrice può instaurare una connessione (sottoscrizione) con un'entità osservabile al fine di monitorare e gestire i dati o gli eventi trasmessi da quest'ultima secondo specifiche politiche reattive. 
 Gli elementi all'interno di un flusso sono emessi in modo sequenziale, uno dopo l'altro, e vengono elaborati dall'entità osservatrice in modo consecutivo. Questa caratteristica impedisce la comparsa di corse critiche, mantenendo l'ordine delle operazioni e garantendo una gestione reattiva dei dati.
 Nel caso in cui un grande numero di dati o eventi venga emesso rapidamente dall'entità osservabile e l'entità osservatrice non sia in grado di elaborarli con la stessa velocità, è possibile adottare strategie come l'utilizzo di una \textit{coda degli eventi} o il meccanismo di \textit{buffering} per gestire in modo efficiente il flusso di dati e prevenire perdite o sovraccarichi.
@@ -504,7 +517,7 @@ La progettazione di un linguaggio reattivo distribuito è di gran lunga più com
 Una soluzione che potrebbe essere adottata è utilizzare un approccio centralizzato, nel quale un'entità avente un orologio centrale è responsabile dell'ordinamento degli aggiornamenti nel grafo delle dipendenze. Questo approccio introduce un \textit{singolo punto di rottura} e un eccessivo numero di comunicazioni dovute al fatto che tutte le parti coinvolte devono comunicare con una singola entità ogni qualvolta ricevono e propagano dati, limitando in questo modo la scalabilità dell'architettura. 
 
 \section{Il Manifesto Reattivo}
-Il 16 settembre 2014 è stata rilasciata la seconda versione del \textit{Manifesto Reattivo}~\footnote{https://www.reactivemanifesto.org/}, un documento redatto da esperti del settore tra cui Jonas Bonér, Dave Farley, Roland Kuhn e Martin Thompson. Questo manifesto, piuttosto che essere un trattato sulla programmazione reattiva, si presenta come una guida pratica per la progettazione di sistemi reattivi, delineando le caratteristiche chiave che tali sistemi dovrebbero possedere.
+Il 16 settembre 2014 è stata rilasciata la seconda versione del \textit{Manifesto Reattivo}~\footnote{\url{https://www.reactivemanifesto.org/}}, un documento redatto da esperti del settore tra cui Jonas Bonér, Dave Farley, Roland Kuhn e Martin Thompson. Questo manifesto, piuttosto che essere un trattato sulla programmazione reattiva, si presenta come una guida pratica per la progettazione di sistemi reattivi, delineando le caratteristiche chiave che tali sistemi dovrebbero possedere.
 È importante comprendere che il manifesto non promuove un'unica metodologia o paradigma di programmazione reattiva, ma piuttosto si concentra su principi generali che possono essere applicati a una vasta gamma di architetture e tecnologie. L'obiettivo è garantire che i sistemi reattivi siano capaci di affrontare sfide come la scalabilità, la resilienza e la responsività, comuni nell'ambito delle applicazioni moderne.
 La necessità di redigere il manifesto è stata spinta dai rapidi cambiamenti nel panorama tecnologico. Mentre in passato le applicazioni erano caratterizzate da un'architettura monolitica, tempi di risposta relativamente lunghi e gestione di volumi limitati di dati, oggi vi è una realtà in cui le applicazioni devono essere distribuite su una vasta gamma di dispositivi, supportare grandi volumi di dati e fornire risposte quasi istantanee agli utenti.
 Gli autori del manifesto descrivono un sistema reattivo come \textbf{flessibile}, a \textbf{basso accoppiamento} e \textbf{scalabile}: questo lo rende più semplice da sviluppare e più malleabile nel tempo. Tali sistemi sono più \textbf{tolleranti ai guasti} e reagiscono ad essi in modo elegante e non brusco. Sono altamente \textbf{responsivi}, offrendo agli utenti un feedback concreto.
@@ -512,7 +525,7 @@ Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{
 \begin{itemize}
     \item \textbf{responsività}: il sistema, se è in generale possible dare una risposta ai client, la dà in maniera tempestiva. La responsività è la pietra miliare dell'usabilità e dell'utilità del sistema; essa presuppone che i problemi vengano identificati velocemente e gestiti in modo efficace. I sistemi responsivi sono focalizzati a minimizzare il tempo di risposta, individuando per esso un limite massimo prestabilito di modo da garantire una qualità del servizio consistente nel tempo. Il comportamento risultante è quindi predicibile, il che semplifica la gestione delle situazioni di errore, genera fiducia negli utenti finali e predispone ad ulteriori interazioni con il sistema;
     \item \textbf{relisienza}: il sistema resta responsivo anche in caso di guasti. Ciò riguarda non solo i sistemi ad alta disponibilità o mission-critical, infatti, accade che ogni sistema che non è resiliente si dimostrerà anche non responsivo in seguito ad un guasto. La resilienza si acquisisce tramite replica, contenimento, isolamento e delega. I guasti sono relegati all'interno di ogni componente, isolando così ogni componente dagli altri e quindi garantendo che il guasto delle singole porzioni del sistema non comprometta il sistema intero. Il recupero di ogni componente viene delegato ad un altro componente (esterno) e l'alta disponibilità viene assicurata tramite replica laddove necessario. I client di un componente vengono dunque alleviati dal compito di gestirne i guasti;
-    \item \textbf{elasticità}: il sistema rimane responsivo sotto carichi di lavoro variabili nel tempo. I sistemi reattivi possono adattarsi alle variazioni nella frequenza temporale degli input incrementando o decrementando le risorse allocate al processamento degli stessi. Questo porta ad architetture che non hanno né sezioni contese né colli di bottiglia, favorendo così la distribuibilità o la replica dei componenti e la ripartizione degli input su di essi. I sistemi reattivi permettono l'implementazione predittiva, oltre che reattiva, di algoritmi scalabili perché fondati sulla misurazione real-time della performance. Tali sistemi, raggiungono l'elasticità in maniera cost-effective su commodity hardware e piattaforme software a basso costo;
+    \item \textbf{elasticità}: il sistema rimane responsivo sotto carichi di lavoro variabili nel tempo. I sistemi reattivi possono adattarsi alle variazioni nella frequenza temporale degli input incrementando o decrementando le risorse allocate al processamento degli stessi. Questo porta ad architetture che non hanno né sezioni contese né colli di bottiglia, favorendo così la distribuzione o la replica dei componenti e la ripartizione degli input su di essi. I sistemi reattivi permettono l'implementazione predittiva, oltre che reattiva, di algoritmi scalabili perché fondati sulla misurazione real-time della performance. Tali sistemi, raggiungono l'elasticità in maniera cost-effective su commodity hardware e piattaforme software a basso costo;
     \item \textbf{orientato ai messaggi}: i sistemi reattivi si basano sullo scambio di messaggi asincrono per delineare per ogni componente il giusto confine che possa garantirne il basso accoppiamento con gli altri, l'isolamento e la trasparenza sul dislocamento e permetta di esprimere i guasti del componente sotto forma di messaggi al fine di delegarne la gestione. L'utilizzo di uno scambio esplicito di messaggi permette migliore gestibilità del carico di lavoro, elasticità e controllo dei flussi di messaggi mediante setup e monitoraggio di code di messaggi all'interno del sistema. Uno scambio di messaggi trasparente rispetto al dislocamento rende possibile, ai fini della gestione dei guasti, l'utilizzo degli stessi costrutti e semantiche sia su cluster che su singoli host. Uno stile di comunicazione non bloccante fa sì che l'entità ricevente possa solo consumare le risorse, il che porta ad un minor sovraccarico sul sistema.
 \end{itemize}
 
@@ -529,10 +542,10 @@ Il manifesto delinea quattro principali caratteristiche, rappresentate in~\Cref{
 %----------------------------------------------------------------------------------------
 \chapter{Programmazione reattiva in Kotlin}
 \section{Kotlin}
-\textbf{Kotlin}~\footnote{https://kotlinlang.org/} è un linguaggio di programmazione, sviluppato dall'azienda JetBrains~\footnote{https://www.jetbrains.com/} nel 2011, il quale si pone come alternativa a linguaggi come Java e Scala, che girano su \textit{Java Virtual Machine} (JVM). La crescita di Kotlin è stata piuttosto rapida, affermandosi come linguaggio di programmazione di riferimento per applicazioni Android. 
+\textbf{Kotlin}~\footnote{\url{https://kotlinlang.org/}} è un linguaggio di programmazione, sviluppato dall'azienda JetBrains~\footnote{\url{https://www.jetbrains.com/}} nel 2011, il quale si pone come alternativa a linguaggi come Java e Scala, che girano su \textit{Java Virtual Machine} (JVM). La crescita di Kotlin è stata piuttosto rapida, affermandosi come linguaggio di programmazione di riferimento per applicazioni Android. 
 È possibile configurare Kotlin per essere eseguito su JVM, ma può essere compilato anche in codice Javascript o direttamente in nativo tramite la struttura di compilazione LLVM~\cite{DBLP:conf/lcpc/LattnerA04} per essere eseguito su dispositivi Android. 
 Kotlin è un linguaggio a tipizzazione statica che unisce i costrutti tipici della programmazione ad oggetti con alcuni di quelli della programmazione funzionale. 
-Una delle caratteristiche principali di Kotlin è la sua \textbf{concisione} ed \textbf{espressività}: in media è necessario scrivere il 40\% di codice in meno rispetto alla controparte Java per raggiungere le stesse funzionalità. Questo è possibile poiché i pattern più comuni sono supportati di default a livello di linguaggio. 
+Una delle caratteristiche principali di Kotlin è la sua \textbf{concisione} ed \textbf{espressività}: in media è necessario scrivere il 40\% di codice in meno rispetto alla controparte Java~\footnote{\url{https://kotlinlang.org/docs/faq.html}} per raggiungere le stesse funzionalità. Questo è possibile poiché i pattern più comuni sono supportati già a livello di linguaggio. 
 Un'altra caratteristica fondamentale è la \textbf{null-safety}. In Kotlin i tipi definiscono se un oggetto può essere nullo o meno. Inoltre Kotlin è tipizzato staticamente, ciò significa che tutti i tipi sono conoscibili a tempo di compilazione, siano essi dichiarati esplicitamente o inferiti dal compilatore stesso. Gli eventuali errori vengono quindi intercettati prima dell'esecuzione del codice. 
 Il codice scritto in Kotlin è interoperabile con il codice scritto in linguaggio Java, è possibile quindi richiamare codice Kotlin da codice Java e viceversa.
 
@@ -566,7 +579,6 @@ Ana Lucia De Moura e Roberto Ierusalimschy~\cite{DBLP:journals/toplas/MouraI09} 
 \label{sec:async-limitation}
 La programmazione asincrona è soggetta agli stessi problemi della programmazione in generale; allo stesso tempo, presenta una serie di problemi unici, non rilevanti per il codice sincrono~\cite{DBLP:conf/oopsla/ElizarovBAU21}. In questa sezione verranno discussi brevemente due dei problemi che influenzano maggiormente lo spazio di progettazione per un linguaggio di programmazione con supporto alla programmazione asincrona: ``\textbf{colorazione delle funzioni}'' e \textbf{gestione degli errori}.
 
-\subsubsection{Colorazione delle funzioni}
 Una differenza importante tra diverse implementazioni di computazione asincrona riguarda la gestione della divisione tra codice asincrono e sincrono. Ci si riferisce a questo problema come ``\textit{colorazione delle funzioni}''.
 Questo è un concetto comune che assume diverse forme e formalizzazioni, ma in sostanza si riduce a un numero di regole semplici: 
 \begin{itemize}
@@ -583,8 +595,7 @@ Per risolvere questo problema si potrebbe pensare ad un linguaggio in cui tutto 
 \end{itemize}
 
 
-\subsubsection{Gestione degli errori}
-Un altro problema cruciale nella programmazione asincrona riguarda la gestione degli errori. Quando si hanno più esecuzioni asincrone in corso contemporaneamente e una di esse fallisce, il modo per recuperare e proseguire l'esecuzione non è così lineare come nel codice sincrono. Nel codice standard, esiste una chiara relazione tra chiamante e chiamato: gli errori nel chiamato si propagano verso l'alto al chiamante e vengono gestiti lì o continuano a propagarsi. Tuttavia, nel codice asincrono, questa relazione non è più presente e senza di essa non c'è un punto di responsabilità definito su chi debba gestire quali errori. È anche possibile che sia necessario propagare la gestione degli errori verso il basso, ad esempio per annullare calcoli non necessari.
+Un problema cruciale nella programmazione asincrona riguarda la gestione degli errori. Quando si hanno più esecuzioni asincrone in corso contemporaneamente e una di esse fallisce, il modo per recuperare e proseguire l'esecuzione non è così lineare come nel codice sincrono. Nel codice standard, esiste una chiara relazione tra chiamante e chiamato: gli errori nel chiamato si propagano verso l'alto al chiamante e vengono gestiti lì o continuano a propagarsi. Tuttavia, nel codice asincrono, questa relazione non è più presente e senza di essa non c'è un punto di responsabilità definito su chi debba gestire quali errori. È anche possibile che sia necessario propagare la gestione degli errori verso il basso, ad esempio per annullare calcoli non necessari.
 Per affrontare questo problema, si possono utilizzare le funzionalità offerte dal linguaggio di programmazione per creare un meccanismo di gestione degli errori sostitutivo, tuttavia, tutte queste soluzioni non sono ottimali per la gestione degli errori verso il basso.
 Un approccio più strutturato alla gestione degli errori asincroni incorporerebbe sia la gestione verso l'alto che quella verso il basso. 
 
@@ -594,7 +605,7 @@ Rispetto agli alberi di supervisione, la concorrenza strutturata è meno flessib
 \subsection{Goals}
 Kotlin è stato concepito come un linguaggio di programmazione pragmatico, pensato per essere utilizzato quotidianamente e per agevolare gli sviluppatori nel completare i loro compiti attraverso le sue funzionalità e strumenti. Questo stesso approccio viene applicato al suo supporto per la programmazione asincrona, con obiettivi principali ben definiti.
 
-Prima di tutto, Kotlin mira a garantire \textbf{l'indipendenza dalle specifiche implementazioni di basso livello} delle piattaforme. Poiché è progettato per essere un linguaggio multipiattaforma, costruire un supporto asincrono basato su altre implementazioni (come ad esempio i futures su JVM) potrebbe generare diversi problemi, soprattutto in termini di interoperabilità tra le diverse piattaforme.
+Prima di tutto, Kotlin mira a garantire \textbf{l'indipendenza dalle specifiche implementazioni di basso livello} delle piattaforme. Poiché è progettato per essere un linguaggio multipiattaforma, costruire un supporto asincrono basato su altre implementazioni (come ad esempio le futures su JVM) potrebbe generare diversi problemi, soprattutto in termini di interoperabilità tra le diverse piattaforme.
 
 Inoltre, Kotlin si impegna a essere altamente \textbf{adattabile alle implementazioni esistenti}. Essendo relativamente nuovo, il linguaggio presta particolare attenzione all'interoperabilità con il codice già esistente, con un'enfasi speciale sul lavoro con il codice Java sulla piattaforma JVM in modo trasparente. Considerando che esistono già approcci consolidati per la gestione del codice asincrono su piattaforme specifiche (come ad esempio le promise in JavaScript o le operazioni di input/output non bloccanti su JVM), Kotlin mira a integrare senza soluzione di continuità tali API nel suo ecosistema.
 
@@ -647,7 +658,7 @@ Tutti i coroutine builder, come \texttt{launch} e \texttt{async}, accettano opzi
 Quando un coroutine builder è utilizzato senza parametri, eredita il contesto (e quindi il dispatcher) dal coroutine scope dal quale è stato eseguito. 
 
 \section{Kotlin Flow}
-Kotlin flow è una libreria che offre un'API reattiva per gestire i flussi di dati asincroni in applicazioni Kotlin. Basato sul modello della programmazione reattiva, Kotlin Flow permette agli sviluppatori di creare, trasformare e combinare flussi di eventi in modo dichiarativo e componibile.
+Kotlin Flow è una libreria che offre un'API reattiva per gestire i flussi di dati asincroni in applicazioni Kotlin. Basato sul modello della programmazione reattiva, Kotlin Flow permette agli sviluppatori di creare, trasformare e combinare flussi di eventi in modo dichiarativo e componibile.
 Android descrive un flow come un tipo in grado di emettere valori in sequenza, a differenza delle suspending function, le quale restituiscono un solo valore. È possibile per esempio utilizzare un flow per ricevere aggiornamenti in tempo reale da un database. Concettualmente un flow è un flusso di dati che può essere consumato in modo asincrono. 
 Un flow è molto simile ad un iteratore che produce una sequenza di valori, ma utilizza suspending function per produrre e consumare valori in modo asincrono. 
 Le entità coinvolte nei flow sono tre: 
@@ -675,7 +686,7 @@ Tutti i flow builder di tipo cold emettono tutti i valori ad ogni nuova sottoscr
 
 \begin{figure}
     \centering
-    \includegraphics[width=.80\linewidth]{figures/reactive-programming/flow-class-diagram.png}
+    \includegraphics[width=.80\linewidth]{figures/reactive-programming/flow-class-diagram.pdf}
     \caption{Diagramma delle classi dei Kotlin Flow.}
     \label{fig:rp-flow-class-diagram}
 \end{figure}
@@ -755,40 +766,76 @@ Gli operatori sono funzioni specializzate progettate per manipolare, trasformare
 % Progettazione e implementazione del prototipo
 %----------------------------------------------------------------------------------------
 \chapter{Progettazione e implementazione del prototipo}
-\section{Scelta delle tecnologie}
-Come linguaggio di programmazione per lo sviluppo del prototipo è stato scelto \textbf{Kotlin}. Le ragioni principali di questa decisione sono: 
-\begin{itemize}
-    \item \textbf{continuità con il codice preesistente}: il simulatore Alchemist, nel quale si intende integrare la soluzione, è stato inizialmente sviluppato utilizzando il linguaggio Java. Tuttavia, nel corso del tempo, lo sviluppo è stato portato avanti utilizzando Kotlin.  Questa transizione può essere stata motivata da diverse ragioni, tra cui la maggior espressività e la maggiore sicurezza del codice offerte da Kotlin rispetto a Java. Perciò, per mantenere la coerenza e la continuità con il codice già esistente, è logico che il prototipo venga sviluppato utilizzando Kotlin;
-    \item \textbf{vantaggi di Kotlin}: Kotlin è un linguaggio di programmazione moderno che offre numerosi vantaggi rispetto a Java. Tra questi vantaggi vi sono la concisione della sintassi, la null safety integrata, la gestione migliorata delle eccezioni e molte altre caratteristiche che consentono di scrivere codice più pulito, sicuro ed efficiente. Utilizzare Kotlin per lo sviluppo del prototipo permetterà quindi di beneficiare di queste caratteristiche, migliorando la produttività e la qualità del codice;
-    \item \textbf{interoperabilità con Java}: un altro punto importante da considerare è l'interoperabilità di Kotlin con Java. Essendo entrambi i linguaggi compatibili con la JVM, è possibile utilizzare liberamente librerie Java esistenti all'interno del codice Kotlin e viceversa. Questo significa che il prototipo sviluppato in Kotlin potrà facilmente integrarsi con il codice Java esistente nel simulatore Alchemist, sfruttando le funzionalità e le risorse già disponibili senza doverle riscrivere o adattare.
-\end{itemize}
+% \section{Scelta delle tecnologie}
+% Come linguaggio di programmazione per lo sviluppo del prototipo è stato scelto \textbf{Kotlin}. Le ragioni principali di questa decisione sono: 
+% \begin{itemize}
+%     \item \textbf{continuità con il codice preesistente}: il simulatore Alchemist, nel quale si intende integrare la soluzione, è stato inizialmente sviluppato utilizzando il linguaggio Java. Tuttavia, nel corso del tempo, lo sviluppo è stato portato avanti utilizzando Kotlin.  Questa transizione può essere stata motivata da diverse ragioni, tra cui la maggior espressività e la maggiore sicurezza del codice offerte da Kotlin rispetto a Java. Perciò, per mantenere la coerenza e la continuità con il codice già esistente, è logico che il prototipo venga sviluppato utilizzando Kotlin;
+%     \item \textbf{vantaggi di Kotlin}: Kotlin è un linguaggio di programmazione moderno che offre numerosi vantaggi rispetto a Java. Tra questi vantaggi vi sono la concisione della sintassi, la null safety integrata, la gestione migliorata delle eccezioni e molte altre caratteristiche che consentono di scrivere codice più pulito, sicuro ed efficiente. Utilizzare Kotlin per lo sviluppo del prototipo permetterà quindi di beneficiare di queste caratteristiche, migliorando la produttività e la qualità del codice;
+%     \item \textbf{interoperabilità con Java}: un altro punto importante da considerare è l'interoperabilità di Kotlin con Java. Essendo entrambi i linguaggi compatibili con la JVM, è possibile utilizzare liberamente librerie Java esistenti all'interno del codice Kotlin e viceversa. Questo significa che il prototipo sviluppato in Kotlin potrà facilmente integrarsi con il codice Java esistente nel simulatore Alchemist, sfruttando le funzionalità e le risorse già disponibili senza doverle riscrivere o adattare.
+% \end{itemize}
 
-Per quando riguarda la libreria reattiva, è stata scelta \textbf{Kotlin Flow} rispetto all'alternativa \textbf{RxKotlin}. Questa decisione è stata presa considerando diversi fattori e vantaggi: 
-\begin{itemize}
-    \item \textbf{integrazione nativa con Kotlin}: Kotlin Flow è parte integrante della libreria standard di Kotlin, mentre RxKotlin è una libreria esterna. Kotlin Flow si integra quindi più naturalmente con il codice Kotlin e sfrutta le caratteristiche specifiche del linguaggio in modo più efficace;
-    \item \textbf{supporto per la programmazione asincrona strutturata}: Kotlin Flow è progettato per supportare la programmazione asincrona strutturata, facilitando la gestione di flussi di dati reattivi in modo più chiaro e intuitivo;
-    \item \textbf{gestione delle risorse}: Kotlin Flow offre un meccanismo integrato per la gestione delle risorse, consentendo di gestire automaticamente la chiusura delle risorse quando non sono più necessarie;
-    \item \textbf{compatibilità con coroutine}: Kotlin Flow è completamente compatibile con le coroutines di Kotlin, consentendo di combinare facilmente flussi reattivi con il modello asincrono basato su coroutine. 
-\end{itemize}
+% Per quando riguarda la libreria reattiva, è stata scelta \textbf{Kotlin Flow} rispetto all'alternativa \textbf{RxKotlin}. Questa decisione è stata presa considerando diversi fattori e vantaggi: 
+% \begin{itemize}
+%     \item \textbf{integrazione nativa con Kotlin}: Kotlin Flow è parte integrante della libreria standard di Kotlin, mentre RxKotlin è una libreria esterna. Kotlin Flow si integra quindi più naturalmente con il codice Kotlin e sfrutta le caratteristiche specifiche del linguaggio in modo più efficace;
+%     \item \textbf{supporto per la programmazione asincrona strutturata}: Kotlin Flow è progettato per supportare la programmazione asincrona strutturata, facilitando la gestione di flussi di dati reattivi in modo più chiaro e intuitivo;
+%     \item \textbf{gestione delle risorse}: Kotlin Flow offre un meccanismo integrato per la gestione delle risorse, consentendo di gestire automaticamente la chiusura delle risorse quando non sono più necessarie;
+%     \item \textbf{compatibilità con coroutine}: Kotlin Flow è completamente compatibile con le coroutines di Kotlin, consentendo di combinare facilmente flussi reattivi con il modello asincrono basato su coroutine. 
+% \end{itemize}
+\section{Analisi}
+Trattandosi dello sviluppo di un prototipo, avente come fine ultimo quello dell'integrazione, è opportuno mantenere un modello del dominio che sia il più fedele possibile a quello del simulatore Alchemist. Tuttavia, occorre definire ulteriori vincoli affinché le tecniche di programmazione reattiva possa essere utilizzata adeguatamente. 
 
-\section{Progettazione}
-\label{sec:progettazione}
-Trattandosi dello sviluppo di un prototipo, avente come fine ultimo quello dell'integrazione nel simulatore Alchemist, è stato scelto di mantenere lo stesso modello del dominio, astraendo però dalla metafora chimica presente in Alchemist, descritta in~\Cref{sec:alchemist}. 
+La programmazione reattiva introduce aspetti asincroni non presenti attualmente in Alchemist. Uno degli aspetti fondamentali per una esecuzione corretta di una simulazione a step è la consistenza dello stato del sistema, uno step non può cominciare fintanto che l'ambiente allo step precedente non si trova in uno stato consistente. Questo serve a garantire che le decisioni prese in uno step siano influenzate dallo snapshot acquisito allo step precedente e non da una rappresentazione parziale di esso. 
+Occorre inoltre considerare il vincolo di causalità fra eventi: ad ogni step l'evento che viene eseguito deve essere quello con il tempo di occorrenza minore, garantendo così la corretta sequenza di esecuzione e la coerenza temporale della simulazione. 
+L'esecuzione di tutte le azioni di un evento devono avvenire in maniera sequenziale. Questo assicura che ciascuna azione possa prendere decisioni basandosi su uno stato consistente del sistema. La consistenza dell'ambiente all'inizio di ciascuno step assicura anche che tutte le condizioni che un evento necessità per essere eseguito possano essere prese basandosi su una rappresentazione fedele di esso
+In una simulazione ad eventi discreti un evento necessità di uno stato consistente dell'environment per aggiornare il proprio tempo. Solo quando l'ambiente è coerente, il tempo di accadimento di un evento può essere aggiornato in base alle regole definite nel modello di simulazione, assicurando che l'evoluzione di essa avvenga in modo corretto, riflettendo il comportamento del sistema che si intende simulare. 
+La simulazione, come in Alchemist, avanza per step discreti, in ognuno dei quali viene eseguito l'evento imminente e il tempo della simulazione avanza in relazione al tempo di accadimento dell'evento. 
+
+Come anticipato, si è deciso di rimanere fedeli al modello del dominio presente in Alchemist, astraendo però dalla metafora chimica descritta in~\Cref{sec:alchemist}. 
 A seguito di questa scelta, nel modello del dominio del prototipo non esiste il concetto di \textbf{reazione}, il quale viene sostituito con il concetto di \textbf{evento}. Non esiste nemmeno il concetto di \textbf{molecola}, il quale è sostituito da un generico \textbf{content}. Restano invariati invece gli altri concetti. 
 Come si può notare in figura, l'\textbf{environment} contiene al suo interno un insieme di \textbf{nodi} e tutti i \textbf{vicinati}, i quali vengono creati grazie ad una regola di collegamento (\textbf{linking rule}). L'environment è anche responsabile di mantenere la \textbf{posizione} di ciascun nodo, consentirne l'aggiunta, la rimozione e lo spostamento. 
 Ogni nodo ha al suo interno \textbf{eventi}, i quali possono verificarsi ad un determinato istante, e \textbf{content}, ovvero contenitori di valori. 
 Ogni evento a sua volta contiene \textbf{condizioni}, le quali devono essere soddisfatte per garantire l'esecuzione dell'evento stesso, e le \textbf{azioni} che verranno eseguite a seguito della sua esecuzione.
 Ogni evento ha anche un \textbf{tempo putativo}, ovvero il tempo al quale è schedulata la sua prossima occorrenza.
-È possibile osservare il modello appena descritto in~\Cref{fig:design-class-diagram}.
+È possibile osservare il modello appena descritto in~\Cref{fig:analysis-class-diagram}.
+
+È prevista anche la presenza di un \textbf{engine}, ovvero il motore della simulazione, responsabile di far partire la simulazione e farla avanzare, e di uno \textbf{scheduler}, responsabile di mantenere una lista degli eventi futuri, ordinati per tempo di accadimento. 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/design/class-diagram.png}
-    \caption{Design del modello del dominio.}
+    \includegraphics[width=\linewidth]{figures/analysis/domain-model.pdf}
+    \caption{Modello del dominio modellato attraverso il diagramma delle classi di analisi.}
+    \label{fig:analysis-class-diagram}
+\end{figure}
+
+
+\section{Progettazione}
+\label{sec:progettazione}
+In~\Cref{fig:design-class-diagram} è possibile notare il diagramma delle classi emerso in fase di progettazione. Come è possibile notare, l'environment consente di poter osservare i vicinati, i nodi, e le posizioni di essi. Anche i nodi consentono di osservare gli eventi e i contenuti al loro interno. Il singolo contenuto consente di osservare il proprio valore. Tutto all'interno dell'ambiente deve essere osservabile. Questo garantisce che la linking rule possa osservare elementi arbitrari all'interno dell'ambiente per formare i vicinati. 
+Ciascun evento emette un valore sul proprio flusso quando viene eseguito. Gli eventi dipendenti da esso, ricevendo notifica dell'esecuzione, possono aggiornare il proprio tempo di occorrenza. 
+Ulteriori considerazioni relative alla progettazione verranno discusse in questa sezione. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/design/design-class-diagram.pdf}
+    \caption{Diagramma delle classi del prototipo emerso in fase di progettazione.}
     \label{fig:design-class-diagram}
 \end{figure}
 
-È stata prevista anche la presenza di un \textbf{engine}, ovvero il motore della simulazione, responsabile di far partire la simulazione e farla avanzare, e di uno \textbf{scheduler}, responsabile di mantenere una lista degli eventi futuri, ordinati per tempo di accadimento. 
+\subsection{Engine e Scheduler}
+L'\textit{engine} è responsabile di far partire la simulazione e del suo avanzamento. In fase di inizializzazione deve aggiornare il tempo putativo degli eventi presenti nell'\textit{environment}, dopodiché li aggiunge allo \textit{scheduler}. 
+Una volta terminata la fase di inizializzazione fa partire l'effettiva simulazione, la quale termina nel caso in cui sia stato raggiunto il limite massimo di step eseguibili o non ci sia più nessun evento programmato per essere eseguito. 
+Ad ogni step della simulazione, l'\textit{engine}:
+\begin{enumerate}
+    \item preleva, se presente, il prossimo evento da eseguire dallo scheduler;
+    \item aggiorna il tempo della simulazione con il tempo dell'evento da eseguire;
+    \item controlla che le condizioni dell'evento da eseguire siano soddisfatte;
+    \item esegue effettivamente l'evento;
+    \item aggiorna il tempo putativo dell'evento appena eseguito;
+    \item comunica allo scheduler di ordinare la lista di eventi futuri, poiché i tempi putativi di alcuni eventi potrebbero essere cambiati. 
+\end{enumerate}
+Si noti che, a seguito della chiamata per eseguire l'evento, il controllo deve ritornare all'engine solo nel momento in cui tutte le azioni dell'evento sono state effettivamente eseguite, tutte le dipendenze fra eventi sono state aggiornate e gli eventi dipendenti da quello eseguito hanno aggiornato il proprio tempo putativo. 
+
+Lo scheduler deve mantenere una lista degli eventi futuri ordinati per tempo di accadimento. Oltre a ciò, deve fornire la possibilità di rimuovere eventi dalla propria lista e di aggiungerne di nuovi. 
 
 \subsection{Eliminazione grafo delle dipendenze}
 Come anticipato in sezione~\Cref{sec:alchemist}, Alchemist gestisce le dipendenze fra gli eventi utilizzando un grafo delle dipendenze, nel quale i nodi sono le reazioni (eventi) e gli archi connettono una reazione $r$ a tutti i nodi che dipendono da essa, ovvero quelli il cui tempo di attivazione deve essere aggiornato a seguito dell'esecuzione di $r$. 
@@ -804,32 +851,33 @@ Per far fronte alla complessità della creazione e dell'aggiornamento dei vicina
 In pratica, la linking rule monitora ciò di cui ha bisogno per la creazione dei vicinati e osserva l'insieme dei nodi presenti nell'environment in modo da rilevarne eventuali modifiche come l'aggiunta o la rimozione e aggiornare di conseguenza i vicinati dei nodi interessati. Potrebbe essere necessario osservare altri attributi dei nodi, come i valori contenuti al loro interno, per definire in modo più preciso i vicinati.
 Per esempio, se i vicinati vengono definiti in base alla loro posizione, occorre osservarne anche il cambiamento di posizione durante la simulazione.
 
-\section{Implementazione}
-Nel contesto di una simulazione è importante che gli osservatori ricevano tutti lo stesso stato al fine di garantire la coerenza dei risultati. Si è deciso quindi di utilizzare flow di tipo hot, descritti in~\Cref{sec:hot-flow}. 
-Come descritto precedentemente, i possibili hot flow utilizzabili nella libreria Kotlin Flow sono \textbf{MutableSharedFlow} e \textbf{MutableStateFlow}. Si è scelto di utilizzare i primi nel caso in cui il flusso dovesse rappresentare lo stato attuale di una determinata risorsa, mentre i secondi sono stati utilizzati nel caso in cui si volesse comunicare un determinato evento che è accaduto all'interno della simulazione. Le scelte in dettaglio verranno analizzate successivamente nel capitolo. 
-Il codice del simulatore è disponibile su Github~\footnote{https://github.com/giacomoaccursi/Reactive-DES}.
-
 \subsection{Criticità nell'uso degli Hot Flow in simulazioni a step}
+\label{sec:criticità-hot-flow}
 In una simulazione a step è essenziale garantire uno stato consistente prima di procedere allo step successivo al fine di garantire risultati accurati ed affidabili. 
 L'utilizzo degli hot flow, con la loro natura asincrona e non deterministica, rende difficile garantire questa consistenza dello stato, poiché non esiste un momento definito in cui tutti gli osservatori hanno elaborato i dati e lo stato è completamente aggiornato. 
 Come anticipato in~\Cref{sec:hot-flow}, la chiamata alla funzione \texttt{collect}, la quale controlla costantemente la presenza di nuovi elementi da consumare, non termina mai ed è quindi necessario eseguire ciascuna di esse in una coroutine dedicata. Questa coroutine, rimarrà attiva fino al termine della simulazione, o fino a quando l'osservatore necessiterà dei dati emessi su tale flusso. 
 Quando un nuovo elemento viene emesso su un flusso hot, non è possibile controllare con precisione quando tutti gli osservatori hanno finito di elaborare il nuovo elemento; il controllo ritorna al punto di emissione del flusso non appena tutti gli osservatori lo hanno ricevuto. Ci si potrebbe quindi trovare nella situazione in cui inizia un nuovo step senza che gli aggiornamenti degli eventi dipendenti o la creazione dei nuovi vicinati sia stata effettivamente terminata. 
 Ogni osservatore, oltretutto, può a sua volta reagire alla presenza di un elemento su un flusso, emettendo a sua volta elementi su un altro flusso, creando così un albero di chiamate asincrone che può diventare complesso da gestire e sincronizzare. 
 
-Nel contesto di questo prototipo, il termine dello step non è il solo punto in cui è necessaria consistenza nello stato del sistema. Come è stato descritto in~\Cref{sec:progettazione}, l'occorrenza di un evento scatena l'esecuzione di una o più azioni, le quali potrebbero necessitare dello stato attuale dell'ambiente per prendere decisioni su come modificarlo. 
+Nel contesto di questo prototipo, il termine dello step non è il solo punto in cui è necessaria consistenza nello stato del sistema. L'occorrenza di un evento scatena l'esecuzione di una o più azioni, le quali potrebbero necessitare dello stato attuale dell'ambiente per prendere decisioni su come modificarlo. 
 Un altro punto nel quale è necessaria consistenza è quando un evento intende notificare gli eventi da esso dipendenti della sua effettiva esecuzione. Qui la consistenza è necessaria poiché le azioni eseguite potrebbero aver modificato la topologia dei vicinati, portando quindi ad una variazione nella lista degli eventi dal quale ogni singolo evento dipende. 
 La garanzia che tutti gli eventi dipendenti abbiano aggiornato il proprio tempo putativo prima di proseguire con lo step successivo è fondamentale per garantire che la lista di eventi futuri sia ordinata nel modo corretto. Quando si gestisce una simulazione a step, è essenziale mantenere un controllo accurato del tempo e degli eventi che devono accadere in specifici momenti temporali. Se un evento dovesse aggiornare il suo tempo dopo la fine dello step in cui dovrebbe effettivamente farlo, potrebbe causare un problema di inconsistenza temporale nell'ambiente di simulazione.
 Si immagini di avere un evento programmato per accadere in un certo momento temporale all'interno di uno step. Dopo la fine di questo step, l'evento potrebbe aggiornare il suo tempo per essere pianificato per il prossimo step. Tuttavia, se questo aggiornamento non avviene correttamente, potrebbe verificarsi una situazione in cui, al successivo step, l'evento si ritrovi nella lista degli eventi futuri con un tempo minore rispetto al tempo corrente.
 
-\subsection{Soluzione al problema}
-Come spiegato precedentemente il problema principale risiede nel fatto che la libreria Kotlin Flow non mette a disposizione meccanismi per controllare l'avvenuto consumo di un elemento pubblicato sul flusso. Si è deciso quindi di implementare un meccanismo per risolvere questa necessità. 
+\section{Implementazione}
+Nel contesto di una simulazione è importante che gli osservatori ricevano tutti lo stesso stato al fine di garantire la coerenza dei risultati. Si è deciso quindi di utilizzare flow di tipo hot, descritti in~\Cref{sec:hot-flow}. 
+Come descritto precedentemente, i possibili hot flow utilizzabili nella libreria Kotlin Flow sono \textbf{MutableSharedFlow} e \textbf{MutableStateFlow}. Si è scelto di utilizzare i primi nel caso in cui il flusso dovesse rappresentare lo stato attuale di una determinata risorsa, mentre i secondi sono stati utilizzati nel caso in cui si volesse comunicare un determinato evento che è accaduto all'interno della simulazione. Le scelte in dettaglio verranno analizzate successivamente nel capitolo. 
+Il codice del simulatore è disponibile su Github~\footnote{\url{https://github.com/giacomoaccursi/Reactive-DES}}.
+
+\subsection{Soluzione al problema degli hot flow in simulazioni a step}
+Come spiegato in~\Cref{sec:criticità-hot-flow}, il problema principale risiede nel fatto che la libreria Kotlin Flow non mette a disposizione meccanismi per controllare l'avvenuto consumo di un elemento pubblicato sul flusso. Si è deciso quindi di implementare un meccanismo per risolvere questa necessità. 
 L'idea di base è fare in modo che a seguito di ogni emissione sul flusso, si attenda una notifica da parte degli osservatori dell'avvenuta consumazione dell'elemento. Così facendo, il controllo torna all'entità che ha emesso sul flusso solo quando tutti gli osservatori hanno effettivamente consumato l'elemento. Utilizzando questo approccio non occorre preoccuparsi di possibili alberi di chiamate asincrone, poiché, nel caso in cui un osservatore emettesse elementi a sua volta su un ulteriore flusso, anch'esso aspetterebbe le notifiche dai consumatori di tale flusso, e il controllo tornerebbe all'emettitore alla radice solo quando tutto l'albero è stato risolto con successo.
 Per fare ciò, si sono utilizzate due classi ad-hoc: \textit{AwaitableMutableStateFlow} e \textit{AwaitableMutableSharedFlow}, il cui codice è disponibile al Listato~\ref{lst:awaitable-mutable-flow}. Le suddette classi implementano rispettivamente le interfacce \textit{MutableStateFlow} e \textit{MutableSharedFlow}, delegando però l'effettiva implementazione a \textit{StateFlowImpl} e \textit{SharedFlowImpl}. Entrambe le classi implementate eseguono l'\textit{override} del metodo \texttt{emit}, aggiungendo la logica per attendere le notifica descritta sopra, e definiscono il metodo \texttt{notifyConsumed}, utilizzato dall'osservatore per comunicare l'effettivo consumo dell'elemento. La logica per attendere il consumo degli elementi emessi è incapsulata all'interno del flow stesso, l'attesa è perciò trasparente lato emettitore. È stata creata anche una classe \textit{AwaitableMutableFlow}, la quale è estesa da entrambe le classi implementate, per evitare ripetizione di codice. 
 In~\Cref{fig:extended-flow} è possibile notare come le classi implementate appena descritte si interfacciano con le classi definite nella libreria Kotlin Flow. 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/implementation/extended-flow.png}
+    \includegraphics[width=\linewidth]{figures/implementation/extended-flow.pdf}
     \caption{Diagramma delle classi dei Kotlin Flow estesa con le classi implementate ad-hoc.}
     \label{fig:extended-flow}
 \end{figure}
@@ -863,28 +911,15 @@ Al momento di ogni effettiva sottoscrizione viene decrementato il latch.
 Così facendo si ha la certezza che una volta terminata l'inizializzazione di un osservatore, questo sia effettivamente pronto per consumare gli elementi emessi sul flow. 
 
 \subsection{Engine e scheduler}
-L'\textit{engine}, come spiegato in~\Cref{sec:progettazione}, è responsabile di far partire la simulazione e del suo avanzamento. In fase di inizializzazione aggiorna il tempo putativo degli eventi presenti nell'environment, dopodiché li aggiunge allo scheduler. 
-Una volta terminata la fase di inizializzazione fa partire l'effettiva simulazione, la quale termina nel caso in cui sia stato raggiunto il limite massimo di step eseguibili o non ci sia più nessun evento programmato per essere eseguito. 
-Ad ogni step della simulazione, l'\textit{engine}:
-\begin{enumerate}
-    \item preleva, se presente, il prossimo evento da eseguire dallo scheduler;
-    \item aggiorna il tempo della simulazione con il tempo dell'evento da eseguire;
-    \item controlla che le condizioni dell'evento da eseguire siano soddisfatte;
-    \item esegue effettivamente l'evento;
-    \item aggiorna il tempo putativo dell'evento appena eseguito;
-    \item comunica allo scheduler di ordinare la lista di eventi futuri, poiché i tempi putativi di alcuni eventi potrebbero essere cambiati. 
-\end{enumerate}
-Si noti che, a seguito della chiamata per eseguire l'evento, il controllo ritorna all'engine solo nel momento in cui tutte le azioni dell'evento sono state effettivamente eseguite, tutte le dipendenze fra eventi sono state aggiornate e gli eventi dipendenti da quello eseguito hanno aggiornato il proprio tempo putativo. 
 Il codice utilizzato per al gestione del singolo step appena descritto è consultabile al Listato~\ref{lst:engine-step}. 
-In questa fase prototipale è stato scelto di implementare lo \textit{scheduler} di eventi attraverso una semplice lista. Se il prototipo dovesse poi essere integrato nel simulatore Alchemist, questa soluzione sarebbe limitante dal punto di vista delle performance, poiché ad ogni step, viene effettuato un ordinamento completo della lista di eventi, in tal caso si renderebbe necessario l'utilizzo di meccanismi più efficienti, come quello già presente in Alchemist, descritto in~\Cref{sec:next-reaction-method}.
+In questa fase prototipale è stato scelto di implementare lo \textit{scheduler} di eventi attraverso una semplice lista. Se il prototipo dovesse poi essere integrato nel simulatore Alchemist, questa soluzione sarebbe limitante dal punto di vista delle performance, poiché ad ogni step, viene effettuato un ordinamento completo della lista di eventi, in tal caso si renderebbe necessario l'utilizzo di meccanismi più efficienti, come quello già presente in Alchemist, descritto in~\Cref{sec:next-reaction-method}. 
 
 \lstinputlisting[float,language=Kotlin,caption = {Codice per l'esecuzione di un singolo step all'interno della simulazione.}, label={lst:engine-step}]{listings/implementation/engineStep.kt}
-
 
 \section{Considerazioni sui risultati raggiunti}
 Il prototipo sviluppato~\cite{https://doi.org/10.5281/zenodo.10718499} è stato concepito con l'intento di essere poi integrato all'interno del simulatore Alchemist. Prima di immergersi nella fase di sviluppo del codice per Alchemist, è stato ritenuto fondamentale dedicare del tempo alla valutazione preliminare della fattibilità di tale progetto. Questo approccio ha permesso di acquisire una comprensione approfondita dei requisiti tecnici, delle possibili criticità e delle opportunita associate all'integrazione. 
 Tuttavia, dato che si tratta di un prototipo, è importante sottolineare che esso astrae la complessità presente in Alchemist. Questo significa che al momento risultata difficile effettuare un confronto diretto fra la soluzione presentata e il simulatore. Eventuali valutazioni delle performance dovranno essere effettuate una volta completata l'integrazione. 
-L'implementazione della programmazione reattiva, caratterizzata da un flusso di lavoro asincrono, ha portato alla luce alcune criticità quando è stata combinata con la simulazione a step. In una simulazione a step, è fondamentale mantenere la consistenza dell'ambiente, specialmente prima di procedere allo step successivo. La natura asincrona della programmazione reattiva può causare situazioni in cui gli eventi vengono elaborati in tempi variabili, rendendo difficile garantire che lo stato dell'ambiente sia coerente e stabile. Si potrebbe definire l'approccio adottato per risolvere tale problema come un ``work around''. Questo perché la programmazione reattiva mira a gestire gli eventi in modo asincrono, senza dover attendere il completamento di un'operazione prima di procedere con altre attività. Aspettare che tutti gli osservatori consumino un elemento introduce una dipendenza sincrona che può rallentare l'esecuzione complessiva del programma.
+L'implementazione della programmazione reattiva, caratterizzata da un flusso di lavoro asincrono, ha portato alla luce alcune criticità quando è stata combinata con la simulazione a step. In una simulazione a step, è fondamentale mantenere la consistenza dell'ambiente, specialmente prima di procedere allo step successivo. La natura asincrona della programmazione reattiva può causare situazioni in cui gli eventi vengono elaborati in tempi variabili, rendendo difficile garantire che lo stato dell'ambiente sia coerente e stabile. Si potrebbe definire l'approccio adottato per risolvere tale problema come un ``workaround''. Questo perché la programmazione reattiva mira a gestire gli eventi in modo asincrono, senza dover attendere il completamento di un'operazione prima di procedere con altre attività. Aspettare che tutti gli osservatori consumino un elemento introduce una dipendenza sincrona che può rallentare l'esecuzione complessiva del programma.
 
 \subsection{Lavori futuri}
 Trattandosi di un prototipo, avente come obiettivo l'analisi della fattibilità della creazione di un simulatore ad eventi discreti le cui dipendenze e aggiornamento dell'environment avvenissero in maniera reattiva, alcuni aspetti legati soprattutto alle performance sono stati trascurati. Questi aspetti, in sede di integrazione con il simulatore Alchemist dovranno sicuramente essere presi in considerazione per la riuscita del progetto. 
