@@ -1,34 +1,32 @@
 private fun observeLocalEvents() {
     coroutineScope.launch {
         node.events.run {
-            this.onSubscription {
-                initLatch.countDown()
-            }.collect {
-                // vengono identificati gli eventi che non occorre più osservare.
+            this.onSubscription { initLatch.countDown() }.collect {
+                // Events that no longer belong to the neighborhood are identified.
                 val removed = observedLocalEvents.keys - it.toSet() - setOf(this@EventImpl)
-                // vengono identificati gli eventi che occorre iniziare ad osservare.
+                // Events that are now part of the neighborhood are identified.
                 val added = it.toSet() - setOf(this@EventImpl) - observedLocalEvents.keys
-                // le osservazioni degli eventi da cui non si dipende più vengono cancellate.
+                // Observations of events on which it no longer depends are deleted.
                 removed.forEach { event ->
                     observedLocalEvents[event]?.cancelAndJoin()
                     observedLocalEvents.remove(event)
                 }
-                // viene avviata una nuova osservazione per ciascun nuovo evento da cui si è dipendenti.
+                // A new observation is started for each new event on which it is dependent.
                 added.forEach { event ->
                     val job = launch {
                         val executionFlow = event.observeExecution()
                         executionFlow.run {
                             this.collect { event ->
-                                // a seguito dell'esecuzione di un evento da cui si è dipendenti occorre aggiornare il proprio tempo di esecuzione
+                                // Following the execution of an event on which it is dependent, the execution time must be updated.
                                 updateEvent(event.tau)
-                                // notifica al flow dell'effettivo consumo.
+                                // Notification to the flow of actual consumption.
                                 this.notifyConsumed()
                             }
                         }
                     }
                     observedLocalEvents[event] = job
                 }
-                // notifica al flow dell'effettivo consumo.
+                // Notification to the flow of actual consumption.
                 this.notifyConsumed()
             }
         }
