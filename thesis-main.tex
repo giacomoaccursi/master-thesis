@@ -948,6 +948,36 @@ In questa fase prototipale è stato scelto di implementare lo \textit{scheduler}
 
 \lstinputlisting[float,language=Kotlin,caption = {Codice per l'esecuzione di un singolo step all'interno della simulazione.}, label={lst:engine-step}]{listings/implementation/engineStep.kt}
 
+\section{Visualizzazione aggiornamento dipendenze fra eventi}
+Al fine di dimostrare l'effettivo funzionamento del prototipo sviluppato e mostrare che è possibile gestire le dipendenze fra eventi attraverso l'uso della programmazione reattiva, eliminando la necessità del grafo delle dipendenze, è stato creato un semplice esportatore che si occupa, ad ogni step, di collezionare lo snapshot dell'ambiente al tempo corrente. 
+Ogni snapshot contiene lo step e il tempo correnti, i nodi dell'environment e le loro relazioni in termini di vicinato, le dipendenze di ciascun evento e la lista di eventi futuri con relativo tempo di accadimento.
+Attraverso un piccolo programma scritto in codice Python, utilizzando le librerie \textit{Matplotlib} e \textit{NetworkX}, è stata creata una rappresentazione grafica di tutti gli snapshot esportati, consentendo di visualizzare le dipendenze in modo più intuitivo. 
+
+In~\Cref{fig:step-0-visualization} si può notare come lo snapshot allo step 0, ovvero il momento in cui i nodi e gli eventi sono stati aggiunti all'environment ma la simulazione non è ancora partita effettivamente. 
+In alto è visualizzato lo step corrente e il tempo di simulazione corrente.
+Il grafico di sinistra mostra i nodi, connessi con una linea continua con i nodi facenti parte il vicinato. In questo step tutti i nodi sono vicini fra loro, quindi tutti i nodi hanno una linea che li connette con tutti gli altri. Il fatto che tutti i nodi siano vicini è un caso particolare della simulazione in questione e non un vincolo. 
+Il grafico di destra mostra invece le dipendenze fra eventi. Ogni evento ha una freccia uscente verso gli eventi da cui dipende. Dato che nel prototipo sviluppato gli eventi sono dipendenti dagli eventi presenti nel proprio nodo e nei nodi vicini, è possibile notare come tutti gli eventi inizialmente siano dipendenti da tutti quelli presenti nell'environment. 
+Il colore di ciascun evento corrisponde al colore del nodo nel quale risiede. 
+In basso invece è visualizzata la lista degli eventi futuri, ordinata per tempo di accadimento. 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/visualization/step-0.pdf}
+    \caption{Rappresentazione grafica dello snapshot dell'ambiente allo step 0.}
+    \label{fig:step-0-visualization}
+\end{figure}
+
+In~\Cref{fig:step-1-visualization} è possibile visualizzare l'evoluzione del sistema allo step 1 a seguito dell'esecuzione dell'evento 5, ovvero l'evento con il tempo di accadimento più basso. 
+Il tempo viene fatto avanzare e corrisponde al tempo putativo dell'evento eseguito. 
+Come si può notare, il nodo 1 non è più vicino degli altri nodi, ragion per cui gli eventi presenti al suo interno non hanno più relazioni di dipendenza con gli eventi presenti negli altri nodi. 
+A seguito dell'esecuzione dell'evento, gli eventi dipendenti hanno aggiornato il proprio tempo di occorrenza e la lista è stata riordinata opportunamente. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/visualization/step-1.pdf}
+    \caption{Rappresentazione grafica dello snapshot dell'ambiente allo step 1.}
+    \label{fig:step-1-visualization}
+\end{figure}
+
 \section{Considerazioni sui risultati raggiunti}
 Il prototipo sviluppato~\cite{https://doi.org/10.5281/zenodo.10718499} è stato concepito con l'intento di essere poi integrato all'interno del simulatore Alchemist. Prima di immergersi nella fase di sviluppo del codice per Alchemist, è stato ritenuto fondamentale dedicare del tempo alla valutazione preliminare della fattibilità di tale progetto. Questo approccio ha permesso di acquisire una comprensione approfondita dei requisiti tecnici, delle possibili criticità e delle opportunita associate all'integrazione. 
 Tuttavia, dato che si tratta di un prototipo, è importante sottolineare che esso astrae la complessità presente in Alchemist. Questo significa che al momento risultata difficile effettuare un confronto diretto fra la soluzione presentata e il simulatore. Eventuali valutazioni delle performance dovranno essere effettuate una volta completata l'integrazione. 
